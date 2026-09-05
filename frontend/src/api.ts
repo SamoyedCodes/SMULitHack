@@ -4,6 +4,8 @@ import type { components } from '../../shared/api.generated'
 
 export type Health = components['schemas']['HealthResponse']
 export type Portfolio = components['schemas']['Portfolio']
+export type Finding = components['schemas']['Finding']
+export type Evidence = components['schemas']['Evidence']
 export type ApiDocument = components['schemas']['Document']
 
 // Use the exact backend schemas for runtime validation as well as generated types.
@@ -76,4 +78,14 @@ export async function fetchLatestBatch(): Promise<Batch | null> {
   const body = await apiRequest('/batches?limit=1')
   if (!Array.isArray(body) || body.some(item => !validateBatch(item))) throw new ApiError('validation', 'Invalid batch history response.')
   return (body[0] as Batch | undefined) ?? null
+}
+
+const validateSme = ajv.compile<components['schemas']['SmeSelection-Output']>({ $ref: 'aithena#/components/schemas/SmeSelection-Output' })
+export async function setSme(name: string | null): Promise<void> {
+  const body = await apiRequest('/settings/sme', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({name, mode:'live'}) })
+  if (!validateSme(body)) throw new ApiError('validation', 'The party selection response does not match this build.')
+}
+export async function extractDocument(id: string): Promise<void> {
+  const body = await apiRequest(`/extract?document_id=${encodeURIComponent(id)}`, { method: 'POST' })
+  if (!validateRetry(body)) throw new ApiError('validation', 'The extraction response does not match this build.')
 }

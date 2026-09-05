@@ -1,4 +1,4 @@
-"""Local ingestion API. Inference modules remain disconnected."""
+"""Local ingestion and explicitly queued, grounded extraction API."""
 import sqlite3
 import uuid
 from contextlib import asynccontextmanager
@@ -14,7 +14,7 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from .config import VERSION, Config, libreoffice_path, tesseract_path
 from .foundation import CAPABILITIES, DatabaseStatus, ErrorResponse, HealthResponse, WorkerStatus
-from .models import Document, Page, Portfolio, BatchResponse, Job, RetryResponse
+from .models import Document, Page, Portfolio, BatchResponse, Job, RetryResponse, SmeSelection
 from .store import Store
 
 
@@ -59,7 +59,7 @@ def create_app(config: Config | None = None, start_worker: bool = True):
         capability = None
         if request.method == "POST":
             capability = {"/api/batches": "ingestion", "/api/retry": "ingestion",
-                          "/api/settings/sme": "extraction", "/api/demo": "sample_workspace"}.get(path.rstrip("/"))
+                          "/api/extract": "extraction", "/api/settings/sme": "extraction", "/api/demo": "sample_workspace"}.get(path.rstrip("/"))
         if request.method == "GET":
             if re.fullmatch(r"/api/documents/[^/]+/(?:pages(?:/[^/]+/image)?|original)/?", path):
                 capability = "ingestion"
@@ -191,10 +191,33 @@ def create_app(config: Config | None = None, start_worker: bool = True):
         path = source_path(request.app.state.config, document_id, original.name)
         return FileResponse(path, filename=doc.filename, media_type='application/octet-stream', headers={'X-Content-Type-Options':'nosniff'})
 
-    def disabled():
-        raise HTTPException(501, "This feature is not implemented in Phase 2.")
+    @app.post("/api/extract", response_model=RetryResponse, status_code=202)
+    def extract(document_id: str, request: Request):
+        import hashlib
+        from .ingestion import source_path
+        doc = document(document_id, request)
+        source = source_path(request.app.state.config, doc.id, 'pages.json')
+        cfg = request.app.state.config
+        key = 'extract:' + hashlib.sha256((doc.id + doc.sha256 + cfg.model + VERSION).encode() + source.read_bytes()).hexdigest()
+        try:
+            count = request.app.state.store.queue_extraction(doc.id, key)
+        except ValueError as exc:
+            raise HTTPException(409, str(exc)) from None
+        return RetryResponse(resumed_jobs=count)
 
-    for path in ("/api/settings/sme", "/api/demo"):
+    @app.post("/api/settings/sme", response_model=SmeSelection)
+    def set_sme(selection: SmeSelection, request: Request):
+        store = request.app.state.store
+        parties = {p for doc in store.documents(selection.mode) for p in doc.parties}
+        if selection.name is not None and selection.name not in parties:
+            raise HTTPException(422, 'Choose a party established in this workspace.')
+        store.set_setting('sme:' + selection.mode, selection.name)
+        return selection
+
+    def disabled():
+        raise HTTPException(501, "This feature is not implemented in Phase 3.")
+
+    for path in ("/api/demo",):
         app.add_api_route(path, disabled, methods=["POST"], status_code=501)
     app.add_api_route("/api/review/{issue_id}/brief", disabled, methods=["GET"])
     return app

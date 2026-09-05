@@ -1,4 +1,5 @@
-"""One ingestion-only worker per data directory. Never imports Gemini or extraction."""
+"""One durable worker: local ingestion and explicitly requested extraction only."""
+import json
 import fcntl
 import logging
 import threading
@@ -14,8 +15,9 @@ class Interrupted(Exception):
 
 
 class Worker:
-    def __init__(self, config, store):
+    def __init__(self, config, store, llm=None):
         self.config, self.store = config, store
+        self.llm = llm  # Construct a provider only inside an extraction job.
         self.stop_event = threading.Event()
         self.thread = None
         self.lock = None
@@ -32,6 +34,9 @@ class Worker:
             self.lock.close()
             raise RuntimeError('Another ingestion worker is already using this data directory.') from None
         self.store.recover('ingestion')
+        from .foundation import CAPABILITIES
+        if CAPABILITIES.extraction:
+            self.store.recover('extract')
         self.thread = threading.Thread(target=self.run, name='aithena-ingestion', daemon=True)
         self.thread.start()
 
@@ -57,9 +62,14 @@ class Worker:
 
     def run_once(self):
         job = self.store.claim('ingestion')
+        from .foundation import CAPABILITIES
+        if not job and CAPABILITIES.extraction:
+            job = self.store.claim('extract')
         if not job:
             return False
         try:
+            if job['kind'] == 'extract':
+                return self.run_extraction_job(job)
             self.process_document(job['payload']['document_id'])
             self.store.job_state(job['id'], 'complete')
         except Interrupted:
@@ -75,7 +85,7 @@ class Worker:
     def mark_doc(self, job, state, message):
         doc = self.store.document(job['payload']['document_id'])
         if doc:
-            doc.status, doc.stage, doc.error = state, message, message if state == 'failed' else None
+            doc.status, doc.stage, doc.error = state, message, message if state in {'failed', 'awaiting_key', 'waiting'} else None
             self.store.put_document(doc)
 
     def process_document(self, document_id):
@@ -103,7 +113,7 @@ class Worker:
             save_pages(pages_path, pages)
             doc.page_count, doc.pages_read = total, sum(p.status == 'read' and bool(p.spans) for p in pages)
             doc.has_ocr = any(s.source == 'ocr' for p in pages for s in p.spans)
-            doc.stage = f'Reading page {len(pages)} of {total} locally; extraction is disabled'
+            doc.stage = f'Reading page {len(pages)} of {total} locally; obligations not yet analyzed'
             self.store.put_document(doc)
             if self.stop_event.is_set():
                 raise Interrupted()
@@ -121,6 +131,93 @@ class Worker:
             kind='source_reading', mode=doc.mode,
         ) for p in pages if p.warnings]
         doc.status = 'needs_source_review' if doc.warnings else 'text_ready'
-        doc.stage = 'Local reading finished with source issues; extraction is disabled' if doc.warnings else 'Text ready; obligations have not been extracted'
+        doc.stage = 'Local reading finished with source issues; review before extraction' if doc.warnings else 'Text ready; obligations have not been extracted'
+        doc.error = None
+        self.store.put_document(doc)
+
+    def run_extraction_job(self, job):
+        from .llm import ProviderUnavailable, ProviderFailure, QuotaWait
+        try:
+            self.extract_document(job['payload']['document_id'])
+            self.store.job_state(job['id'], 'complete')
+        except ProviderUnavailable as exc:
+            self.store.job_state(job['id'], 'blocked', str(exc))
+            self.mark_doc(job, 'awaiting_key', str(exc))
+        except QuotaWait as exc:
+            self.store.job_state(job['id'], 'waiting', str(exc), exc.delay)
+            self.mark_doc(job, 'waiting', 'Waiting for model availability or the configured request interval.')
+        except Interrupted:
+            self.store.job_state(job['id'], 'queued', 'Interrupted; extraction will resume using cached responses.')
+            self.mark_doc(job, 'extraction_queued', 'Interrupted; extraction will resume using cached responses.')
+        except Exception as exc:
+            logger.exception('Extraction job %s failed', job['id'])
+            message = str(exc) if isinstance(exc, (ValueError, ProviderFailure)) else 'Extraction failed; inspect the local service logs and retry.'
+            self.store.job_state(job['id'], 'failed', message)
+            self.mark_doc(job, 'failed', message)
+        return True
+
+    def extract_document(self, document_id):
+        """Phase 3 stage: grounded extraction and support review over already-read pages."""
+        from .config import VERSION
+        from .evidence import apply_extraction, stable_id
+        from .llm import Gemini, text_chunks, text_context
+        from .models import Extraction, SupportReview, Verdict
+        doc = self.store.document(document_id)
+        if not doc:
+            raise ValueError("Document no longer exists.")
+        pages_path = self.config.directory(doc.id, create=False) / "pages.json"
+        if pages_path.is_symlink() or not pages_path.exists():
+            raise ValueError("Document pages are not available; read the document before extraction.")
+        pages = load_pages(pages_path)
+        if not any(p.spans for p in pages):
+            raise ValueError("No legible text could be extracted. The document has not been analyzed.")
+        if self.llm is None:
+            self.llm = Gemini(self.config, self.store)
+        doc.model, doc.version = self.config.model, VERSION
+        doc.pages_analyzed = 0
+        doc.status, doc.error = "extracting", None
+        self.store.put_document(doc)
+        chunks = text_chunks(pages)
+        extraction = Extraction(title=doc.filename)
+        fingerprints = set()
+        for n, chunk in enumerate(chunks):
+            if self.stop_event.is_set():
+                raise Interrupted()
+            doc.stage = f"Extracting obligations · section {n+1} of {len(chunks)}"
+            self.store.put_document(doc)
+            part = self.llm.extract(doc.id, chunk)
+            extraction.parties.extend(part.parties)
+            extraction.missing_context.extend(part.missing_context)
+            for category in ("findings", "deadlines", "provisions"):
+                for item in getattr(part, category):
+                    fingerprint = stable_id(category, json.dumps(item.model_dump(exclude={"id"}), sort_keys=True))
+                    if fingerprint in fingerprints:
+                        continue
+                    fingerprints.add(fingerprint)
+                    item.id = stable_id(doc.id, category, fingerprint)
+                    getattr(extraction, category).append(item)
+        extraction.parties = sorted(set(extraction.parties))
+        extraction.missing_context = list(dict.fromkeys(extraction.missing_context))
+        doc.stage = "Checking source support and exceptions"
+        self.store.put_document(doc)
+        context = text_context(pages)
+        items = [*extraction.findings, *extraction.deadlines, *extraction.provisions]
+        verdicts = []
+        if len(context) > 240000:
+            # All extraction chunks were read, but full-context support cannot be claimed.
+            verdicts = [Verdict(item_id=item.id, status="uncertain",
+                                reason="Full-context support review exceeds the local request budget; specialist review is needed.")
+                        for item in items]
+            doc.warnings.append("Full-context support review could not be completed within the request budget.")
+        else:
+            for start in range(0, len(items), 20):
+                if self.stop_event.is_set():
+                    raise Interrupted()
+                review = self.llm.review(context, [{"item_id": x.id, "item": x.model_dump()} for x in items[start:start+20]])
+                verdicts.extend(review.verdicts)
+        doc = apply_extraction(doc, extraction, SupportReview(verdicts=verdicts), pages)
+        doc.pages_analyzed = doc.pages_read if len(context) <= 240000 else 0
+        doc.status = "needs_review" if doc.issues or doc.warnings else "complete"
+        doc.stage = "Analysis complete; review unresolved items" if doc.status == "needs_review" else "Analysis complete"
         doc.error = None
         self.store.put_document(doc)

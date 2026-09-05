@@ -81,8 +81,10 @@ def test_native_sources_coordinates_original_and_no_llm(client):
     assert image.status_code == 200 and image.headers['content-type'] == 'image/png'
     assert client.get(f'/api/documents/{id}/pages/2/image').status_code == 404
     assert client.get(f'/api/documents/{id}/original').content == original
-    assert 'backend.llm' not in sys.modules and 'google.genai' not in sys.modules
-    assert not any(client.get('/api/health').json()['capabilities'][k] for k in ['extraction','conflicts','deadlines','handoff','sample_workspace'])
+    # Phase 3 tests import Gemini during collection; isolate the ingestion-only import check.
+    import subprocess
+    subprocess.run([sys.executable, '-c', "from backend.worker import Worker; import sys; assert 'backend.llm' not in sys.modules and 'google.genai' not in sys.modules"], check=True)
+    assert not any(client.get('/api/health').json()['capabilities'][k] for k in ['conflicts','deadlines','handoff','sample_workspace'])
 
 
 def test_bad_pdf_and_page_limit_are_visible_failures(client):

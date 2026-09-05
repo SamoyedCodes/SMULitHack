@@ -45,6 +45,6 @@ describe('batch ingestion UI contract', () => {
   })
   it('does not equate text readiness with legal assessment', () => {
     const markup = renderToStaticMarkup(<DocumentLibrary documents={[]} enabled stale={false} onOpen={() => {}} onRefresh={() => {}} />)
-    expect(markup).toContain('All documents remain legally unassessed')
+    expect(markup).toContain('Text readiness is not obligation extraction')
   })
 })

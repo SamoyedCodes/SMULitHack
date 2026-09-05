@@ -119,6 +119,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/extract": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Extract */
+        post: operations["extract_api_extract_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/health": {
         parameters: {
             query?: never;
@@ -213,8 +230,8 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Disabled */
-        post: operations["disabled_api_settings_sme_post"];
+        /** Set Sme */
+        post: operations["set_sme_api_settings_sme_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -775,6 +792,28 @@ export interface components {
              * @default Review before relying on this provision.
              */
             urgency: string;
+        };
+        /** SmeSelection */
+        "SmeSelection-Input": {
+            /**
+             * Mode
+             * @default live
+             * @enum {string}
+             */
+            mode: "live" | "sample";
+            /** Name */
+            name: string | null;
+        };
+        /** SmeSelection */
+        "SmeSelection-Output": {
+            /**
+             * Mode
+             * @default live
+             * @enum {string}
+             */
+            mode: "live" | "sample";
+            /** Name */
+            name: string | null;
         };
         /** Span */
         Span: {
@@ -1509,6 +1548,91 @@ export interface operations {
             };
         };
     };
+    extract_api_extract_post: {
+        parameters: {
+            query: {
+                document_id: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RetryResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request Entity Too Large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Implemented */
+            501: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     health_api_health_get: {
         parameters: {
             query?: never;
@@ -1941,15 +2065,28 @@ export interface operations {
             };
         };
     };
-    disabled_api_settings_sme_post: {
+    set_sme_api_settings_sme_post: {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SmeSelection-Input"];
+            };
+        };
         responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SmeSelection-Output"];
+                };
+            };
             /** @description Forbidden */
             403: {
                 headers: {
@@ -2004,7 +2141,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description Successful Response */
+            /** @description Not Implemented */
             501: {
                 headers: {
                     [name: string]: unknown;

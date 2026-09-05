@@ -1,5 +1,8 @@
 # AITHENA — local contract workspace
 
+> Current checkpoint: Phases 1–3 are integrated. Uploads read locally; open a document and choose **Extract obligations** to queue Gemini extraction/support review. Missing key/quota failures remain visible. Only ingestion and extraction are enabled. See [Phase 3 integration](docs/PHASE_3_INTEGRATION.md) and [Builder 2 Phase 4 handoff](docs/PHASE_4_HANDOFF.md). Later Phase 1/2 verification records below are historical.
+
+
 Phase 2 adds batch ingestion and real source viewing to Builder 2's React interface and the local FastAPI/SQLite foundation. Upload PDFs, DOCX, PNGs or JPEGs (including scans), inspect every physical page, and select text blocks to highlight their source locations. No Gemini key is needed and no provider requests are made.
 
 The navy/blue dashboard styling and navigation are retained. The earlier synthetic dashboard is preserved in `frontend/src/PrototypeDashboard.tsx` for component reuse and fixture tests; it is not loaded by the application. Its legacy sample schema is **not** the backend integration contract. Live types are generated from Python into `shared/api.generated.ts`.

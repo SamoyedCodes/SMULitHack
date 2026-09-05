@@ -1,7 +1,7 @@
 {
   "api_version": "1",
   "status": "ready",
-  "version": "2026-09-05.2",
+  "version": "2026-09-05.3",
   "model": "gemini-3.8-flash",
   "key_configured": false,
   "model_status": "not_configured",
@@ -16,7 +16,7 @@
   },
   "capabilities": {
     "ingestion": true,
-    "extraction": false,
+    "extraction": true,
     "deadlines": false,
     "conflicts": false,
     "handoff": false,

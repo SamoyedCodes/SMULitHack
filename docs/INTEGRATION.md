@@ -20,7 +20,7 @@ The earlier `shared/types.ts`, `shared/sample-portfolio.json`, `frontend/src/dat
 
 When reusing the prototype's visual components, consume canonical records directly. Do not flatten away evidence, multiple findings, unknowns, parties, conditional dates, or the scope of a conflict assessment. The synthetic prototype is not a calibrated extraction evaluation or a lawyer handoff implementation.
 
-## Current Phase 2 endpoints
+## Ingestion endpoints retained from Phase 2
 
 All paths start with `/api`. The browser connects only to FastAPI via Vite's proxy. No provider credentials or direct Gemini calls belong in the browser.
 
@@ -47,13 +47,13 @@ Disabled routes are gated before multipart/body parsing. Error shape:
 
 Other codes: `not_found`, `validation_error`, `forbidden`, `internal_error`. Validation errors omit submitted inputs. Internal errors do not return stack traces or filesystem paths. A degraded health response retains the health schema, not the error envelope.
 
-Health has separate local service/database, model configuration, executable detection, worker, capability and limit fields. The frontend must require a current successful connection and the relevant capability before offering an action. A key or installed executable alone never enables a feature. The Phase 2 UI offers ingestion only with current health and the ingestion capability. It polls every three seconds and keeps all inference features disabled.
+Health has separate local service/database, model configuration, executable detection, worker, capability and limit fields. The frontend must require a current successful connection and the relevant capability before offering an action. A key or installed executable alone never enables a feature. The UI offers ingestion/extraction only with current health and the matching capability. It polls every three seconds. Extraction is a separate explicit request; deadline/conflict/brief features remain disabled.
 
 `mode=sample` reads are separate from `mode=live`; loading samples remains disabled. Events are not recomputed during Phase 1; an empty event list cannot establish an absence of deadlines in stored documents.
 
 ## Storage and lifecycle
 
-SQLite retains tables `documents`, `jobs`, `settings`, `llm_cache`, `comparisons`, `batches`. Initialization is in FastAPI lifespan only. Schema export and module import have no storage/model side effects. In Phase 2 the ingestion worker is constructed and started in lifespan by default. `start_worker=False` is reserved for isolated tests. It imports no inference modules, recovers/claims only ingestion jobs and holds an exclusive process lock. The original coupled worker is retained as an inactive draft in `analysis_worker.py`.
+SQLite retains tables `documents`, `jobs`, `settings`, `llm_cache`, `comparisons`, `batches`. Initialization is in FastAPI lifespan only. Schema export and module import have no storage/model side effects. The single worker is constructed and started in lifespan by default. `start_worker=False` is reserved for isolated tests. It lazily imports the provider only for explicit extraction, recovers/claims ingestion and extraction jobs, and holds an exclusive process lock. Old document/conflict jobs remain idle. The original coupled worker is retained as an inactive draft in `analysis_worker.py`.
 
 Domain values and serialized field names are preserved. The additive Pydantic schema setting `json_schema_serialization_defaults_required` makes generated *response* types accurately require default values that Python serializes; it does not change input validation or stored values.
 
@@ -68,3 +68,13 @@ Uploads are copied in bounded chunks. Valid originals land before one SQLite tra
 Ingestion caches are keyed by bytes, normalized format, workspace and ingestion version. Changing Gemini settings does not invalidate local reading. The worker checkpoints pages via atomic JSON replacement, resumes completed reliable pages, and rereads uncertain/error pages on explicit retry. `pages_read` counts pages with readable spans and no page-level reading error; warnings may still lower text reliability. `pages_analyzed` is not incremented by ingestion.
 
 Statuses for new files: `queued` → `processing` → `text_ready` / `needs_source_review` / `failed`. Blank/error pages remain in the page list with warnings. A document over 200 pages is rejected in full. Source reads never create missing document directories, and resolved file paths are confined to their document directory.
+
+## Phase 3 integration additions
+
+- `POST /api/extract?document_id=...` returns HTTP 202 `RetryResponse {resumed_jobs}`. One means queued/retried; zero means active, quota-waiting or matching completed work. Key includes source checkpoint, document/hash, model and processing version. Waiting jobs retain their delay. Failed/blocked jobs can be explicitly retried. This endpoint is capability/origin guarded.
+- `POST /api/settings/sme` accepts `SmeSelection {name: string|null, mode: live|sample}` and returns the selection. Unknown or other-workspace names produce 422; null clears. OpenAPI distinguishes `SmeSelection-Input` and `SmeSelection-Output` because defaults are required in responses.
+- `ingestion` and `extraction` are true; all other capabilities remain false. Upload does not enqueue Gemini automatically. Extraction is available from document detail and works through the existing durable worker.
+- `Findings.tsx` retains every finding per category, renders unresolved placeholders, and links Evidence to SourceViewer's optional `evidence` prop. Multiple cited spans on the source page highlight. No clause number is invented when parsing did not find one.
+- Keep source-reading retry separate from extraction retry. Re-reading beneath a queued/saved extraction is currently disallowed; replace a damaged source with a new corrected upload. Earlier reading checkpoints and original-file hashes remain intact.
+- Incomplete page sets, source warnings or missing context prevent high-confidence complete analysis and supported machine rules. Missing support for machine rules/provisions creates review issues. OCR remains marked OCR even if numeric reading confidence is absent.
+- See `PHASE_3_INTEGRATION.md` for checks and `PHASE_4_HANDOFF.md` for parallel calendar/conflict contracts. No Phase 4/5 behavior is enabled by this merge.

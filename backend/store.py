@@ -158,6 +158,8 @@ class Store:
             if not row:
                 return 0
             doc = Document.model_validate_json(row['body'])
+            if db.execute("SELECT id FROM jobs WHERE kind='extract' AND json_extract(payload,'$.document_id')=? LIMIT 1", (document_id,)).fetchone():
+                return 0  # Never re-read beneath queued or saved extraction; use extraction retry.
             if doc.status not in {'failed', 'needs_source_review'}:
                 return 0
             count = db.execute("UPDATE jobs SET state='queued',next_run=0,error=NULL WHERE kind='ingestion' AND state IN ('failed','complete') AND json_extract(payload,'$.document_id')=? AND json_extract(payload,'$.mode')=?", (document_id, mode)).rowcount
@@ -165,3 +167,27 @@ class Store:
                 doc.status, doc.stage, doc.error = 'queued', 'Queued for local reading retry', None
                 db.execute("UPDATE documents SET body=? WHERE id=?", (doc.model_dump_json(), document_id))
             return count
+
+    def queue_extraction(self, document_id: str, key: str) -> int:
+        with self.connection() as db:
+            db.execute('BEGIN IMMEDIATE')
+            row = db.execute('SELECT body FROM documents WHERE id=?', (document_id,)).fetchone()
+            if not row:
+                raise ValueError('Document not found.')
+            doc = Document.model_validate_json(row['body'])
+            if doc.status in {'queued', 'processing'} or not doc.pages_read:
+                raise ValueError('Read the document locally before extracting obligations.')
+            pending = db.execute("SELECT id FROM jobs WHERE kind='extract' AND state IN ('queued','running','waiting') AND json_extract(payload,'$.document_id')=?", (document_id,)).fetchone()
+            if pending:
+                return 0
+            job = db.execute('SELECT id,state FROM jobs WHERE cache_key=?', (key,)).fetchone()
+            if job and job['state'] == 'complete':
+                return 0
+            if job:
+                db.execute("UPDATE jobs SET state='queued', next_run=0, error=NULL WHERE id=?", (job['id'],))
+            else:
+                db.execute('INSERT INTO jobs(id,cache_key,kind,payload,created_at) VALUES(?,?,?,?,?)',
+                           (str(uuid.uuid4()), key, 'extract', json.dumps({'document_id':doc.id, 'mode':doc.mode}), now()))
+            doc.status, doc.stage, doc.error = 'extraction_queued', 'Queued for Gemini extraction and support review', None
+            db.execute('UPDATE documents SET body=? WHERE id=?', (doc.model_dump_json(), doc.id))
+            return 1

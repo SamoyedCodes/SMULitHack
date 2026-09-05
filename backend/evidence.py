@@ -47,7 +47,7 @@ def resolve_citations(citations: list[Citation], pages: list[Page], allowed: set
         evidence.append(Evidence(
             document_id=citation.document_id, span_ids=[s.id for s in selected], quote=quote,
             page=selected[0].page, clause=next((s.clause for s in selected if s.clause), None),
-            boxes=[s.bbox for s in selected], source="ocr" if ocr else "native",
+            boxes=[s.bbox for s in selected], source="ocr" if any(s.source == "ocr" for s in selected) else "native",
             ocr_confidence=min(ocr) if ocr else None,
         ))
     unique = {stable_id(e.document_id, str(e.page), e.quote): e for e in evidence}
@@ -74,12 +74,15 @@ def unresolved_finding(field: FieldName, document_id: str, reason: str) -> Findi
 def apply_extraction(doc: Document, extraction: Extraction, review: SupportReview, pages: list[Page]) -> Document:
     verdicts = {v.item_id: v for v in review.verdicts}
     findings, issues = [], []
-    complete = bool(pages) and all(p.status == "read" for p in pages)
+    complete = (bool(pages) and len(pages) == doc.page_count
+                and {p.number for p in pages} == set(range(1, doc.page_count + 1))
+                and not extraction.missing_context
+                and all(p.status == "read" and p.spans and not p.warnings for p in pages))
     for draft in extraction.findings:
         evidence, errors = resolve_citations(draft.citations, pages, {doc.id})
         verdict = verdicts.get(draft.id)
         reason = "; ".join(errors) or (verdict.reason if verdict else "Support review did not assess this field.")
-        supported = draft.value is not None and bool(evidence) and not errors and verdict and verdict.status == "supported"
+        supported = draft.value is not None and bool(evidence) and not errors and verdict and verdict.status == "supported" and not verdict.missing_context
         if supported:
             confidence, confidence_reason = evidence_confidence(evidence, draft.inferred)
             if not complete:
@@ -124,19 +127,30 @@ def apply_extraction(doc: Document, extraction: Extraction, review: SupportRevie
     for item in [*extraction.deadlines, *extraction.provisions]:
         evidence, errors = resolve_citations(item.citations, pages, {doc.id})
         verdict = verdicts.get(item.id)
-        if errors or not evidence or not complete:
-            why = "; ".join(errors) or ("Some pages could not be read." if not complete else "No valid source evidence.")
+        if errors or not evidence or not complete or (verdict and verdict.missing_context):
+            why = "; ".join(errors) or ("Source coverage or required context is incomplete." if not complete else "; ".join(verdict.missing_context) if verdict and verdict.missing_context else "No valid source evidence.")
             checked_reviews = [v for v in checked_reviews if v.item_id != item.id]
             checked_reviews.append(Verdict(item_id=item.id, status="uncertain", reason=why))
         elif not verdict:
             checked_reviews.append(Verdict(item_id=item.id, status="uncertain", reason="Not assessed by the support-review pass."))
+    for item in [*extraction.deadlines, *extraction.provisions]:
+        verdict = next((v for v in checked_reviews if v.item_id == item.id), None)
+        if not verdict or verdict.status != 'supported' or verdict.missing_context:
+            evidence, _ = resolve_citations(item.citations, pages, {doc.id})
+            issues.append(ReviewIssue(
+                id=stable_id(doc.id, item.id, 'support'), document_ids=[doc.id],
+                title='Extracted rule or commercial scope needs review',
+                missing_facts=([verdict.reason, *verdict.missing_context] if verdict else ['Support review is missing.']),
+                lawyer_question='What does the complete source establish about this rule or commercial scope?',
+                evidence=evidence, mode=doc.mode,
+            ))
     doc.findings = findings
     doc.rules = extraction.deadlines
     doc.provisions = extraction.provisions
     doc.reviews = checked_reviews
-    doc.issues = [i for i in doc.issues if i.kind == "processing"] + issues
+    doc.issues = [i for i in doc.issues if i.kind in {"processing", "source_reading"}] + issues
     # Party picker entries must occur verbatim in accepted party findings' sources.
     party_sources = normalized(" ".join(e.quote for f in findings if f.field == "parties" and f.value for e in f.evidence))
-    doc.parties = [p for p in extraction.parties if normalized(p) in party_sources]
+    doc.parties = [p for p in extraction.parties if normalized(p) and normalized(p) in party_sources]
     # Model-generated titles are not used as an uncited summary.
     return doc

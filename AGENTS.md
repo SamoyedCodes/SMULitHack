@@ -2,12 +2,12 @@
 
 ## Read this first
 
-This is AITHENA, the SMU legal-tech hackathon contract-obligation project. Work in this repository, preserve Builder B's frontend, and implement the solution one phase at a time. Phase 1 foundation and Phase 2 local ingestion/source viewing are implemented; verification limits are recorded below. Finish the assigned checkpoint; begin Phase 3 only when the user advances the phase.
+This is AITHENA, the SMU legal-tech hackathon contract-obligation project. Work in this repository, preserve Builder B's frontend, and implement the solution one phase at a time. Phases 1–3 are integrated; verification limits are recorded in `docs/PHASE_3_INTEGRATION.md`. Builder 2 is assigned Phase 4 via `docs/PHASE_4_HANDOFF.md`; the user owns Phase 5 on a separate branch. Finish the assigned checkpoint only.
 
 This file records both the inspected implementation and the agreed destination. A planned feature, a sample screen, or a draft in another workspace is not a completed feature. Recheck the source and update this file when changes land. User instructions take precedence over this guidance.
 
 **Snapshot date:** 5 September 2026, Asia/Singapore.
-**Inspected baseline:** `1f352ea` plus the Phase 2 working-tree implementation. Existing `.env.example` deletion and unrelated `.claude/` work are preserved; no commit or push is implied.
+**Integrated baseline:** main combines Phase 2 checkpoint `f467ea8` and Phase 3 branch `460049c`, with integration fixes. Existing `.env.example` deletion and unrelated `.claude/` work are preserved. The user authorized this local merge; no push was requested.
 **Repository:** `SMULitHack` (the saved Codex project may be named “SMU Hack”). An older folder also named “SMU Hack” contains a separate scaffold and planning material; do not confuse it with this Git repository or overwrite this frontend with that scaffold.
 
 ## Product scope
@@ -31,13 +31,13 @@ General legal chat, Singapore-law retrieval, authentication, drive integrations,
 
 ## What is actually in this repository
 
-The repository now contains the **Phase 2 live ingestion and source viewer**, preserving Builder B's design, plus an isolated synthetic prototype and disabled draft processing modules. It is not yet a working contract-analysis system.
+The repository now contains the **Phase 3 ingestion, grounded extraction and source viewer**, preserving Builder B's design. Extraction is explicitly requested per document. Calendar, conflict and handoff modules remain disabled drafts. Live model accuracy is unverified.
 
 | Area | Current implementation | Important limit |
 | --- | --- | --- |
 | Frontend | React 19, TypeScript, Vite 6, Tailwind CSS 4, Lucide icons; Zod for prototype data and Ajv for live response validation | Preserve the existing stack and blue/ink visual design. This checkout is not the older Vinext/Sites scaffold. |
-| Live screens | Overview/readiness, Contracts, Calendar, Conflicts, Needs review | Add contracts uploads files/folders; Contracts shows reading progress, source pages and highlights. Inference screens remain disabled. No real SME is assumed. |
-| Backend | FastAPI/Pydantic, root configuration, SQLite persistence, typed health/errors, read-only saved metadata | One local ingestion worker runs. Only `ingestion` is enabled; no model requests occur. |
+| Live screens | Overview/readiness, Contracts, Calendar, Conflicts, Needs review | Add contracts uploads files/folders; Contracts shows reading progress, source pages and highlights. Extracted findings retain all obligations per field and link to source highlights. SME selection uses established parties; later views remain disabled. |
+| Backend | FastAPI/Pydantic, root configuration, SQLite persistence, typed health/errors, read-only saved metadata | One locked worker handles `ingestion` and explicit `extract` jobs. Both capabilities are enabled; other job types remain idle. |
 | API contract | Relative `/api`, Vite proxy, OpenAPI snapshot and generated TypeScript types | Legacy sample types are isolated and must not become the live contract. |
 | Samples | Four synthetic agreements; original dashboard retained in `PrototypeDashboard.tsx` | Not loaded by the live application. Fixed as-of date `2026-09-05`; sample confidence is illustrative, not calibrated. |
 | Evidence | Prototype text-page dialogs; canonical page/span and coordinate models in Python | Live source pages and coordinate highlights are implemented. New generated fixtures include actual scanned PDFs; prototype OCR remains illustrative. |
@@ -60,8 +60,10 @@ The repository now contains the **Phase 2 live ingestion and source viewer**, pr
 - `frontend/package.json`, `frontend/pnpm-lock.yaml`, `frontend/pnpm-workspace.yaml`: dependencies, scripts, pinned pnpm and build-script policy.
 - `backend/api.py`, `config.py`, `foundation.py`: application lifespan, configuration, health, capabilities and route guards.
 - `backend/models.py`, `store.py`: canonical Pydantic records and persistent SQLite layout.
-- `backend/ingestion.py`, `documents.py`, `worker.py`: active local upload/reading pipeline, with no inference imports.
-- `backend/analysis_worker.py`, `llm.py`, `evidence.py`, `deadlines.py`, `conflicts.py`: inactive drafts for later phases; do not start the old coupled worker.
+- `backend/ingestion.py`, `documents.py`, `worker.py`: active local upload/reading pipeline and explicitly queued extraction. Provider imports are lazy; local reading needs no key.
+- `backend/llm.py`, `evidence.py`: active extraction/support review and evidence checks; no live model accuracy claim.
+- `frontend/src/Findings.tsx`: extraction request, full findings/evidence and SME selector.
+- `backend/analysis_worker.py`, `deadlines.py`, `conflicts.py`: inactive drafts; never start the old coupled worker.
 - `shared/openapi.json`, `shared/api.generated.ts`: canonical API snapshot and generated types.
 - `shared/health.fixture.json`, `shared/portfolio.fixture.json`: backend-derived non-legal API fixtures.
 - `shared/types.ts`, `shared/sample-portfolio.json`: **legacy prototype v1.0**, not the live API payload.
@@ -85,13 +87,13 @@ The original dashboard's automatic sample selection, URL-based “Connected” b
 
 ## Phase status and checkpoints
 
-**Current phase: Phase 2 — ingestion and source viewing implemented.** Read `PHASE_2_COMPLETION.md` for verification and limits. Phases 3–7 are not complete. The sample dashboard previews later UI only. Do not import temporary work or overwrite another active builder's changes without checking the repository.
+**Current checkpoint: Phase 3 integrated with Phase 2.** Read `docs/PHASE_3_INTEGRATION.md` for verification and limits, and `docs/PHASE_4_HANDOFF.md` for Builder 2. Phases 4–7 are not complete. The sample dashboard previews later UI only. Do not import temporary work or overwrite another active builder's changes without checking the repository.
 
 | Phase | Scope and completion gate | Status at this snapshot |
 | --- | --- | --- |
 | 1 — Runnable foundation | Preserve the frontend shell; add FastAPI/SQLite, validated configuration, real health/capability reporting, stable generated interfaces, portable startup and smoke tests. Runs without a Gemini key. | Implemented; remaining checks listed below. |
 | 2 — Ingestion and pages | Up to 80 mixed-format files, originals/hashes, durable local queue, conversion/OCR, page coverage/errors, deduplication, restart recovery, source viewer. Local reading must work without a key. | Implemented and tested, including real OCR/DOCX and 80-file ingestion; no model calls. |
-| 3 — Grounded extraction | Gemini structured extraction and support review, Python citation checks, all required fields, explained provenance/confidence, completeness and SME selection. | Planned; sample fields and disabled drafts only. |
+| 3 — Grounded extraction | Gemini structured extraction and support review, Python citation checks, all required fields, explained provenance/confidence, completeness and SME selection. | Integrated and tested with fake-provider fixtures; live model access and extraction accuracy remain unverified. |
 | 4 — Deadlines | Tested Python rules, notice windows, ambiguity stops, adjustable as-of date, 90-day/overdue events with cited calculations. | Planned; sample date display and disabled drafts only. |
 | 5 — Conflicts | Conservative Python candidate selection, LLM comparison of both agreements, evidence validation, cached/pending assessments and uncertainty. | Planned; sample conflict display and disabled drafts only. |
 | 6 — Review and handoff | Dedicated review queue, missing facts, urgency, source excerpts and a specific lawyer question; printable/downloadable briefs. | Planned; sample conflict JSON export only exists. |
@@ -120,7 +122,7 @@ flowchart TB
     COMPARE <--> GEMINI
 ```
 
-Phase 2 adds local upload, OCR/conversion and source viewing. Inference, deadline, conflict and handoff nodes remain disabled. Later stages use the Google Gemini SDK with configurable `GEMINI_MODEL`; the agreed provisional default is `gemini-3.8-flash`. Model availability, key validity and free-tier capacity must be verified in the extraction phase; naming a default does not verify access. Never silently switch to paid inference.
+Phases 2–3 add local upload, OCR/conversion, source viewing and explicit Gemini extraction/support review. Deadline, conflict and handoff nodes remain disabled. Later stages use the Google Gemini SDK with configurable `GEMINI_MODEL`; the agreed provisional default is `gemini-3.8-flash`. Model availability, key validity and free-tier capacity must be verified in the extraction phase; naming a default does not verify access. Never silently switch to paid inference.
 
 Conversion/OCR run locally. When model analysis is enabled, extracted text is sent to Gemini. Keys stay in the backend. The browser communicates only with FastAPI; no credentials belong in `VITE_*` variables.
 
@@ -257,7 +259,7 @@ Still unverified: exact default `3000 → 8000` proxy path (3000 was occupied), 
 
 Phase 2 verification: **37 backend tests and 25 frontend tests passed**, including real clean/degraded scans, mixed/blank pages, DOCX, images, duplicate/idempotent/concurrent uploads, errors/retries, process-lock/restart behavior, path confinement and an 80-file ingestion run. Source coordinates and rotated page geometry are checked. Browser verification exercised native PDF/scan/DOCX upload and visible source highlights. See `PHASE_2_COMPLETION.md` for final checks and limits; Phase 1's old out-of-scope list above is historical.
 
-Before Phase 3, read `docs/PHASE_3_HANDOFF.md`. The active `worker.py` handles ingestion only; `analysis_worker.py` retains the old coupled draft for review, not execution. Add extraction as a separate stage without making local reading depend on a key. Only ingestion jobs may be recovered/claimed now; old document/conflict jobs remain idle. Update generated schemas/types and preserve every page's source/warnings. Current UI polling is three seconds during local processing. Keep every inference capability false until that phase passes.
+Phase 3 integration: read `docs/PHASE_3_INTEGRATION.md`. The active `worker.py` retains local ingestion and claims explicit `extract` jobs with a lazy provider; old `document` and `conflict` jobs remain idle. `analysis_worker.py` is an inactive reference. Keep source checkpoints, warnings, lock/recovery, generated contracts and three-second polling intact. Only ingestion/extraction capabilities are enabled. Builder 2's Phase 4 ownership and Phase 5 compatibility are specified in `docs/PHASE_4_HANDOFF.md`.
 
 ## Skills and local tooling
 
