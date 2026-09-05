@@ -13,7 +13,7 @@ from fastapi.responses import JSONResponse, FileResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from .config import VERSION, Config, libreoffice_path, tesseract_path
-from .foundation import CAPABILITIES, DatabaseStatus, ErrorResponse, HealthResponse, WorkerStatus
+from .foundation import CAPABILITIES, DatabaseStatus, ErrorResponse, HealthResponse, WorkerStatus, ProviderStatus
 from .models import Document, Page, Portfolio, BatchResponse, Job, RetryResponse, SmeSelection
 from .store import Store
 
@@ -93,8 +93,10 @@ def create_app(config: Config | None = None, start_worker: bool = True):
             ready = False
         if not ready:
             response.status_code = 503
-        configured = bool(cfg.api_key)
-        return HealthResponse(status="ready" if ready else "degraded", version=VERSION, model=cfg.model,
+        configured = bool(cfg.openrouter_api_key or cfg.api_key)
+        return HealthResponse(status="ready" if ready else "degraded", version=VERSION, model=cfg.openrouter_model,
+                              providers=[ProviderStatus(name="openrouter", role="primary", model=cfg.openrouter_model, key_configured=bool(cfg.openrouter_api_key)),
+                                         ProviderStatus(name="gemini", role="secondary", model=cfg.model, key_configured=bool(cfg.api_key))],
                               key_configured=configured, model_status="configured_unverified" if configured else "not_configured",
                               ocr_available=bool(tesseract_path()), docx_available=bool(libreoffice_path()),
                               database=DatabaseStatus(status="ready" if ready else "unavailable"),
@@ -198,7 +200,7 @@ def create_app(config: Config | None = None, start_worker: bool = True):
         doc = document(document_id, request)
         source = source_path(request.app.state.config, doc.id, 'pages.json')
         cfg = request.app.state.config
-        key = 'extract:' + hashlib.sha256((doc.id + doc.sha256 + cfg.model + VERSION).encode() + source.read_bytes()).hexdigest()
+        key = 'extract:' + hashlib.sha256((doc.id + doc.sha256 + cfg.routing_identity + VERSION).encode() + source.read_bytes()).hexdigest()
         try:
             count = request.app.state.store.queue_extraction(doc.id, key)
         except ValueError as exc:

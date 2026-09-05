@@ -23,6 +23,7 @@ from scripts.make_ingestion_fixtures import fixtures, native_pdf
 
 @pytest.fixture
 def client(tmp_path, monkeypatch):
+    monkeypatch.delenv('OPENROUTER_API_KEY', raising=False)
     monkeypatch.delenv('GEMINI_API_KEY', raising=False); monkeypatch.delenv('GOOGLE_API_KEY', raising=False)
     app = create_app(Config(tmp_path), start_worker=False)
     with TestClient(app) as client:

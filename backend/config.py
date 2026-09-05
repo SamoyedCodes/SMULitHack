@@ -7,7 +7,7 @@ from pathlib import Path
 from dotenv import dotenv_values
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSION = "2026-09-05.3"
+VERSION = "2026-09-05.3-or1"
 
 
 def setting(name: str, default: str = "") -> str:
@@ -64,6 +64,19 @@ class Config:
     @property
     def model(self) -> str:
         return setting("GEMINI_MODEL", "gemini-3.8-flash")
+
+    @property
+    def openrouter_api_key(self) -> str:
+        return setting("OPENROUTER_API_KEY")
+
+    @property
+    def openrouter_model(self) -> str:
+        return setting("OPENROUTER_MODEL", "openrouter/free")
+
+    @property
+    def routing_identity(self) -> str:
+        # No credentials in job/cache identifiers; include both requested model identities.
+        return f"openrouter:{self.openrouter_model}|gemini:{self.model}"
 
     @property
     def llm_interval(self) -> float:

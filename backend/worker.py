@@ -160,7 +160,7 @@ class Worker:
         """Phase 3 stage: grounded extraction and support review over already-read pages."""
         from .config import VERSION
         from .evidence import apply_extraction, stable_id
-        from .llm import Gemini, text_chunks, text_context
+        from .llm import ModelClient, text_chunks, text_context
         from .models import Extraction, SupportReview, Verdict
         doc = self.store.document(document_id)
         if not doc:
@@ -172,11 +172,19 @@ class Worker:
         if not any(p.spans for p in pages):
             raise ValueError("No legible text could be extracted. The document has not been analyzed.")
         if self.llm is None:
-            self.llm = Gemini(self.config, self.store)
-        doc.model, doc.version = self.config.model, VERSION
+            self.llm = ModelClient(self.config, self.store)
+        doc.model, doc.version = self.config.routing_identity, VERSION
+        doc.model_usage = []
         doc.pages_analyzed = 0
         doc.status, doc.error = "extracting", None
         self.store.put_document(doc)
+        def record_model_use():
+            use = getattr(self.llm, 'last_use', None)
+            if use and use not in doc.model_usage:
+                doc.model_usage.append(use)
+                doc.model = ', '.join(sorted({f'{u.provider}:{u.model}' for u in doc.model_usage}))
+                self.store.put_document(doc)
+
         chunks = text_chunks(pages)
         extraction = Extraction(title=doc.filename)
         fingerprints = set()
@@ -186,6 +194,7 @@ class Worker:
             doc.stage = f"Extracting obligations · section {n+1} of {len(chunks)}"
             self.store.put_document(doc)
             part = self.llm.extract(doc.id, chunk)
+            record_model_use()
             extraction.parties.extend(part.parties)
             extraction.missing_context.extend(part.missing_context)
             for category in ("findings", "deadlines", "provisions"):
@@ -214,6 +223,7 @@ class Worker:
                 if self.stop_event.is_set():
                     raise Interrupted()
                 review = self.llm.review(context, [{"item_id": x.id, "item": x.model_dump()} for x in items[start:start+20]])
+                record_model_use()
                 verdicts.extend(review.verdicts)
         doc = apply_extraction(doc, extraction, SupportReview(verdicts=verdicts), pages)
         doc.pages_analyzed = doc.pages_read if len(context) <= 240000 else 0

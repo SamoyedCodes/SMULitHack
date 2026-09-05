@@ -5,6 +5,8 @@
 
 Implement **Phase 4 only**, including its React interface. Stop after tested delivery and a completion note. Do not implement conflict assessment, lawyer-brief export, sample loading, legal chat, or deployment. Existing deadline/conflict modules are drafts, not acceptance evidence.
 
+> Provider update after the Phase 3 merge: OpenRouter is primary and Gemini secondary. Read `docs/MODEL_PROVIDERS.md` for configuration and additive health/document metadata. Calendar code remains provider-independent and makes no model calls.
+
 ## 1. Start on your instance
 
 Read `AGENTS.md`, `README.md`, `docs/INTEGRATION.md`, and this handoff. Inspect `git status` before changing files. Obtain the updated main commit through the team's Git transport; this handoff does not imply that the local merge was pushed. If your clone does not contain both commits above in main's ancestry, stop and obtain the merged baseline rather than using the old Phase 1 branch.
@@ -28,7 +30,7 @@ If native OCR/DOCX tools are absent, record skipped native checks separately; do
 
 - React 19 / TypeScript / Vite / Tailwind, with the existing blue/ink design. The browser uses relative `/api` requests and runtime validation against generated OpenAPI. Preserve this stack.
 - FastAPI and Pydantic own schemas. SQLite stores documents, queue jobs, batches, settings, model-response caches and comparisons. Local files retain originals, canonical PDFs and page/span checkpoints.
-- Uploads read PDF, DOCX, PNG/JPEG and scanned pages locally. Reading does not require Gemini. `POST /api/extract?document_id=...` explicitly queues model extraction after reading; the UI explains that page text goes to Gemini.
+- Uploads read PDF, DOCX, PNG/JPEG and scanned pages locally. Reading does not require Gemini. `POST /api/extract?document_id=...` explicitly queues model extraction after reading; the UI explains that page text goes to OpenRouter or Gemini.
 - A **single locked worker** claims `ingestion` and `extract` jobs only. Old `document` and `conflict` jobs remain idle. Missing-key jobs block visibly; provider delays wait and resume without bypassing quota. Repeated extraction requests reuse active/completed work.
 - Extraction produces eight finding categories, rules, commercial provisions and support verdicts. Python verifies source quotes, IDs, pages and coordinates. Missing fields remain unresolved. OCR, missing pages/context, rejected support and absent schedules reduce confidence or require review.
 - Source viewing supports `Evidence` links to the exact physical page and **all cited span boxes**. Clause labels come from source parsing; no clause number is invented when none was detected. DOCX pages are labelled rendered pagination.
@@ -62,7 +64,7 @@ flowchart TB
     Calendar -->|Evidence selection| Source
     Overview -->|Evidence selection| Source
     Source -->|Existing page/image API| DB
-    Phase3[Phase 3 Gemini extraction] -. already saved rules .-> DB
+    Phase3[Phase 3 provider extraction] -. already saved rules .-> DB
     Phase5[Phase 5 candidate + semantic conflict work] -. separate consumer .-> DB
 ```
 

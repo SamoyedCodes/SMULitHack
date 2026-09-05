@@ -78,3 +78,7 @@ Statuses for new files: `queued` → `processing` → `text_ready` / `needs_sour
 - Keep source-reading retry separate from extraction retry. Re-reading beneath a queued/saved extraction is currently disallowed; replace a damaged source with a new corrected upload. Earlier reading checkpoints and original-file hashes remain intact.
 - Incomplete page sets, source warnings or missing context prevent high-confidence complete analysis and supported machine rules. Missing support for machine rules/provisions creates review issues. OCR remains marked OCR even if numeric reading confidence is absent.
 - See `PHASE_3_INTEGRATION.md` for checks and `PHASE_4_HANDOFF.md` for parallel calendar/conflict contracts. No Phase 4/5 behavior is enabled by this merge.
+
+## Provider update after Phase 3
+
+OpenRouter is primary and Gemini secondary through `backend.llm.ModelClient`. See `MODEL_PROVIDERS.md` for configuration, fallback behavior, cache identities, `HealthResponse.providers` and additive `Document.model_usage`. Existing references to Gemini-only extraction above describe the preceding checkpoint. No date/conflict capability is activated.

@@ -670,6 +670,13 @@
             "title": "Model",
             "type": "string"
           },
+          "model_usage": {
+            "items": {
+              "$ref": "#/components/schemas/ModelUse"
+            },
+            "title": "Model Usage",
+            "type": "array"
+          },
           "page_count": {
             "default": 0,
             "title": "Page Count",
@@ -764,6 +771,7 @@
           "pagination",
           "parties",
           "findings",
+          "model_usage",
           "rules",
           "provisions",
           "reviews",
@@ -1111,7 +1119,7 @@
             "type": "boolean"
           },
           "inference_notice": {
-            "default": "When analysis is enabled, extracted contract text is sent to Gemini. Original files and saved results stay local.",
+            "default": "When analysis is enabled, extracted contract text is sent to OpenRouter and its model provider, or Gemini as secondary when OpenRouter is unavailable. Original files and saved results stay local.",
             "title": "Inference Notice",
             "type": "string"
           },
@@ -1138,6 +1146,13 @@
             "title": "Ocr Available",
             "type": "boolean"
           },
+          "providers": {
+            "items": {
+              "$ref": "#/components/schemas/ProviderStatus"
+            },
+            "title": "Providers",
+            "type": "array"
+          },
           "status": {
             "enum": [
               "ready",
@@ -1159,6 +1174,7 @@
           "status",
           "version",
           "model",
+          "providers",
           "key_configured",
           "model_status",
           "ocr_available",
@@ -1259,6 +1275,57 @@
           "pages_per_file"
         ],
         "title": "Limits",
+        "type": "object"
+      },
+      "ModelUse": {
+        "additionalProperties": false,
+        "properties": {
+          "cached": {
+            "default": false,
+            "title": "Cached",
+            "type": "boolean"
+          },
+          "fallback_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fallback Reason"
+          },
+          "model": {
+            "title": "Model",
+            "type": "string"
+          },
+          "provider": {
+            "enum": [
+              "openrouter",
+              "gemini"
+            ],
+            "title": "Provider",
+            "type": "string"
+          },
+          "purpose": {
+            "title": "Purpose",
+            "type": "string"
+          },
+          "requested_model": {
+            "title": "Requested Model",
+            "type": "string"
+          }
+        },
+        "required": [
+          "provider",
+          "requested_model",
+          "model",
+          "purpose",
+          "cached",
+          "fallback_reason"
+        ],
+        "title": "ModelUse",
         "type": "object"
       },
       "Page": {
@@ -1402,6 +1469,53 @@
           "coverage"
         ],
         "title": "Portfolio",
+        "type": "object"
+      },
+      "ProviderStatus": {
+        "additionalProperties": false,
+        "properties": {
+          "key_configured": {
+            "title": "Key Configured",
+            "type": "boolean"
+          },
+          "model": {
+            "title": "Model",
+            "type": "string"
+          },
+          "name": {
+            "enum": [
+              "openrouter",
+              "gemini"
+            ],
+            "title": "Name",
+            "type": "string"
+          },
+          "role": {
+            "enum": [
+              "primary",
+              "secondary"
+            ],
+            "title": "Role",
+            "type": "string"
+          },
+          "status": {
+            "default": "not_configured",
+            "enum": [
+              "configured_unverified",
+              "not_configured"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "role",
+          "model",
+          "key_configured",
+          "status"
+        ],
+        "title": "ProviderStatus",
         "type": "object"
       },
       "RetryResponse": {
@@ -1689,7 +1803,7 @@
   },
   "info": {
     "title": "AITHENA evidence API",
-    "version": "2026-09-05.3"
+    "version": "2026-09-05.3-or1"
   },
   "openapi": "3.1.0",
   "paths": {

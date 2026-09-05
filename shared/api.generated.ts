@@ -479,6 +479,8 @@ export interface components {
             mode: "live" | "sample";
             /** Model */
             model: string;
+            /** Model Usage */
+            model_usage: components["schemas"]["ModelUse"][];
             /**
              * Page Count
              * @default 0
@@ -642,7 +644,7 @@ export interface components {
             docx_available: boolean;
             /**
              * Inference Notice
-             * @default When analysis is enabled, extracted contract text is sent to Gemini. Original files and saved results stay local.
+             * @default When analysis is enabled, extracted contract text is sent to OpenRouter and its model provider, or Gemini as secondary when OpenRouter is unavailable. Original files and saved results stay local.
              */
             inference_notice: string;
             /** Key Configured */
@@ -657,6 +659,8 @@ export interface components {
             model_status: "not_configured" | "configured_unverified";
             /** Ocr Available */
             ocr_available: boolean;
+            /** Providers */
+            providers: components["schemas"]["ProviderStatus"][];
             /**
              * Status
              * @enum {string}
@@ -707,6 +711,27 @@ export interface components {
              */
             pages_per_file: number;
         };
+        /** ModelUse */
+        ModelUse: {
+            /**
+             * Cached
+             * @default false
+             */
+            cached: boolean;
+            /** Fallback Reason */
+            fallback_reason: string | null;
+            /** Model */
+            model: string;
+            /**
+             * Provider
+             * @enum {string}
+             */
+            provider: "openrouter" | "gemini";
+            /** Purpose */
+            purpose: string;
+            /** Requested Model */
+            requested_model: string;
+        };
         /** Page */
         Page: {
             /** Height */
@@ -754,6 +779,29 @@ export interface components {
             parties: string[];
             /** Sme */
             sme: string | null;
+        };
+        /** ProviderStatus */
+        ProviderStatus: {
+            /** Key Configured */
+            key_configured: boolean;
+            /** Model */
+            model: string;
+            /**
+             * Name
+             * @enum {string}
+             */
+            name: "openrouter" | "gemini";
+            /**
+             * Role
+             * @enum {string}
+             */
+            role: "primary" | "secondary";
+            /**
+             * Status
+             * @default not_configured
+             * @enum {string}
+             */
+            status: "configured_unverified" | "not_configured";
         };
         /** RetryResponse */
         RetryResponse: {

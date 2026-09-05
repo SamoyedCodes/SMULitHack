@@ -4,12 +4,14 @@ import sys
 from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from backend.foundation import HealthResponse, DatabaseStatus
+from backend.foundation import HealthResponse, DatabaseStatus, ProviderStatus
 from backend.models import Portfolio
 from backend.config import VERSION
 
 fixtures = {
-    'health': HealthResponse(status='ready', version=VERSION, model='gemini-3.8-flash', key_configured=False,
+    'health': HealthResponse(status='ready', version=VERSION, model='openrouter/free', key_configured=False,
+                             providers=[ProviderStatus(name='openrouter',role='primary',model='openrouter/free',key_configured=False),
+                                        ProviderStatus(name='gemini',role='secondary',model='gemini-3.8-flash',key_configured=False)],
                              model_status='not_configured', ocr_available=False, docx_available=False,
                              database=DatabaseStatus(status='ready')),
     'portfolio': Portfolio(mode='live', as_of='2026-09-05', horizon_end='2026-12-04', sme=None, parties=[], documents=[], events=[], issues=[], conflicts=[],

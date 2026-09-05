@@ -199,6 +199,15 @@ class ConflictAssessment(Record):
     mode: Literal["live", "sample"] = "live"
 
 
+class ModelUse(Record):
+    provider: Literal["openrouter", "gemini"]
+    requested_model: str
+    model: str
+    purpose: str
+    cached: bool = False
+    fallback_reason: str | None = None
+
+
 class Document(Record):
     id: str
     filename: str
@@ -215,6 +224,7 @@ class Document(Record):
     pagination: str = "original"
     parties: list[str] = Field(default_factory=list)
     findings: list[Finding] = Field(default_factory=list)
+    model_usage: list[ModelUse] = Field(default_factory=list)
     rules: list[DeadlineRule] = Field(default_factory=list)
     provisions: list[CommercialProvision] = Field(default_factory=list)
     reviews: list[Verdict] = Field(default_factory=list)

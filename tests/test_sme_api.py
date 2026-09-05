@@ -13,7 +13,7 @@ LOCAL = {"Origin": "http://127.0.0.1:3000"}
 @pytest.fixture(autouse=True)
 def isolated(monkeypatch, tmp_path):
     monkeypatch.setattr(settings, "ROOT", tmp_path)
-    for name in ("GEMINI_API_KEY", "GOOGLE_API_KEY", "AITHENA_DATA_DIR",
+    for name in ("OPENROUTER_API_KEY", "OPENROUTER_MODEL", "GEMINI_MODEL", "GEMINI_API_KEY", "GOOGLE_API_KEY", "AITHENA_DATA_DIR",
                  "AITHENA_API_PORT", "AITHENA_WEB_PORT", "AITHENA_LLM_INTERVAL"):
         monkeypatch.delenv(name, raising=False)
 

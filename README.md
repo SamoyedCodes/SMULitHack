@@ -1,6 +1,6 @@
 # AITHENA — local contract workspace
 
-> Current checkpoint: Phases 1–3 are integrated. Uploads read locally; open a document and choose **Extract obligations** to queue Gemini extraction/support review. Missing key/quota failures remain visible. Only ingestion and extraction are enabled. See [Phase 3 integration](docs/PHASE_3_INTEGRATION.md) and [Builder 2 Phase 4 handoff](docs/PHASE_4_HANDOFF.md). Later Phase 1/2 verification records below are historical.
+> Current checkpoint: Phases 1–3 are integrated. Uploads read locally; open a document and choose **Extract obligations** to queue extraction/support review through OpenRouter (primary) and Gemini (secondary). Missing key/quota failures remain visible. Only ingestion and extraction are enabled. See [Phase 3 integration](docs/PHASE_3_INTEGRATION.md) and [Builder 2 Phase 4 handoff](docs/PHASE_4_HANDOFF.md). Later Phase 1/2 verification records below are historical.
 
 
 Phase 2 adds batch ingestion and real source viewing to Builder 2's React interface and the local FastAPI/SQLite foundation. Upload PDFs, DOCX, PNGs or JPEGs (including scans), inspect every physical page, and select text blocks to highlight their source locations. No Gemini key is needed and no provider requests are made.
@@ -37,7 +37,9 @@ Nonempty process environment values override repository-root `.env`, then defaul
 | `AITHENA_API_PORT` | `8000` | API loopback port |
 | `AITHENA_WEB_PORT` | `3000` | UI loopback port; must differ from API port |
 | `AITHENA_DATA_DIR` | `data` | Local SQLite and future originals/results |
-| `GEMINI_API_KEY` | absent | Optional backend credential; `GOOGLE_API_KEY` is the fallback |
+| `OPENROUTER_API_KEY` | absent | Primary backend provider credential |
+| `OPENROUTER_MODEL` | `openrouter/free` | Primary model/route; set a supported model explicitly for reproducible evaluation |
+| `GEMINI_API_KEY` | absent | Secondary backend credential; `GOOGLE_API_KEY` is its alias |
 | `GEMINI_MODEL` | `gemini-3.8-flash` | Planned configurable model; access has not been verified |
 | `AITHENA_LLM_INTERVAL` | `12` | Future request spacing; finite and nonnegative |
 | `TESSERACT_CMD` | discovery | Optional executable override; an invalid override reports unavailable |
@@ -107,3 +109,7 @@ To generate seven synthetic test files (native PDF, real scanned PDF, degraded s
 These fixtures are for ingestion verification only. They are not reviewed extraction ground truth. The native integration tests require installed Tesseract/LibreOffice and otherwise report explicit skips; all other tests still run. The 80-file ingestion test is separate from any future extraction evaluation.
 
 Maximum document size is 200 pages; oversized/password-protected/damaged PDFs fail visibly. DOCX conversion has a 90-second timeout and a 100 MiB expanded archive limit; images have a 40-megapixel limit. Multi-frame images are rejected rather than reading only the first frame. New ingestion jobs use a cache version independent of Gemini model/key configuration. A process lock ensures one worker per data directory.
+
+## Provider configuration
+
+See [MODEL_PROVIDERS.md](docs/MODEL_PROVIDERS.md) for OpenRouter primary/Gemini secondary setup, fallback conditions and provider provenance. Local reading still requires no key; provider access and quality are unverified until tested with your configured account/model.

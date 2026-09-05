@@ -122,9 +122,9 @@ flowchart TB
     COMPARE <--> GEMINI
 ```
 
-Phases 2–3 add local upload, OCR/conversion, source viewing and explicit Gemini extraction/support review. Deadline, conflict and handoff nodes remain disabled. Later stages use the Google Gemini SDK with configurable `GEMINI_MODEL`; the agreed provisional default is `gemini-3.8-flash`. Model availability, key validity and free-tier capacity must be verified in the extraction phase; naming a default does not verify access. Never silently switch to paid inference.
+Phases 2–3 add local upload, OCR/conversion, source viewing and explicit provider extraction/support review. Deadline, conflict and handoff nodes remain disabled. OpenRouter is primary via existing httpx with `OPENROUTER_API_KEY`/`OPENROUTER_MODEL` (default `openrouter/free`), with the Google Gemini SDK as secondary and configurable `GEMINI_MODEL`; the agreed provisional default is `gemini-3.8-flash`. Model availability, key validity and free-tier capacity must be verified in the extraction phase; naming a default does not verify access. Never silently switch to paid inference.
 
-Conversion/OCR run locally. When model analysis is enabled, extracted text is sent to Gemini. Keys stay in the backend. The browser communicates only with FastAPI; no credentials belong in `VITE_*` variables.
+Conversion/OCR run locally. When model analysis is enabled, extracted text is sent to OpenRouter and its model provider, or Gemini as secondary. Keys stay in the backend. The browser communicates only with FastAPI; no credentials belong in `VITE_*` variables.
 
 ### Historical Phase 1 contract and continuing invariants
 
@@ -302,3 +302,7 @@ Ponytail's help identifies Codex mentions such as `@ponytail`, `@ponytail-review
 - Azure deployment, document/presentation/spreadsheet creation and image-generation skills are not required for Phase 1. Do not add infrastructure or artifacts outside the requested phase.
 
 Keep this file current as implementation replaces the prototype: update the inspected baseline, phase status, live routes/schema, commands, verification evidence and remaining gaps. Clearly separate facts, plans and unverified assumptions.
+
+## Provider routing update
+
+Use `backend.llm.ModelClient` for extraction/review and future Phase 5 comparison work: OpenRouter primary, Gemini secondary. Read `docs/MODEL_PROVIDERS.md`; primary/secondary caches and cooldowns are separate, failed/refused answers do not trigger fallback, and per-document model usage stays separate from evidence/confidence. Health reports both providers without exposing keys; original data and inference capability boundaries are unchanged. Phase 4 makes no model calls. Preserve the additive schema fields when merging other builders’ branches. Live provider access/accuracy remain unverified.

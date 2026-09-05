@@ -6,7 +6,7 @@ from pathlib import Path
 from .conflicts import candidates, pair_id, time_comparison, validate_assessment
 from .documents import load_pages, normalize_pdf, parse_pdf, save_pages
 from .evidence import apply_extraction, stable_id
-from .llm import Gemini, ProviderFailure, ProviderUnavailable, QuotaWait, text_chunks, text_context
+from .llm import ModelClient, ProviderFailure, ProviderUnavailable, QuotaWait, text_chunks, text_context
 from .models import Extraction, ReviewIssue, SupportReview, Verdict
 
 logger = logging.getLogger(__name__)
@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 class Worker:
     def __init__(self, config, store, llm=None):
         self.config, self.store = config, store
-        self.llm = llm or Gemini(config, store)
+        self.llm = llm or ModelClient(config, store)
         self.stop_event = threading.Event()
         self.thread = None
 

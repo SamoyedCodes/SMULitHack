@@ -188,6 +188,6 @@ class Store:
             else:
                 db.execute('INSERT INTO jobs(id,cache_key,kind,payload,created_at) VALUES(?,?,?,?,?)',
                            (str(uuid.uuid4()), key, 'extract', json.dumps({'document_id':doc.id, 'mode':doc.mode}), now()))
-            doc.status, doc.stage, doc.error = 'extraction_queued', 'Queued for Gemini extraction and support review', None
+            doc.status, doc.stage, doc.error = 'extraction_queued', 'Queued for extraction and support review (OpenRouter primary, Gemini secondary)', None
             db.execute('UPDATE documents SET body=? WHERE id=?', (doc.model_dump_json(), doc.id))
             return 1
