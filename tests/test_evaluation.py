@@ -191,3 +191,37 @@ def test_scoring_distinguishes_unreviewed_incorrect_and_unsupported_citations(tm
     assert reviewed['field_accuracy']['rate'] == 0 and reviewed['answerable_coverage']['rate'] == 1
     assert reviewed['correctness_by_confidence']['high']['rate'] == 0
     assert reviewed['conflict_precision']['rate'] is None
+
+
+def test_successful_campaign_extracts_ten_before_bounded_comparisons(setup, tmp_path, monkeypatch):
+    from scripts import evaluate
+    from conflict_fixtures import seed, FakeComparison, SME
+    cfg, store, _ = setup
+    entries = []
+    for i in range(10):
+        doc, _ = seed(cfg, store, f'd{i}', exclusive=i % 2 == 0)
+        entries.append({'document_id': doc.id, 'sample_id': f's{i+1:02}'})
+    monkeypatch.setattr(evaluate, 'verify', lambda root: ({'documents': entries}, cfg, store))
+    endpoint = {'tag': 'mock', 'context_length': 1000000, 'prompt': '.000001',
+                'completion': '.000002', 'checked_at': time.time()}
+    monkeypatch.setattr(evaluate, 'select_endpoint', lambda data: endpoint)
+    monkeypatch.setattr(httpx.Client, 'get', lambda *a, **k: httpx.Response(200, json={'data': {}}, request=httpx.Request('GET', 'https://example.test')))
+    extracted = []
+    class FakeWorker:
+        def __init__(self, *a, **k): pass
+        def extract_document(self, id): extracted.append(id)
+    class Comparison(FakeComparison):
+        def compare(self, payload):
+            assert len(extracted) == 10
+            return super().compare(payload)
+    fake = Comparison()
+    monkeypatch.setattr(evaluate, 'Worker', FakeWorker)
+    monkeypatch.setattr(evaluate, 'PacedOpenRouter', lambda *a, **k: fake)
+    evaluate.run(tmp_path)
+    assert len(extracted) == 10 and fake.calls == 10
+    assert store.setting('evaluation:closed') is True
+    scan = store.setting('evaluation:contexts')[SME]['scan']
+    assert scan['completed'] == 10 and scan['unchecked'] > 0
+    monkeypatch.setattr(httpx.Client, 'get', lambda *a, **k: pytest.fail('Closed campaign must not call HTTP'))
+    evaluate.run(tmp_path)
+    assert fake.calls == 10
