@@ -6,7 +6,7 @@ import type { ApiDocument, ConflictAssessment, Evidence, Portfolio, ReviewIssue 
 
 const evidence: Evidence = { document_id: 'doc-a', span_ids: ['doc-a:s0'], quote: 'exclusive distribution rights', page: 2, clause: '4.1', boxes: [[1, 2, 3, 4]], source: 'native', ocr_confidence: null }
 
-const issue: ReviewIssue = { id: 'issue-1', document_ids: ['doc-a'], title: 'Termination rights need review', established: ['A 30-day notice period is stated.'], missing_facts: ['Schedule 2 was not supplied.'], lawyer_question: 'Does the missing schedule change the notice window?', urgency: 'Confirm before renewal.', evidence: [evidence], kind: 'uncertainty', mode: 'live' }
+const issue: ReviewIssue = { id: 'issue-1', document_ids: ['doc-a'], title: 'Termination rights need review', established: ['A 30-day notice period is stated.'], missing_facts: ['Schedule 2 was not supplied.'], lawyer_question: 'Does the missing schedule change the notice window?', urgency: 'Confirm before renewal.', evidence: [evidence], kind: 'uncertainty', reason_codes: [], mode: 'live' }
 
 const conflict: ConflictAssessment = { id: 'conflict-1', input_revision: 'conflict-1', current: true, created_at: '2026-09-05', dimension_evidence: {}, exception_evidence: [], model_usage: [], status: 'potential_conflict', documents: ['doc-a', 'doc-b'], scope_comparison: { territory: 'Both grant Singapore.' }, evidence: [evidence], exceptions: [], missing_facts: ['Effective date unconfirmed.'], explanation: 'Overlapping exclusive grants.', lawyer_question: 'Can both exclusive grants coexist?', confidence: 'medium', confidence_reason: 'Wording overlaps.', provenance: 'inferred', mode: 'live' }
 

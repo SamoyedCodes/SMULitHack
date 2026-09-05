@@ -56,7 +56,7 @@ class HealthResponse(Record):
     worker: WorkerStatus = Field(default_factory=WorkerStatus)
     capabilities: Capabilities = Field(default_factory=lambda: CAPABILITIES.model_copy())
     limits: Limits = Field(default_factory=Limits)
-    inference_notice: str = "When analysis is enabled, extracted contract text is sent to OpenRouter and its model provider, or Gemini as secondary when OpenRouter is unavailable. Original files and saved results stay local."
+    inference_notice: str = "When analysis is enabled, extracted contract text is sent to OpenRouter and its model provider, or Gemini as secondary when OpenRouter is unavailable. Optional visual OCR review also sends rendered page images and flagged crops to the configured OpenRouter vision model. Original files and saved results stay local."
 
 
 class ErrorDetail(Record):

@@ -2,7 +2,9 @@
 
 ## Read this first
 
-This is AITHENA, the SMU legal-tech hackathon contract-obligation project. Work in this repository and preserve Builder B's frontend. Phases 1–6 are integrated; read `docs/PHASE_4_6_INTEGRATION.md` for the current checkpoint and verification limits. Phase 7 evaluation/demo is not implemented; finish only the explicitly assigned checkpoint.
+Use ponytail skill for all code writing.
+
+This is AITHENA, the SMU legal-tech hackathon contract-obligation project. Work in this repository and preserve Builder B's frontend. Phases 1–6 are integrated; read `docs/PHASE_4_6_INTEGRATION.md` for the current checkpoint and verification limits. Phase 7 evaluation tooling and read-only demo instructions are implemented; the first live request stopped because usage cost was missing. Read `docs/PHASE_7_EVALUATION.md`; do not retry paid work while its reservation is unresolved.
 
 This file records both the inspected implementation and the agreed destination. A planned feature, a sample screen, or a draft in another workspace is not a completed feature. Recheck the source and update this file when changes land. User instructions take precedence over this guidance.
 
@@ -90,7 +92,7 @@ The original dashboard's automatic sample selection, URL-based “Connected” b
 
 ## Phase status and checkpoints
 
-**Current checkpoint: Phases 1–6 integrated.** Read `docs/PHASE_4_6_INTEGRATION.md` for combined verification, and the individual phase completion reports for historical results and semantic limits. Phase 7 remains unimplemented. Preserve other builders' work and do not start further phases without assignment.
+**Current checkpoint: Phases 1–6 integrated, plus bounded Phase 7 evaluation tooling.** Read `docs/PHASE_4_6_INTEGRATION.md` for combined verification, and the individual phase completion reports for historical results and semantic limits. Phase 7 bounded evaluation tooling is implemented, with live evaluation incomplete; see `docs/PHASE_7_EVALUATION.md`. Preserve other builders' work and do not start further phases without assignment.
 
 | Phase | Scope and completion gate | Status at this snapshot |
 | --- | --- | --- |
@@ -100,7 +102,7 @@ The original dashboard's automatic sample selection, URL-based “Connected” b
 | 4 — Deadlines | Tested Python rules, notice windows, ambiguity stops, adjustable as-of date, 90-day/overdue events with cited calculations. | Integrated and tested with synthetic fixtures; see `docs/PHASE_4_COMPLETION.md`. Per-input grounding of offset/unit/direction remains unverified, so calculated dates are capped at medium confidence. |
 | 5 — Conflicts | Conservative Python candidate selection, LLM comparison of both agreements, evidence validation, cached/pending assessments and uncertainty. | Integrated; automatic screening, versioned comparisons, persistent allowance and evidence validation. Live model accuracy remains unverified. |
 | 6 — Review and handoff | Dedicated review queue, missing facts, urgency, source excerpts and a specific lawyer question; printable/downloadable briefs. | Integrated; current review queue, source-validated briefs, HTML download and browser printing. |
-| 7 — Evaluation and demo | Mixed-quality corpus and reviewed answer key, grouped holdout, quality/calibration metrics, 80-file ingestion test and reproducible demonstration. | Planned; four synthetic examples are not an evaluation corpus. |
+| 7 — Evaluation and demo | Ten selected mixed-format documents, provisional source-checked answer key/grouped holdout, guarded evaluation CLI, transparent metrics and read-only replay instructions. | Tooling implemented and locally tested. First live request stopped on missing usage cost; no extraction scores or independent calibration established. Sample UI deferred by user choice. |
 
 Complete the explicitly assigned phase, run appropriate acceptance checks, record actual results and remaining limits, and stop at the checkpoint. Do not silently enable the next phase.
 
@@ -267,6 +269,12 @@ Phase 3 integration: read `docs/PHASE_3_INTEGRATION.md`. The active `worker.py` 
 
 ## Skills and local tooling
 
+### Optional visual OCR triage — 6 September 2026
+
+The user subsequently authorized a separate random CUAD visual smoke test. Five requests using `google/gemini-2.5-flash-lite` successfully classified eight simulated-scan text regions; all retained source review, matching visual inspection. Provider-reported cost was US$0.0007286, with no unresolved charge in this separate smoke ledger. Cached replay made no further request. This verifies live access and these text-preservation cases, not decorative-logo/diagram accuracy. See `docs/VISUAL_OCR_CUAD_SMOKE.md`. The stopped Phase 7 campaign was untouched.
+
+User-authorized visual triage is implemented behind an unchecked extraction-screen option and the persisted `visual_review` extraction-job flag. `OPENROUTER_VISION_MODEL` defaults to `google/gemini-2.5-flash-lite`; the ordinary extraction model is unchanged. Only inferred purely decorative regions can downgrade the low-OCR warning. Text (including company names), diagrams and uncertainty retain review. Original spans and evidence confidence are preserved. See `docs/VISUAL_OCR_REVIEW.md` for rendering, cache, request/price limits and verification. This does not authorize changing or retrying the stopped Phase 7 campaign; its evaluator remains text-only by default. Live vision quality and billing are unverified.
+
 Use a skill only when its actual instructions and the task make it applicable. Read its `SKILL.md` first and tell the user when applying it. A machine-local skill path is not a portable repository dependency.
 
 ### Ponytail — smallest correct implementation
@@ -307,6 +315,14 @@ Ponytail's help identifies Codex mentions such as `@ponytail`, `@ponytail-review
 
 Keep this file current as implementation replaces the prototype: update the inspected baseline, phase status, live routes/schema, commands, verification evidence and remaining gaps. Clearly separate facts, plans and unverified assumptions.
 
+## Usability and saved evaluation checkpoint — 6 September 2026
+
+The five approved usability improvements are implemented; see `docs/USABILITY_EVALUATION.md` for behavior, routes and actual verification limits. `frontend/src/presentation.ts` owns shared current-review selection and display ordering; Overview, Contracts and Needs review reuse it. Python remains the deadline engine. Additive `ReviewIssue.reason_codes` defaults preserve old records; do not infer categories by matching error prose.
+
+`backend/evaluation_report.py` validates versioned saved scorecards and renders standalone HTML. Read-only `GET /api/evaluation/scorecard` and `GET /api/evaluation/report` use `AITHENA_EVALUATION_DIR` (default `data/phase7`); they must never initialize campaigns, enqueue work or invoke providers. `frontend/src/Evaluation.tsx` defaults to Holdout and labels the saved campaign separately from the live portfolio. Offline scoring now emits `scorecard.json` and `SCORECARD.html` alongside existing outputs. The stopped campaign still has zero validated extractions and the same unresolved reservation.
+
+Combined verification: 208 backend tests and 62 frontend tests passed, plus schema/type/fixture checks and production build. Browser checks covered synthetic 80-document flows, evidence/return focus, retained filters, stale exports, mobile layout and standalone HTML. A 200% CSS-zoom preview was checked; native browser zoom and native PDF/download-save completion remain unverified. Preserve concurrent visual-review implementation and other unrelated edits in this shared checkout.
+
 ## Provider routing update
 
 Use `backend.llm.ModelClient` for extraction/review and Phase 5 comparison work: OpenRouter primary, Gemini secondary. Read `docs/MODEL_PROVIDERS.md`; primary/secondary caches and cooldowns are separate, failed/refused answers do not trigger fallback, and per-document model usage stays separate from evidence/confidence. Health reports both providers without exposing keys; original data and inference capability boundaries are unchanged. Phase 4 makes no model calls. Preserve the additive schema fields when merging other builders’ branches. Live provider access/accuracy remain unverified.
@@ -318,3 +334,11 @@ Use `backend.llm.ModelClient` for extraction/review and Phase 5 comparison work:
 ## Current combined verification
 
 The Phase 4–6 integration preserves all source branches, the provider prerequisite, SQLite data/allowances and the one-worker lock. See `docs/PHASE_4_6_INTEGRATION.md` for actual backend, frontend, schema and browser results. Review counts share one current-item selector; deadline briefs share portfolio projection and selected dates. Evidence is revalidated against parsed source pages and failed checks remain visible. Legacy support issues and missing arithmetic-input issues remain separate when their IDs and questions differ. Phase 7 and live-provider accuracy/calibration are not claimed.
+
+## Phase 7 bounded evaluation checkpoint — 6 September 2026
+
+The user authorized ten documents (not ten API calls), OpenRouter `z-ai/glm-5.3-flash` only, US$14 execution ceiling within US$15, provisional key review, and demo instructions without a sample-mode UI. `scripts/evaluate.py` provides prepare/freeze/run/score/replay; `backend/evaluation_budget.py` adds an optional durable request guard at the existing OpenRouter boundary; `evaluation/answer-key.json` and `evaluation/scoring.py` define provisional scoring. Keep the three Seychelle-related documents grouped in holdout and exclude `Lease Agreement.pdf`. Normal application data, frontend and provider routing are preserved.
+
+The actual isolated campaign is `data/phase7`: all ten inputs were locally read and the 144-expectation key frozen, but the first live request returned no trustworthy usage cost. No validated extraction was published, and the other nine documents were not sent. Its US$0.082739200 reservation remains unresolved; confirmed US$0 is not proof of zero actual spend. Do not delete the ledger, reset the stopped state, create another workspace to retry, or send more inference without reconciliation and relevant authorization. Later guard code retains error receipts; the first attempt did not retain its response envelope.
+
+See `docs/PHASE_7_EVALUATION.md` for exact test evidence, scoring limits and read-only replay commands. `/api/demo` stays disabled. The local 80-file test is separate and makes no model calls. Phase 7 tooling is delivered; successful live semantic evaluation and independent review/calibration are still unverified.

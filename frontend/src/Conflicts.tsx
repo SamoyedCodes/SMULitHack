@@ -11,7 +11,7 @@ export function EvidenceLinks({ items, onEvidence }: {items:Evidence[]; onEviden
 export function ConflictCard({ result, names, onEvidence, focused }: {result:ConflictAssessment; names:Map<string,string>; onEvidence:(e:Evidence)=>void; focused:boolean}) {
   const card=useRef<HTMLElement>(null)
   useEffect(()=>{if(focused)card.current?.scrollIntoView({block:'start',behavior:'smooth'})},[focused])
-  return <article ref={card} id={`conflict-${result.id}`} className={`card conflict-card ${focused?'conflict-focused':''}`}>
+  return <article ref={card} tabIndex={-1} id={`conflict-${result.id}`} className={`card conflict-card ${focused?'conflict-focused':''}`}>
     <div className="section-heading"><h2>{labels[result.status]}</h2><span className={`badge ${result.status==='potential_conflict'?'amber':''}`}>{result.provenance} · {result.confidence} confidence</span></div>
     <p className="conflict-documents">{result.documents.map(id=>names.get(id)??id).join(' ↔ ')}</p>
     {!result.current && <p className="error">Stale assessment: source analysis or SME selection has changed. Do not rely on this result.</p>}
@@ -80,7 +80,7 @@ export default function Conflicts({portfolio,enabled,stale,onEvidence,onRefresh,
   const current=portfolio.conflicts.filter(r=>r.current)
   const visible=(history?portfolio.conflicts.filter(r=>!r.current):current).filter(r=>filter==='all'||filter==='attention'&&r.status!=='no_conflict_identified_for_this_rule'||r.status===filter)
   const progress=screens.filter(s=>s.job_state&&['queued','running','waiting','blocked','failed'].includes(s.job_state))
-  return <div className="conflicts-view">
+  return <div className="conflicts-view">{focused && !current.some(c => c.id === focused) && <p role="alert" className="error">The selected comparison changed or is no longer current.</p>}
     <section className="card conflict-summary"><div className="section-heading"><h2>Distribution exclusivity checks</h2><span className="badge">{scan.state.replaceAll('_',' ')}{stale?' · stale':''}</span></div>
       <p>Checks start automatically after extraction and SME selection. The first 10 pairs are allowed automatically; Continue adds the next 10. A pair can require multiple provider requests.</p>
       {!portfolio.sme&&<p className="phase-notice">Select your SME before automatic comparisons begin. <button className="contract-link" onClick={onChooseSme}>Choose your organisation</button></p>}

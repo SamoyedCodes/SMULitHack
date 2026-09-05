@@ -170,6 +170,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/evaluation/report": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Evaluation Report */
+        get: operations["evaluation_report_api_evaluation_report_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/evaluation/scorecard": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Evaluation Scorecard */
+        get: operations["evaluation_scorecard_api_evaluation_scorecard_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/extract": {
         parameters: {
             query?: never;
@@ -810,6 +844,130 @@ export interface components {
         ErrorResponse: {
             error: components["schemas"]["ErrorDetail"];
         };
+        /** EvaluationBudgetSummary */
+        EvaluationBudgetSummary: {
+            /** Ceiling Usd */
+            ceiling_usd: string;
+            /** Charged Usd */
+            charged_usd: string;
+            /** Requests */
+            requests: number;
+            /** Unreconciled Requests */
+            unreconciled_requests: number;
+            /** Unreconciled Reserved Usd */
+            unreconciled_reserved_usd: string;
+        };
+        /** EvaluationExample */
+        EvaluationExample: {
+            /**
+             * Confidence
+             * @enum {string}
+             */
+            confidence: "high" | "medium" | "low";
+            /** Expected */
+            expected: string;
+            /** Explanation */
+            explanation: string;
+            /** Finding Id */
+            finding_id: string;
+            /** Observed */
+            observed: string;
+            /** Sample */
+            sample: string;
+            /**
+             * Split
+             * @enum {string}
+             */
+            split: "development" | "holdout";
+        };
+        /** EvaluationFailure */
+        EvaluationFailure: {
+            /** Message */
+            message: string;
+            /** Sample */
+            sample: string;
+            /**
+             * Split
+             * @enum {string}
+             */
+            split: "development" | "holdout";
+            /** Status */
+            status: string;
+        };
+        /** EvaluationGroup */
+        EvaluationGroup: {
+            /** Completed Documents */
+            completed_documents: number;
+            /** Confidence */
+            confidence: {
+                [key: string]: components["schemas"]["EvaluationRatio"];
+            };
+            /** Documents */
+            documents: number;
+            /** Fields Unreviewed */
+            fields_unreviewed: number;
+            /** Metrics */
+            metrics: {
+                [key: string]: components["schemas"]["EvaluationRatio"];
+            };
+            /** Pairs Unassessed */
+            pairs_unassessed: number;
+            /** Predictions Unreviewed */
+            predictions_unreviewed: number;
+        };
+        /** EvaluationRatio */
+        EvaluationRatio: {
+            /** Correct */
+            correct: number;
+            /** Rate */
+            rate: number | null;
+            /** Total */
+            total: number;
+            /**
+             * Unreviewed
+             * @default 0
+             */
+            unreviewed: number;
+        };
+        /** EvaluationScorecard */
+        EvaluationScorecard: {
+            /** Answer Key Sha256 */
+            answer_key_sha256: string;
+            /** As Of Dates */
+            as_of_dates: string[];
+            budget: components["schemas"]["EvaluationBudgetSummary"];
+            /** Campaign Id */
+            campaign_id: string;
+            /** Examples */
+            examples: components["schemas"]["EvaluationExample"][];
+            /** Failures */
+            failures: components["schemas"]["EvaluationFailure"][];
+            /**
+             * Generated At
+             * Format: date-time
+             */
+            generated_at: string;
+            /** Groups */
+            groups: {
+                [key: string]: components["schemas"]["EvaluationGroup"];
+            };
+            /** Limitations */
+            limitations: string[];
+            /** Model */
+            model: string;
+            /** Review Status */
+            review_status: string;
+            /** Run Sha256 */
+            run_sha256: string;
+            /**
+             * Schema Version
+             * @default 1
+             * @constant
+             */
+            schema_version: 1;
+            /** Stopped */
+            stopped: string | null;
+        };
         /** Event */
         Event: {
             /** Action */
@@ -928,7 +1086,7 @@ export interface components {
             docx_available: boolean;
             /**
              * Inference Notice
-             * @default When analysis is enabled, extracted contract text is sent to OpenRouter and its model provider, or Gemini as secondary when OpenRouter is unavailable. Original files and saved results stay local.
+             * @default When analysis is enabled, extracted contract text is sent to OpenRouter and its model provider, or Gemini as secondary when OpenRouter is unavailable. Optional visual OCR review also sends rendered page images and flagged crops to the configured OpenRouter vision model. Original files and saved results stay local.
              */
             inference_notice: string;
             /** Key Configured */
@@ -1030,6 +1188,10 @@ export interface components {
              * @enum {string}
              */
             status: "read" | "unreadable" | "error";
+            /** Visual Review Note */
+            visual_review_note: string | null;
+            /** Visual Reviews */
+            visual_reviews: components["schemas"]["VisualRegionReview"][];
             /** Warnings */
             warnings: string[];
             /** Width */
@@ -1118,6 +1280,8 @@ export interface components {
              * @enum {string}
              */
             mode: "live" | "sample";
+            /** Reason Codes */
+            reason_codes: ("source_unreadable" | "missing_context" | "ambiguous_terms" | "unsupported_evidence" | "incomplete_analysis" | "not_established")[];
             /** Title */
             title: string;
             /**
@@ -1178,11 +1342,29 @@ export interface components {
             missing_context: string[];
             /** Reason */
             reason: string;
+            /** Reason Codes */
+            reason_codes: ("source_unreadable" | "missing_context" | "ambiguous_terms" | "unsupported_evidence" | "incomplete_analysis" | "not_established")[];
             /**
              * Status
              * @enum {string}
              */
             status: "supported" | "uncertain" | "rejected";
+        };
+        /** VisualRegionReview */
+        VisualRegionReview: {
+            /** Contains Meaningful Content */
+            contains_meaningful_content: boolean;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "decoration" | "text" | "diagram" | "uncertain";
+            /** Model */
+            model: string;
+            /** Reason */
+            reason: string;
+            /** Span Id */
+            span_id: string;
         };
         /** WorkerStatus */
         WorkerStatus: {
@@ -2140,10 +2322,180 @@ export interface operations {
             };
         };
     };
+    evaluation_report_api_evaluation_report_get: {
+        parameters: {
+            query?: {
+                run_sha256?: string | null;
+                generated_at?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/html": string;
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/html": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/html": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/html": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request Entity Too Large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/html": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/html": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/html": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Implemented */
+            501: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/html": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    evaluation_scorecard_api_evaluation_scorecard_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EvaluationScorecard"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request Entity Too Large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Implemented */
+            501: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     extract_api_extract_post: {
         parameters: {
             query: {
                 document_id: string;
+                visual_review?: boolean;
             };
             header?: never;
             path?: never;

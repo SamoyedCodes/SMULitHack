@@ -1,0 +1,410 @@
+{
+  "version": 1,
+  "processing_version": "2026-09-05.6",
+  "model": "z-ai/glm-5.3-flash",
+  "as_of": [
+    "2026-09-05",
+    "2026-12-01",
+    "2027-01-01"
+  ],
+  "answer_key_sha256": "5ca7f9c81f3b0b244b4e8bca266df2b834640ff67d39663e127d3d2d2e13efb4",
+  "documents": [
+    {
+      "sample_id": "s01",
+      "source": "northstar.txt",
+      "input": "inputs/northstar.docx",
+      "source_sha256": "bbe8fc84aaedf765b0fb25cf67fb57e308450eb2b0c31106eed6d5c82ab9202d",
+      "input_sha256": "3b3a58b0f8e4422d9e8e1ebc11a911058dde6e6c6010f2de94f78563292ab81b",
+      "source_page_to_physical": [
+        [
+          1
+        ],
+        [
+          2
+        ]
+      ],
+      "split": "development",
+      "document_id": "c8214bf9-6158-4ded-8bde-8bafd128ef56",
+      "pages_sha256": "2735ac059c3da9384c9fb8076cb0b7934708eed8c3daaa747f0345137e12bfbd",
+      "canonical_sha256": "eb3234421bcaf324c9a0bc35d64113eb896554f300d4a0759ff6577c0745733f"
+    },
+    {
+      "sample_id": "s02",
+      "source": "cloud.txt",
+      "input": "inputs/cloud.pdf",
+      "source_sha256": "e6045647beca3b26c69b1eb0231b26ebcf5c321ca3a1b99c31e01c5eb305cb08",
+      "input_sha256": "c7a63c4663cf48e9c85d8f29823c2d03335e64d9ad5a4ada7a5881bfb42b4ee5",
+      "source_page_to_physical": [
+        [
+          1
+        ],
+        [
+          2
+        ]
+      ],
+      "split": "development",
+      "document_id": "46e88bce-649d-4c57-9cb5-13616934ecba",
+      "pages_sha256": "32893d24afd7f6d86f62f4f03e0796905f1f66992dea3b8c65e4a9e070961bfc",
+      "canonical_sha256": "c7a63c4663cf48e9c85d8f29823c2d03335e64d9ad5a4ada7a5881bfb42b4ee5"
+    },
+    {
+      "sample_id": "s03",
+      "source": "harbour.txt",
+      "input": "inputs/harbour.pdf",
+      "source_sha256": "a4b870a062a436388f6df1a2cf38acf3feed40def22aca45120ea45b89eaaa8f",
+      "input_sha256": "355504efe865264a4aedd68ba6f0a2cc4191b5e314abf3bda5cbd10be544add6",
+      "source_page_to_physical": [
+        [
+          1
+        ],
+        [
+          2
+        ]
+      ],
+      "split": "development",
+      "document_id": "b53cdeb9-5868-4b63-ba44-1ffd0f0143b8",
+      "pages_sha256": "2b85761c90eaa52acb1b687e47f4b6a2efb30d0cb0848fad9981add916078a10",
+      "canonical_sha256": "355504efe865264a4aedd68ba6f0a2cc4191b5e314abf3bda5cbd10be544add6"
+    },
+    {
+      "sample_id": "s04",
+      "source": "studio.txt",
+      "input": "inputs/studio.png",
+      "source_sha256": "79229f21e5ced48be92f976a43f6ef17e5e86702b1986db5b36b12c6946bbc25",
+      "input_sha256": "8e49e0d18751deb4ca4bba644e8226cafef1fee69c7bb00166848dd20a2e43cc",
+      "source_page_to_physical": [
+        [
+          1
+        ],
+        [
+          1
+        ]
+      ],
+      "split": "development",
+      "document_id": "47b88152-30da-4658-9505-6317d3933237",
+      "pages_sha256": "48e09f6cba84cd4c416ff9b2bb98e1e5d11791b2dd006bd32db3936d1ea5ada2",
+      "canonical_sha256": "6bd51999bb2b625f852488f69840fb184183ab5621f6eecd41df186ce17ca4d2"
+    },
+    {
+      "sample_id": "s05",
+      "source": "sample contact 1.pdf",
+      "input": "inputs/sample contact 1.pdf",
+      "source_sha256": "245cf07f4878ac728221cb13f57ba53c427fa90146b3c68d81c1a257f2878d3a",
+      "input_sha256": "245cf07f4878ac728221cb13f57ba53c427fa90146b3c68d81c1a257f2878d3a",
+      "source_page_to_physical": [
+        [
+          1
+        ],
+        [
+          2
+        ],
+        [
+          3
+        ],
+        [
+          4
+        ],
+        [
+          5
+        ],
+        [
+          6
+        ],
+        [
+          7
+        ],
+        [
+          8
+        ]
+      ],
+      "split": "development",
+      "document_id": "6c70bbdf-f5e8-473c-8344-c5bc069e707a",
+      "pages_sha256": "f3c743cbcdfe59765d8a1cb88748557a1ff495dc371c2202de1a0424e445e50f",
+      "canonical_sha256": "245cf07f4878ac728221cb13f57ba53c427fa90146b3c68d81c1a257f2878d3a"
+    },
+    {
+      "sample_id": "s06",
+      "source": "Singapore lease agreement.pdf",
+      "input": "inputs/Singapore lease agreement.pdf",
+      "source_sha256": "28d73a43b1365998026afacd07a54079dc514ed67efa5deaf964d44a2b4f98e2",
+      "input_sha256": "28d73a43b1365998026afacd07a54079dc514ed67efa5deaf964d44a2b4f98e2",
+      "source_page_to_physical": [
+        [
+          1
+        ],
+        [
+          2
+        ],
+        [
+          3
+        ],
+        [
+          4
+        ],
+        [
+          5
+        ],
+        [
+          6
+        ],
+        [
+          7
+        ],
+        [
+          8
+        ],
+        [
+          9
+        ],
+        [
+          10
+        ]
+      ],
+      "split": "development",
+      "document_id": "003b356a-2961-4fbb-a292-54e42b8b8aad",
+      "pages_sha256": "8c764d507da09a52ca651a314cb8fe527b0ae4a7341f24466505c8f70f72b5f9",
+      "canonical_sha256": "28d73a43b1365998026afacd07a54079dc514ed67efa5deaf964d44a2b4f98e2"
+    },
+    {
+      "sample_id": "s07",
+      "source": "Exhibit 10.21 - Singapore Lease.pdf",
+      "input": "inputs/Exhibit 10.21 - Singapore Lease.pdf",
+      "source_sha256": "322083e781cf4a76725f68f3d6f9a7d54d623350626249773fd6add925789adb",
+      "input_sha256": "322083e781cf4a76725f68f3d6f9a7d54d623350626249773fd6add925789adb",
+      "source_page_to_physical": [
+        [
+          1
+        ],
+        [
+          2
+        ],
+        [
+          3
+        ],
+        [
+          4
+        ],
+        [
+          5
+        ],
+        [
+          6
+        ],
+        [
+          7
+        ],
+        [
+          8
+        ],
+        [
+          9
+        ],
+        [
+          10
+        ],
+        [
+          11
+        ],
+        [
+          12
+        ],
+        [
+          13
+        ],
+        [
+          14
+        ],
+        [
+          15
+        ],
+        [
+          16
+        ],
+        [
+          17
+        ],
+        [
+          18
+        ],
+        [
+          19
+        ],
+        [
+          20
+        ],
+        [
+          21
+        ],
+        [
+          22
+        ],
+        [
+          23
+        ],
+        [
+          24
+        ],
+        [
+          25
+        ],
+        [
+          26
+        ],
+        [
+          27
+        ],
+        [
+          28
+        ],
+        [
+          29
+        ],
+        [
+          30
+        ],
+        [
+          31
+        ],
+        [
+          32
+        ],
+        [
+          33
+        ],
+        [
+          34
+        ],
+        [
+          35
+        ],
+        [
+          36
+        ],
+        [
+          37
+        ],
+        [
+          38
+        ],
+        [
+          39
+        ],
+        [
+          40
+        ],
+        [
+          41
+        ],
+        [
+          42
+        ],
+        [
+          43
+        ],
+        [
+          44
+        ],
+        [
+          45
+        ],
+        [
+          46
+        ],
+        [
+          47
+        ],
+        [
+          48
+        ],
+        [
+          49
+        ],
+        [
+          50
+        ],
+        [
+          51
+        ],
+        [
+          52
+        ]
+      ],
+      "split": "development",
+      "document_id": "ae3675f6-9ef0-49c6-8c6d-678ff36cec28",
+      "pages_sha256": "8f9f77e599d8a88c0a52e3e60affb9378f3ff9b9732a8cf81e40997f0771eab5",
+      "canonical_sha256": "322083e781cf4a76725f68f3d6f9a7d54d623350626249773fd6add925789adb"
+    },
+    {
+      "sample_id": "s08",
+      "source": "Exclusive_Distribution_Rights_Agreement.pdf",
+      "input": "inputs/Exclusive_Distribution_Rights_Agreement.pdf",
+      "source_sha256": "f93341f5576848f5bd45ee59f27b89721816747f062f3cc4851e73c2645e3ab5",
+      "input_sha256": "f93341f5576848f5bd45ee59f27b89721816747f062f3cc4851e73c2645e3ab5",
+      "source_page_to_physical": [
+        [
+          1
+        ],
+        [
+          2
+        ],
+        [
+          3
+        ],
+        [
+          4
+        ],
+        [
+          5
+        ]
+      ],
+      "split": "holdout",
+      "document_id": "8fa28ba0-e5db-41bc-b283-5a65ddc90644",
+      "pages_sha256": "604fbfc703e5785d762cace6cf47367cc667f7b17729efafa7fac4f6dc18beca",
+      "canonical_sha256": "f93341f5576848f5bd45ee59f27b89721816747f062f3cc4851e73c2645e3ab5"
+    },
+    {
+      "sample_id": "s09",
+      "source": "seychelle and confident.pdf",
+      "input": "inputs/seychelle and confident.pdf",
+      "source_sha256": "9bdbcbb031f4fffc7abcb025675279393c3be86c49dc8f4161723c5e25f40973",
+      "input_sha256": "9bdbcbb031f4fffc7abcb025675279393c3be86c49dc8f4161723c5e25f40973",
+      "source_page_to_physical": [
+        [
+          1
+        ],
+        [
+          2
+        ],
+        [
+          3
+        ]
+      ],
+      "split": "holdout",
+      "document_id": "6f07221f-08be-4b68-8087-234ec6650480",
+      "pages_sha256": "d1b7545b6065f6841260d34c6a6eac4079c0547d27f9a4c4aa203e1124e5b2cc",
+      "canonical_sha256": "9bdbcbb031f4fffc7abcb025675279393c3be86c49dc8f4161723c5e25f40973"
+    },
+    {
+      "sample_id": "s10",
+      "source": "seychelle and pacific.pdf",
+      "input": "inputs/seychelle and pacific.pdf",
+      "source_sha256": "056074ef1ed76961a00d88cc3f44d6186977277ea81de7fba5478c4cddadc3f7",
+      "input_sha256": "056074ef1ed76961a00d88cc3f44d6186977277ea81de7fba5478c4cddadc3f7",
+      "source_page_to_physical": [
+        [
+          1
+        ],
+        [
+          2
+        ],
+        [
+          3
+        ]
+      ],
+      "split": "holdout",
+      "document_id": "38a91bd4-ca1a-41cc-8726-e1957687fd4c",
+      "pages_sha256": "81f85d46f2e73cd36a53d850aa1665256413247df7dca494f7deb7350ddf4bae",
+      "canonical_sha256": "056074ef1ed76961a00d88cc3f44d6186977277ea81de7fba5478c4cddadc3f7"
+    }
+  ]
+}

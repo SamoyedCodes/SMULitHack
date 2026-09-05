@@ -42,6 +42,8 @@ class Config:
             path_str = "/tmp/data"
         path = Path(path_str).expanduser()
         self.data_dir = (path if path.is_absolute() else ROOT / path).resolve()
+        evaluation_path = Path(setting("AITHENA_EVALUATION_DIR", "data/phase7")).expanduser()
+        self.evaluation_dir = (evaluation_path if evaluation_path.is_absolute() else ROOT / evaluation_path).resolve()
         self.api_port = self._port("AITHENA_API_PORT", "8000")
         self.web_port = self._port("AITHENA_WEB_PORT", "3000")
         if self.api_port == self.web_port:
@@ -75,6 +77,10 @@ class Config:
     @property
     def openrouter_model(self) -> str:
         return setting("OPENROUTER_MODEL", "openrouter/free")
+
+    @property
+    def vision_model(self) -> str:
+        return setting("OPENROUTER_VISION_MODEL", "google/gemini-2.5-flash-lite")
 
     @property
     def routing_identity(self) -> str:

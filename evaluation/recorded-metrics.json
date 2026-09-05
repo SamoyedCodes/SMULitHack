@@ -1,0 +1,397 @@
+{
+  "review_status": "provisional_pending_independent_review",
+  "model": "z-ai/glm-5.3-flash",
+  "budget": {
+    "ceiling_usd": "14",
+    "charged_usd": "0",
+    "unreconciled_reserved_usd": "0.082739200",
+    "requests": 1,
+    "unreconciled_requests": 1
+  },
+  "stopped": "Response has no trustworthy usage cost; reservation retained and campaign stopped.",
+  "groups": {
+    "development": {
+      "documents": 7,
+      "field_accuracy": {
+        "correct": 0,
+        "total": 0,
+        "rate": null
+      },
+      "fields_total": 56,
+      "fields_unreviewed": 56,
+      "fact_accuracy": {
+        "correct": 0,
+        "total": 0,
+        "rate": null
+      },
+      "facts_total": 105,
+      "facts_unreviewed": 105,
+      "answerable_coverage": {
+        "correct": 0,
+        "total": 96,
+        "rate": 0.0
+      },
+      "prediction_correctness": {
+        "correct": 0,
+        "total": 0,
+        "rate": null
+      },
+      "predictions_unreviewed": 0,
+      "citation_validity": {
+        "correct": 0,
+        "total": 0,
+        "rate": null
+      },
+      "correctness_by_confidence": {
+        "high": {
+          "correct": 0,
+          "total": 0,
+          "rate": null,
+          "unreviewed": 0
+        },
+        "medium": {
+          "correct": 0,
+          "total": 0,
+          "rate": null,
+          "unreviewed": 0
+        },
+        "low": {
+          "correct": 0,
+          "total": 0,
+          "rate": null,
+          "unreviewed": 0
+        }
+      },
+      "candidate_recall": {
+        "correct": 0,
+        "total": 1,
+        "rate": 0.0
+      },
+      "retained_for_review_recall": {
+        "correct": 0,
+        "total": 1,
+        "rate": 0.0
+      },
+      "conflict_precision": {
+        "correct": 0,
+        "total": 0,
+        "rate": null
+      },
+      "conflict_recall": {
+        "correct": 0,
+        "total": 1,
+        "rate": 0.0
+      },
+      "pairs_unassessed": 1,
+      "deadline_recall": {
+        "correct": 0,
+        "total": 4,
+        "rate": 0.0
+      },
+      "deadline_accuracy": {
+        "correct": 0,
+        "total": 0,
+        "rate": null
+      },
+      "unexpected_dates": []
+    },
+    "holdout": {
+      "documents": 3,
+      "field_accuracy": {
+        "correct": 0,
+        "total": 0,
+        "rate": null
+      },
+      "fields_total": 24,
+      "fields_unreviewed": 24,
+      "fact_accuracy": {
+        "correct": 0,
+        "total": 0,
+        "rate": null
+      },
+      "facts_total": 39,
+      "facts_unreviewed": 39,
+      "answerable_coverage": {
+        "correct": 0,
+        "total": 32,
+        "rate": 0.0
+      },
+      "prediction_correctness": {
+        "correct": 0,
+        "total": 0,
+        "rate": null
+      },
+      "predictions_unreviewed": 0,
+      "citation_validity": {
+        "correct": 0,
+        "total": 0,
+        "rate": null
+      },
+      "correctness_by_confidence": {
+        "high": {
+          "correct": 0,
+          "total": 0,
+          "rate": null,
+          "unreviewed": 0
+        },
+        "medium": {
+          "correct": 0,
+          "total": 0,
+          "rate": null,
+          "unreviewed": 0
+        },
+        "low": {
+          "correct": 0,
+          "total": 0,
+          "rate": null,
+          "unreviewed": 0
+        }
+      },
+      "candidate_recall": {
+        "correct": 0,
+        "total": 3,
+        "rate": 0.0
+      },
+      "retained_for_review_recall": {
+        "correct": 0,
+        "total": 3,
+        "rate": 0.0
+      },
+      "conflict_precision": {
+        "correct": 0,
+        "total": 0,
+        "rate": null
+      },
+      "conflict_recall": {
+        "correct": 0,
+        "total": 1,
+        "rate": 0.0
+      },
+      "pairs_unassessed": 3,
+      "deadline_recall": {
+        "correct": 0,
+        "total": 0,
+        "rate": null
+      },
+      "deadline_accuracy": {
+        "correct": 0,
+        "total": 0,
+        "rate": null
+      },
+      "unexpected_dates": []
+    },
+    "all": {
+      "documents": 10,
+      "field_accuracy": {
+        "correct": 0,
+        "total": 0,
+        "rate": null
+      },
+      "fields_total": 80,
+      "fields_unreviewed": 80,
+      "fact_accuracy": {
+        "correct": 0,
+        "total": 0,
+        "rate": null
+      },
+      "facts_total": 144,
+      "facts_unreviewed": 144,
+      "answerable_coverage": {
+        "correct": 0,
+        "total": 128,
+        "rate": 0.0
+      },
+      "prediction_correctness": {
+        "correct": 0,
+        "total": 0,
+        "rate": null
+      },
+      "predictions_unreviewed": 0,
+      "citation_validity": {
+        "correct": 0,
+        "total": 0,
+        "rate": null
+      },
+      "correctness_by_confidence": {
+        "high": {
+          "correct": 0,
+          "total": 0,
+          "rate": null,
+          "unreviewed": 0
+        },
+        "medium": {
+          "correct": 0,
+          "total": 0,
+          "rate": null,
+          "unreviewed": 0
+        },
+        "low": {
+          "correct": 0,
+          "total": 0,
+          "rate": null,
+          "unreviewed": 0
+        }
+      },
+      "candidate_recall": {
+        "correct": 0,
+        "total": 4,
+        "rate": 0.0
+      },
+      "retained_for_review_recall": {
+        "correct": 0,
+        "total": 4,
+        "rate": 0.0
+      },
+      "conflict_precision": {
+        "correct": 0,
+        "total": 0,
+        "rate": null
+      },
+      "conflict_recall": {
+        "correct": 0,
+        "total": 2,
+        "rate": 0.0
+      },
+      "pairs_unassessed": 4,
+      "deadline_recall": {
+        "correct": 0,
+        "total": 4,
+        "rate": 0.0
+      },
+      "deadline_accuracy": {
+        "correct": 0,
+        "total": 0,
+        "rate": null
+      },
+      "unexpected_dates": []
+    }
+  },
+  "failures": [
+    {
+      "sample": "s01",
+      "status": "failed",
+      "error": "Response has no trustworthy usage cost; reservation retained and campaign stopped."
+    },
+    {
+      "sample": "s02",
+      "status": "text_ready",
+      "error": null
+    },
+    {
+      "sample": "s03",
+      "status": "text_ready",
+      "error": null
+    },
+    {
+      "sample": "s04",
+      "status": "text_ready",
+      "error": null
+    },
+    {
+      "sample": "s05",
+      "status": "text_ready",
+      "error": null
+    },
+    {
+      "sample": "s06",
+      "status": "needs_source_review",
+      "error": null
+    },
+    {
+      "sample": "s07",
+      "status": "needs_source_review",
+      "error": null
+    },
+    {
+      "sample": "s08",
+      "status": "text_ready",
+      "error": null
+    },
+    {
+      "sample": "s09",
+      "status": "text_ready",
+      "error": null
+    },
+    {
+      "sample": "s10",
+      "status": "text_ready",
+      "error": null
+    }
+  ],
+  "pair_results": [
+    {
+      "samples": [
+        "s01",
+        "s03"
+      ],
+      "expected": "potential_conflict",
+      "observed": null,
+      "screen": null,
+      "must_retain": true
+    },
+    {
+      "samples": [
+        "s09",
+        "s10"
+      ],
+      "expected": "potential_conflict",
+      "observed": null,
+      "screen": null,
+      "must_retain": true
+    },
+    {
+      "samples": [
+        "s08",
+        "s09"
+      ],
+      "expected": "insufficient_evidence",
+      "observed": null,
+      "screen": null,
+      "must_retain": true
+    },
+    {
+      "samples": [
+        "s08",
+        "s10"
+      ],
+      "expected": "insufficient_evidence",
+      "observed": null,
+      "screen": null,
+      "must_retain": true
+    }
+  ],
+  "deadline_results": [
+    {
+      "sample": "s01",
+      "as_of": "2026-12-01",
+      "event_date": "2026-12-31",
+      "action_date": null,
+      "event_type": "expiry",
+      "found": false
+    },
+    {
+      "sample": "s02",
+      "as_of": "2026-09-05",
+      "event_date": "2026-11-30",
+      "action_date": "2026-10-01",
+      "event_type": "renewal",
+      "found": false
+    },
+    {
+      "sample": "s03",
+      "as_of": "2026-09-05",
+      "event_date": "2026-10-31",
+      "action_date": null,
+      "event_type": "expiry",
+      "found": false
+    },
+    {
+      "sample": "s04",
+      "as_of": "2026-09-05",
+      "event_date": "2026-10-31",
+      "action_date": null,
+      "event_type": "expiry",
+      "found": false
+    }
+  ]
+}

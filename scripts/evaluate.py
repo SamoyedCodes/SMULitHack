@@ -279,7 +279,7 @@ def run(root):
     if store.setting('evaluation:stopped'):
         finalize_stop(root, cfg, store)
         print('Campaign stopped with an unresolved provider/billing outcome. No network request was made.')
-        return
+        raise SystemExit(2)
     if cfg.openrouter_model != MODEL or not cfg.openrouter_api_key:
         raise ValueError('Configure the agreed OPENROUTER_MODEL and OPENROUTER_API_KEY first.')
     if store.setting('evaluation:closed'):
@@ -364,6 +364,7 @@ def replay_app(root):
     from backend.api import create_app, error
     _, cfg, store = verify(root)
     finalize_stop(root, cfg, store)
+    cfg.evaluation_dir = root.resolve()
     app = create_app(cfg, start_worker=False)
     @app.middleware('http')
     async def read_only(request, call_next):

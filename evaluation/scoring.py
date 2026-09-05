@@ -153,5 +153,9 @@ def score(root, judgment_path=None):
     for f in report['failures']:
         lines.append(f"- {f['sample']}: {f['status']} — {f['error']}")
     (root / 'REPORT.md').write_text('\n'.join(lines) + '\n')
+    from backend.evaluation_report import build_scorecard, render_report
+    card = build_scorecard(report, manifest, run, portfolios, judgments, key, digest(root / 'run.json'))
+    write_json(root / 'scorecard.json', card.model_dump(mode='json'))
+    (root / 'SCORECARD.html').write_text(render_report(card))
     print(root / 'REPORT.md')
     return report

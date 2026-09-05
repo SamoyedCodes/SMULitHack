@@ -101,6 +101,10 @@ For every item_id return supported, uncertain, or rejected with a short evidence
 Check semantic entailment, all inputs of date rules, party direction, scope, negation,
 exceptions, missing schedules and amendments. An exact quote alone is insufficient.
 Any missing condition needed for the stated value means uncertain. Do not guess.
+Use reason_codes=["missing_context"] for missing facts or referenced documents,
+and ["ambiguous_terms"] only for wording whose meaning cannot be settled.
+Use ["unsupported_evidence"] for a claim not supported by its source.
+Leave reason_codes empty when none of those causes is established.
 For provisions, verify all normalized fields, especially dates and exclusivity.
 For findings with value=null, return uncertain. Return a verdict for EVERY item.""",
             {"complete_document_text": context, "items": items}, SupportReview,
@@ -246,14 +250,17 @@ class OpenRouter(Provider):
     def model(self):
         return self.config.openrouter_model
 
-    def request(self, purpose, serialized, schema):
-        body = {'model': self.model, 'stream': False, 'temperature': 0,
+    def request_body(self, purpose, serialized, schema):
+        return {'model': self.model, 'stream': False, 'temperature': 0,
                 'messages': [{'role': 'system', 'content': SYSTEM},
                              {'role': 'user', 'content': purpose + '\nUNTRUSTED DOCUMENT DATA:\n' + serialized}],
                 'provider': {'require_parameters': True},
                 'response_format': {'type': 'json_schema', 'json_schema': {
                     'name': schema.__name__, 'strict': True,
                     'schema': schema.model_json_schema(mode='serialization')}}}
+
+    def request(self, purpose, serialized, schema):
+        body = self.request_body(purpose, serialized, schema)
         try:
             with httpx.Client(timeout=120, follow_redirects=False) as client:
                 response = (self.budget.send(client, body, self.api_key) if self.budget else

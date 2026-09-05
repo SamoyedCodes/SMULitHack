@@ -105,6 +105,10 @@ def apply_extraction(doc: Document, extraction: Extraction, review: SupportRevie
             issues.append(ReviewIssue(
                 id=stable_id(doc.id, draft.id, "issue"), document_ids=[doc.id],
                 title=FIELD_LABELS[draft.field] + " needs review",
+                reason_codes=list(dict.fromkeys((["unsupported_evidence"] if errors or not evidence else []) +
+                    (["incomplete_analysis"] if not verdict else []) +
+                    (["missing_context"] if verdict and verdict.missing_context else []) +
+                    (verdict.reason_codes if verdict else []))),
                 missing_facts=[reason] + (verdict.missing_context if verdict else []),
                 lawyer_question="What does the complete agreement establish about " + FIELD_LABELS[draft.field].lower() + "?",
                 evidence=evidence, mode=doc.mode,
@@ -115,14 +119,14 @@ def apply_extraction(doc: Document, extraction: Extraction, review: SupportRevie
             findings.append(finding)
             issues.append(ReviewIssue(
                 id=stable_id(doc.id, field, "missing"), document_ids=[doc.id],
-                title=FIELD_LABELS[field] + " not established",
+                title=FIELD_LABELS[field] + " not established", reason_codes=["not_established"],
                 missing_facts=[finding.confidence_reason],
                 lawyer_question="Is there another clause or document establishing " + FIELD_LABELS[field].lower() + "?",
                 mode=doc.mode,
             ))
     for missing in extraction.missing_context:
         issues.append(ReviewIssue(
-            id=stable_id(doc.id, missing), document_ids=[doc.id], title="Referenced context needs review",
+            id=stable_id(doc.id, missing), document_ids=[doc.id], title="Referenced context needs review", reason_codes=["missing_context"],
             missing_facts=[missing], lawyer_question="Which additional documents or facts are needed to complete the assessment?",
             mode=doc.mode,
         ))
@@ -134,9 +138,9 @@ def apply_extraction(doc: Document, extraction: Extraction, review: SupportRevie
         if errors or not evidence or not complete or (verdict and verdict.missing_context):
             why = "; ".join(errors) or ("Source coverage or required context is incomplete." if not complete else "; ".join(verdict.missing_context) if verdict and verdict.missing_context else "No valid source evidence.")
             checked_reviews = [v for v in checked_reviews if v.item_id != item.id]
-            checked_reviews.append(Verdict(item_id=item.id, status="uncertain", reason=why))
+            checked_reviews.append(Verdict(item_id=item.id, status="uncertain", reason=why, reason_codes=(["unsupported_evidence"] if errors or not evidence else ["source_unreadable"] if not pages_complete(doc, pages) else ["missing_context"])))
         elif not verdict:
-            checked_reviews.append(Verdict(item_id=item.id, status="uncertain", reason="Not assessed by the support-review pass."))
+            checked_reviews.append(Verdict(item_id=item.id, status="uncertain", reason="Not assessed by the support-review pass.", reason_codes=["incomplete_analysis"]))
     for item in [*extraction.deadlines, *extraction.provisions]:
         verdict = next((v for v in checked_reviews if v.item_id == item.id), None)
         if not verdict or verdict.status != 'supported' or verdict.missing_context:
@@ -144,6 +148,9 @@ def apply_extraction(doc: Document, extraction: Extraction, review: SupportRevie
             issues.append(ReviewIssue(
                 id=stable_id(doc.id, item.id, 'support'), document_ids=[doc.id],
                 title='Extracted rule or commercial scope needs review',
+                reason_codes=list(dict.fromkeys((["unsupported_evidence"] if not evidence else []) +
+                    (["incomplete_analysis"] if not verdict else verdict.reason_codes) +
+                    (["missing_context"] if verdict and verdict.missing_context else []))),
                 missing_facts=([verdict.reason, *verdict.missing_context] if verdict else ['Support review is missing.']),
                 lawyer_question='What does the complete source establish about this rule or commercial scope?',
                 evidence=evidence, mode=doc.mode,

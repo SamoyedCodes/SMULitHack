@@ -139,7 +139,7 @@ class Worker:
         doc.issues = [i for i in doc.issues if i.kind != 'source_reading'] + [ReviewIssue(
             id=f'{doc.id}:source:{p.number}', document_ids=[doc.id], title=f'Page {p.number} needs source review',
             missing_facts=p.warnings, lawyer_question='Is there a legible complete copy of this page?',
-            kind='source_reading', mode=doc.mode,
+            kind='source_reading', reason_codes=['source_unreadable'], mode=doc.mode,
         ) for p in pages if p.warnings]
         doc.status = 'needs_source_review' if doc.warnings else 'text_ready'
         doc.stage = 'Local reading finished with source issues; review before extraction' if doc.warnings else 'Text ready; obligations have not been extracted'
@@ -149,7 +149,8 @@ class Worker:
     def run_extraction_job(self, job):
         from .llm import ProviderUnavailable, ProviderFailure, QuotaWait
         try:
-            self.extract_document(job['payload']['document_id'])
+            self.extract_document(job['payload']['document_id'], visual_review=job['payload'].get('visual_review', False),
+                                  visual_attempt=job['id'])
             self.store.job_state(job['id'], 'complete')
             from .conflict_service import reconcile
             try:
@@ -172,7 +173,7 @@ class Worker:
             self.mark_doc(job, 'failed', message)
         return True
 
-    def extract_document(self, document_id):
+    def extract_document(self, document_id, visual_review=False, visual_attempt=None):
         """Phase 3 stage: grounded extraction and support review over already-read pages."""
         from .config import VERSION
         from .evidence import apply_extraction, stable_id
@@ -194,6 +195,39 @@ class Worker:
         doc.pages_analyzed = 0
         doc.status, doc.error = "extracting", None
         self.store.put_document(doc)
+        if visual_review:
+            from .ingestion import source_path
+            from .visual_review import VisionClient, review_pages
+            vision = VisionClient(self.config, self.store)
+            old_source_warnings = {f'Page {p.number}: {w}' for p in pages for w in p.warnings}
+
+            def visual_checkpoint(number):
+                if self.stop_event.is_set():
+                    raise Interrupted()
+                doc.stage = f"Reviewing low-confidence OCR regions visually · page {number}"
+                self.store.put_document(doc)
+
+            attempt_key = 'visual-triage:' + visual_attempt if visual_attempt else None
+            completed = self.store.setting(attempt_key, None) if attempt_key else None
+            if completed is None:
+                review_pages(source_path(self.config, doc.id, 'canonical.pdf'), pages_path, pages, vision, visual_checkpoint)
+                completed = {'use': vision.last_use.model_dump() if vision.last_use else None}
+                if attempt_key:
+                    self.store.set_setting(attempt_key, completed)
+            if completed['use']:
+                from .models import ModelUse
+                doc.model_usage.append(ModelUse.model_validate(completed['use']))
+            # Replace only source-page warnings and issues; retain all other diagnostics.
+            from .documents import LOW_OCR_WARNING
+            old_source_warnings.update(f'Page {p.number}: {LOW_OCR_WARNING}' for p in pages)
+            doc.warnings = [w for w in doc.warnings if w not in old_source_warnings]
+            doc.warnings.extend(f'Page {p.number}: {w}' for p in pages for w in p.warnings)
+            doc.issues = [i for i in doc.issues if i.kind != 'source_reading'] + [ReviewIssue(
+                id=f'{doc.id}:source:{p.number}', document_ids=[doc.id], title=f'Page {p.number} needs source review',
+                missing_facts=p.warnings, lawyer_question='Is there a legible complete copy of this page?',
+                kind='source_reading', reason_codes=['source_unreadable'], mode=doc.mode,
+            ) for p in pages if p.warnings]
+            self.store.put_document(doc)
         def record_model_use():
             use = getattr(self.llm, 'last_use', None)
             if use and use not in doc.model_usage:

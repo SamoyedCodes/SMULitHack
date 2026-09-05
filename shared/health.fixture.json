@@ -43,5 +43,5 @@
     "megabytes_per_file": 25,
     "pages_per_file": 200
   },
-  "inference_notice": "When analysis is enabled, extracted contract text is sent to OpenRouter and its model provider, or Gemini as secondary when OpenRouter is unavailable. Original files and saved results stay local."
+  "inference_notice": "When analysis is enabled, extracted contract text is sent to OpenRouter and its model provider, or Gemini as secondary when OpenRouter is unavailable. Optional visual OCR review also sends rendered page images and flagged crops to the configured OpenRouter vision model. Original files and saved results stay local."
 }

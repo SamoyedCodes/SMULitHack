@@ -88,8 +88,8 @@ export async function setSme(name: string | null): Promise<void> {
   const body = await apiRequest('/settings/sme', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({name, mode:'live'}) })
   if (!validateSme(body)) throw new ApiError('validation', 'The party selection response does not match this build.')
 }
-export async function extractDocument(id: string): Promise<void> {
-  const body = await apiRequest(`/extract?document_id=${encodeURIComponent(id)}`, { method: 'POST' })
+export async function extractDocument(id: string, visualReview = false): Promise<void> {
+  const body = await apiRequest(`/extract?document_id=${encodeURIComponent(id)}${visualReview ? '&visual_review=true' : ''}`, { method: 'POST' })
   if (!validateRetry(body)) throw new ApiError('validation', 'The extraction response does not match this build.')
 }
 
@@ -119,4 +119,18 @@ export async function fetchBrief(id: string, signal?: AbortSignal, context?: Pic
   const body = await apiRequest(`/review/${encodeURIComponent(id)}/brief${query}`, { signal })
   if (!validateBrief(body)) throw new ApiError('validation', 'The lawyer brief response does not match this build.')
   return body
+}
+
+export type EvaluationScorecard = components['schemas']['EvaluationScorecard']
+const validateScorecard = ajv.compile<EvaluationScorecard>({$ref:'aithena#/components/schemas/EvaluationScorecard'})
+export async function fetchScorecard(signal?: AbortSignal): Promise<EvaluationScorecard> {
+  const result = await apiRequest('/evaluation/scorecard', {signal})
+  if (!validateScorecard(result)) throw new ApiError('validation', 'The saved evaluation does not match this build.')
+  return result
+}
+export async function downloadEvaluation(card: EvaluationScorecard, signal?: AbortSignal) {
+  const query = new URLSearchParams({run_sha256:card.run_sha256, generated_at:card.generated_at})
+  const response = await fetch(`/api/evaluation/report?${query}`, {signal:AbortSignal.any([AbortSignal.timeout(5000), ...(signal ? [signal] : [])])})
+  if (!response.ok) throw new Error('The evaluation report could not be downloaded. Refresh the saved scorecard and retry.')
+  return response.blob()
 }

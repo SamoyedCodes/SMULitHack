@@ -170,7 +170,7 @@ class Store:
                 db.execute("UPDATE documents SET body=? WHERE id=?", (doc.model_dump_json(), document_id))
             return count
 
-    def queue_extraction(self, document_id: str, key: str) -> int:
+    def queue_extraction(self, document_id: str, key: str, visual_review: bool = False) -> int:
         with self.connection() as db:
             db.execute('BEGIN IMMEDIATE')
             row = db.execute('SELECT body FROM documents WHERE id=?', (document_id,)).fetchone()
@@ -189,7 +189,7 @@ class Store:
                 db.execute("UPDATE jobs SET state='queued', next_run=0, error=NULL WHERE id=?", (job['id'],))
             else:
                 db.execute('INSERT INTO jobs(id,cache_key,kind,payload,created_at) VALUES(?,?,?,?,?)',
-                           (str(uuid.uuid4()), key, 'extract', json.dumps({'document_id':doc.id, 'mode':doc.mode}), now()))
+                           (str(uuid.uuid4()), key, 'extract', json.dumps({'document_id':doc.id, 'mode':doc.mode, 'visual_review':visual_review}), now()))
             doc.status, doc.stage, doc.error = 'extraction_queued', 'Queued for extraction and support review (OpenRouter primary, Gemini secondary)', None
             db.execute('UPDATE documents SET body=? WHERE id=?', (doc.model_dump_json(), doc.id))
             return 1

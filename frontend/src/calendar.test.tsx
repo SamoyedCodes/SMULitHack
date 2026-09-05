@@ -17,7 +17,7 @@ const issue = (over: Partial<ReviewIssue> = {}): ReviewIssue => ({
   id: 'i1', document_ids: ['a'], title: 'Deadline cannot be established', established: [],
   missing_facts: ['Business days are not defined in the source.'],
   lawyer_question: 'What does the agreement define as a business day?', urgency: 'Review before relying on this provision.',
-  evidence, kind: 'deadline', mode: 'live', ...over,
+  evidence, kind: 'deadline', reason_codes: [], mode: 'live', ...over,
 })
 
 const portfolio = (over: Partial<Portfolio> = {}): Portfolio => ({

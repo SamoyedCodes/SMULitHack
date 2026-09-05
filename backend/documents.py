@@ -111,6 +111,9 @@ def ocr_spans(page, document_id: str, page_number: int, index: int, clip=None) -
     return spans
 
 
+LOW_OCR_WARNING = "Some scanned words have low OCR confidence; source review is needed."
+
+
 def parse_pdf(path: Path, document_id: str, progress=None, existing: list[Page] | None = None) -> list[Page]:
     pages = []
     cached = {p.number: p for p in (existing or [])}
@@ -146,7 +149,7 @@ def parse_pdf(path: Path, document_id: str, progress=None, existing: list[Page] 
                     result.status = "unreadable"
                     result.warnings.append("No legible text on this page. It may be blank or contain unreadable content.")
                 if any(s.ocr_confidence is not None and s.ocr_confidence < 70 for s in result.spans):
-                    result.warnings.append("Some scanned words have low OCR confidence; source review is needed.")
+                    result.warnings.append(LOW_OCR_WARNING)
             except Exception as error:
                 result.status = "error"
                 result.warnings.append(str(error) if isinstance(error, ValueError) else "Local OCR failed or timed out; this page has not been fully read.")

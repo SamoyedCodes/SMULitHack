@@ -1,6 +1,6 @@
 # AITHENA — local contract workspace
 
-> Current checkpoint: Phases 1–6 are integrated. Local ingestion, explicit OpenRouter/Gemini extraction, grounded deadline calculations, automatic distribution comparisons, and review/printable lawyer briefs are enabled. Phase 7 evaluation and sample loading remain outside this checkpoint. See [combined integration verification](docs/PHASE_4_6_INTEGRATION.md).
+> Current checkpoint: Phases 1–6 are integrated. Local ingestion, explicit OpenRouter/Gemini extraction, grounded deadline calculations, automatic distribution comparisons, and review/printable lawyer briefs are enabled. Phase 7 now has a ten-document evaluation CLI and read-only replay; its first live request stopped on missing usage cost, so accuracy remains unmeasured. Sample loading remains disabled. See [Phase 7 results and demo instructions](docs/PHASE_7_EVALUATION.md) and [combined integration verification](docs/PHASE_4_6_INTEGRATION.md).
 
 
 AITHENA is a local contract workspace built on a React interface over a local FastAPI/SQLite foundation. Phases 1–6 are integrated into a single pipeline: batch ingestion, physical-page source viewing, explicit provider extraction, grounded deadline calendars, automatic distribution comparisons, and review/printable lawyer briefs. Upload PDFs, DOCX, PNGs or JPEGs (including scans), inspect every physical page, and select text blocks to highlight their source locations. Local reading needs no model key. Requested extraction and automatically allowed conflict comparisons send extracted text to a configured provider.
@@ -39,6 +39,7 @@ Nonempty process environment values override repository-root `.env`, then defaul
 | `AITHENA_DATA_DIR` | `data` | Local SQLite and future originals/results |
 | `OPENROUTER_API_KEY` | absent | Primary backend provider credential |
 | `OPENROUTER_MODEL` | `openrouter/free` | Primary model/route; set a supported model explicitly for reproducible evaluation |
+| `OPENROUTER_VISION_MODEL` | `google/gemini-2.5-flash-lite` | Optional visual OCR triage; used only when **Review low-confidence scans with AI** is selected before extraction. Uses the OpenRouter key; see [setup, cost limits and evidence handling](docs/VISUAL_OCR_REVIEW.md). |
 | `GEMINI_API_KEY` | absent | Secondary backend credential; `GOOGLE_API_KEY` is its alias |
 | `GEMINI_MODEL` | `gemini-3.8-flash` | Planned configurable model; access has not been verified |
 | `AITHENA_LLM_INTERVAL` | `12` | Future request spacing; finite and nonnegative |
@@ -111,6 +112,10 @@ These fixtures are for ingestion verification only. They are not reviewed extrac
 Maximum document size is 200 pages; oversized/password-protected/damaged PDFs fail visibly. DOCX conversion has a 90-second timeout and a 100 MiB expanded archive limit; images have a 40-megapixel limit. Multi-frame images are rejected rather than reading only the first frame. New ingestion jobs use a cache version independent of Gemini model/key configuration. A process lock ensures one worker per data directory.
 
 ## Provider configuration
+
+Overview shows the selected Singapore date, analysis coverage and actions needing attention. Contracts supports search, processing/review filters and deadline/review sorting; Needs review explains uncertainty and missing facts. Source navigation retains session filters and the originating item.
+
+Evaluation displays a saved benchmark campaign, separate from the current portfolio, with Holdout selected initially. Use `AITHENA_EVALUATION_DIR` to select its saved artifact directory (default `data/phase7`). The existing offline `scripts/evaluate.py score` command writes a versioned scorecard and standalone HTML report. Viewing or downloading them makes no model calls. The stopped Phase 7 campaign remains incomplete with an unreconciled reservation; do not retry it. See [the usability/evaluation checkpoint](docs/USABILITY_EVALUATION.md) for implementation details and verification limits.
 
 See [MODEL_PROVIDERS.md](docs/MODEL_PROVIDERS.md) for OpenRouter primary/Gemini secondary setup, fallback conditions and provider provenance. Local reading still requires no key; provider access and quality are unverified until tested with your configured account/model.
 

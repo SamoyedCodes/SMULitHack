@@ -35,20 +35,21 @@ ARITHMETIC = ("The offset, unit and direction used for this calculation are cite
 class Unestablished(ValueError):
     """A rule input or convention the source does not settle. Carries the question a lawyer needs."""
 
-    def __init__(self, missing: str, question: str):
+    def __init__(self, missing: str, question: str, reason_code: str = "ambiguous_terms"):
         super().__init__(missing)
         self.question = question
+        self.reason_code = reason_code
 
 
 def parse_date(value: str | None) -> date:
     if not value:
         raise Unestablished("The date this period runs from is not established in the source.",
-                            "What date does this period run from, and which clause records it?")
+                            "What date does this period run from, and which clause records it?", "missing_context")
     try:
         return date.fromisoformat(value)
     except ValueError:
         raise Unestablished("The date this period runs from is not a valid calendar date.",
-                            "What date does this period run from, and which clause records it?") from None
+                            "What date does this period run from, and which clause records it?", "missing_context") from None
 
 
 def offset_months(day: date, months: int, end_rule: str = "unspecified") -> date:
@@ -194,19 +195,21 @@ def check_support(rule: DeadlineRule, evidence: list[Evidence], errors: list[str
     """Grounding gates. A partial citation failure still blocks the whole rule."""
     if errors or not evidence:
         raise Unestablished("; ".join(errors) or "This date rule has no validated source citation.",
-                            "Which clause and page establish this date and the period that runs from it?")
+                            "Which clause and page establish this date and the period that runs from it?", "unsupported_evidence")
     if not verdict or verdict.status != "supported" or verdict.missing_context:
         missing = "; ".join([verdict.reason, *verdict.missing_context]) if verdict \
             else "This date rule has not passed the support-review pass."
-        raise Unestablished(missing, "What does the complete agreement establish about this date rule?")
+        raise Unestablished(missing, "What does the complete agreement establish about this date rule?",
+                            "incomplete_analysis" if not verdict else "missing_context" if verdict.missing_context else
+                            verdict.reason_codes[0] if verdict.reason_codes else "not_established")
     if rule.missing_inputs:
         raise Unestablished("; ".join(rule.missing_inputs),
                             "On what date was the invoice received, and how is receipt evidenced?"
                             if rule.action == "payment_due" else
-                            "What are the missing facts this period depends on, and where are they recorded?")
+                            "What are the missing facts this period depends on, and where are they recorded?", "missing_context")
     if rule.offset is None and rule.action != "expiry":
         raise Unestablished("The notice or payment period is not established.",
-                            "What notice or payment period does the agreement require, and from what date?")
+                            "What notice or payment period does the agreement require, and from what date?", "not_established")
     # Refuse the counting rule before enumeration, or an out-of-range occurrence would hide the gate.
     if rule.offset is not None and rule.unit in {"business_days", "unknown"}:
         raise Unestablished(
@@ -287,6 +290,7 @@ def calendar_for(doc: Document, pages: list[Page], as_of: date,
                 missing_facts=[str(error)],
                 lawyer_question=getattr(error, "question", "What date and counting rule applies to this period?"),
                 evidence=evidence, kind="deadline", mode=doc.mode,
+                reason_codes=[getattr(error, "reason_code", "unsupported_evidence")],
             ))
     events.sort(key=event_order)
     return events, issues
@@ -295,7 +299,7 @@ def calendar_for(doc: Document, pages: list[Page], as_of: date,
 def unreadable_pages_issue(doc: Document) -> ReviewIssue:
     return ReviewIssue(
         id=stable_id(doc.id, "deadline", "pages"), document_ids=[doc.id],
-        title="Source pages could not be read for date checking",
+        title="Source pages could not be read for date checking", reason_codes=["source_unreadable"],
         missing_facts=["The saved page checkpoint for this document could not be read, so its date citations could "
                        "not be revalidated. No deadlines have been calculated from it."],
         lawyer_question="Re-read this document's source pages, then confirm which dates and notice periods it "
@@ -307,7 +311,7 @@ def unreadable_pages_issue(doc: Document) -> ReviewIssue:
 def stale_analysis_issue(doc: Document) -> ReviewIssue:
     return ReviewIssue(
         id=stable_id(doc.id, "deadline", "stale"), document_ids=[doc.id],
-        title="Saved date rules are not current",
+        title="Saved date rules are not current", reason_codes=["incomplete_analysis"],
         missing_facts=[f"This document is currently {doc.status}. Date rules saved by an earlier run are not used "
                        "while the current run is incomplete."],
         lawyer_question="Once analysis finishes, confirm which dates and notice periods this document establishes.",

@@ -40,6 +40,14 @@ class Span(Record):
     clause: str | None = None
 
 
+class VisualRegionReview(Record):
+    span_id: str
+    kind: Literal["decoration", "text", "diagram", "uncertain"]
+    contains_meaningful_content: bool
+    reason: str = Field(min_length=1, max_length=800)
+    model: str
+
+
 class Page(Record):
     number: int
     width: float
@@ -47,6 +55,8 @@ class Page(Record):
     spans: list[Span] = Field(default_factory=list)
     status: Literal["read", "unreadable", "error"] = "read"
     warnings: list[str] = Field(default_factory=list)
+    visual_reviews: list[VisualRegionReview] = Field(default_factory=list)
+    visual_review_note: str | None = None
 
 
 class Citation(Record):
@@ -120,10 +130,14 @@ class Extraction(Record):
     missing_context: list[str] = Field(default_factory=list)
 
 
+ReviewReason = Literal["source_unreadable", "missing_context", "ambiguous_terms", "unsupported_evidence", "incomplete_analysis", "not_established"]
+
+
 class Verdict(Record):
     item_id: str
     status: Literal["supported", "uncertain", "rejected"]
     reason: str
+    reason_codes: list[ReviewReason] = Field(default_factory=list)
     missing_context: list[str] = Field(default_factory=list)
 
 
@@ -144,6 +158,7 @@ class Finding(Record):
 
 
 class ReviewIssue(Record):
+    reason_codes: list[ReviewReason] = Field(default_factory=list)
     id: str
     document_ids: list[str]
     title: str

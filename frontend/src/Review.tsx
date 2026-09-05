@@ -1,35 +1,19 @@
 import { useState } from 'react'
 import { CircleAlert, FileText, Scale } from 'lucide-react'
 import { Brief } from './Brief'
-import type { ConflictAssessment, Portfolio, ReviewIssue } from './api'
+import type { Portfolio } from './api'
 
-const CONFLICT_TITLES: Record<string, string> = {
-  potential_conflict: 'Potential distribution-rights conflict',
-  insufficient_evidence: 'Distribution conflict — insufficient evidence',
-  no_conflict_identified_for_this_rule: 'No distribution conflict identified for this rule',
-}
-const CONFLICT_RANK: Record<string, number> = { potential_conflict: 3, insufficient_evidence: 2 }
-
-type QueueItem = { id: string; source: 'issue' | 'conflict'; title: string; documentIds: string[]; question: string; badge: string; rank: number }
-
-export function reviewItems(portfolio: Portfolio): QueueItem[] {
-  const conflicts = (portfolio.conflicts as ConflictAssessment[])
-    .filter(c => c.current && c.status !== 'no_conflict_identified_for_this_rule')
-    .map(c => ({ id: c.id, source: 'conflict' as const, title: CONFLICT_TITLES[c.status] ?? 'Distribution-rights review', documentIds: c.documents, question: c.lawyer_question, badge: c.status.replaceAll('_', ' '), rank: CONFLICT_RANK[c.status] ?? 1 }))
-  const wrappers = new Set(portfolio.conflicts.map(c => `conflict:${c.id}`))
-  const issues = (portfolio.issues as ReviewIssue[])
-    .filter(i => !wrappers.has(i.id))
-    .map(i => ({ id: i.id, source: 'issue' as const, title: i.title, documentIds: i.document_ids, question: i.lawyer_question, badge: i.kind.replaceAll('_', ' '), rank: i.kind === 'deadline' ? 1 : 0 }))
-  return [...new Map([...conflicts, ...issues].map(item => [item.id, item])).values()].sort((a, b) => b.rank - a.rank || a.id.localeCompare(b.id))
-}
+import { reviewItems, filterReview, REASONS, EMPTY_REVIEW, type ReviewFilters, type ReviewCategory } from './presentation'
+export { reviewItems } from './presentation'
 
 function Stat({ label, value }: { label: string; value: number }) {
   return <article><span>{label}</span><strong>{value}</strong></article>
 }
 
-export function ReviewQueue({ portfolio, onOpen, enabled = true }: { portfolio: Portfolio; onOpen: (id: string) => void; enabled?: boolean }) {
+export function ReviewQueue({ portfolio, onOpen, enabled = true, filters = EMPTY_REVIEW, onFilters = () => {} }: { portfolio: Portfolio; onOpen: (id: string) => void; enabled?: boolean; filters?: ReviewFilters; onFilters?: (f: ReviewFilters) => void }) {
   const queue = reviewItems(portfolio)
   const names = new Map(portfolio.documents.map(doc => [doc.id, doc.title || doc.filename]))
+  const shown = filterReview(queue, names, filters)
   const conflicts = portfolio.conflicts.filter(c => c.current)
   const potential = conflicts.filter(c => c.status === 'potential_conflict').length
   const insufficient = conflicts.filter(c => c.status === 'insufficient_evidence').length
@@ -47,6 +31,14 @@ export function ReviewQueue({ portfolio, onOpen, enabled = true }: { portfolio: 
       <p className="phase-notice">Each item collects the established facts, missing facts, source excerpts and the specific question a lawyer must answer. Opening one builds a printable brief. Nothing is ever sent automatically.</p>
     </section>
     <section className="card ingestion-library review-list">
+      <div className="filter-controls">
+        <label>Search review items<input type="search" value={filters.query} onChange={e => onFilters({...filters, query:e.target.value})} /></label>
+        <label>Reason<select value={filters.category} onChange={e => onFilters({...filters, category:e.target.value as ReviewFilters['category']})}><option value="">All reasons</option>{Object.entries(REASONS).map(([key,label]) => <option key={key} value={key}>{label} ({queue.filter(i => i.reasons.includes(key as ReviewCategory)).length})</option>)}</select></label>
+        <label>Sort review items<select value={filters.sort} onChange={e => onFilters({...filters, sort:e.target.value as ReviewFilters['sort']})}><option value="priority">Queue order</option><option value="document">Document name</option></select></label>
+        <button className="secondary" onClick={() => onFilters({...EMPTY_REVIEW})}>Clear filters</button>
+        <p role="status">Showing {shown.length} of {queue.length} review items. Reason categories may overlap.</p>
+      </div>
+      {queue.length > 0 && !shown.length && <p className="library-note">No review items match these filters.</p>}
       {!queue.length ? <div className="empty"><CircleAlert />
         <p>{!portfolio.documents.length
           ? 'No documents have been analyzed yet. An empty queue does not mean there are no unresolved obligations.'
@@ -54,12 +46,15 @@ export function ReviewQueue({ portfolio, onOpen, enabled = true }: { portfolio: 
             ? 'No documents have completed analysis. Unprocessed documents are not covered by this queue.'
             : 'No open review items in the analyzed set. Documents that are still unprocessed or incomplete are not covered here — this is not an all-clear.'}</p>
       </div>
-      : <ul className="document-rows">{queue.map(item => <li key={`${item.source}-${item.id}`}>
+      : <ul className="document-rows">{shown.map(item => <li key={`${item.source}-${item.id}`}>
         {item.source === 'conflict' ? <Scale size={22} /> : <FileText size={22} />}
         <div className="row-copy">
-          <button className="contract-link" disabled={!enabled} onClick={() => onOpen(item.id)}>{item.title}</button>
+          <button id={`review-${item.id}`} className="contract-link" disabled={!enabled} onClick={() => onOpen(item.id)}>{item.title}</button>
           <p>{item.documentIds.map(id => names.get(id) ?? id).join(' · ')}</p>
-          <small>{item.question}</small>
+          <p>{item.reasons.map(r => REASONS[r]).join(' · ')}</p>
+          <p><strong>Missing:</strong> {item.missing[0] ?? 'No additional fact was specified; review the question below.'}</p>
+          {item.missing.length > 1 && <details><summary>{item.missing.length-1} more missing fact(s)</summary><ul>{item.missing.slice(1).map((fact,i) => <li key={i}>{fact}</li>)}</ul></details>}
+          <p>{item.urgency}</p><small>{item.question}</small>
         </div>
         <span className="badge amber">{item.badge}</span>
         <div className="document-actions"><button className="secondary" disabled={!enabled} onClick={() => onOpen(item.id)}>Open brief</button></div>
@@ -68,8 +63,9 @@ export function ReviewQueue({ portfolio, onOpen, enabled = true }: { portfolio: 
   </>
 }
 
-export function Review({ portfolio, enabled }: { portfolio: Portfolio; enabled: boolean }) {
+export function Review({ portfolio, enabled, filters, onFilters }: { portfolio: Portfolio; enabled: boolean; filters?: ReviewFilters; onFilters?: (f:ReviewFilters) => void }) {
   const [briefId, setBriefId] = useState<string | null>(null)
-  if (briefId) return <Brief id={briefId} portfolio={portfolio} enabled={enabled} onBack={() => setBriefId(null)} />
-  return <ReviewQueue portfolio={portfolio} onOpen={setBriefId} enabled={enabled} />
+  if (briefId && !reviewItems(portfolio).some(i => i.id === briefId)) return <section className="card"><p role="alert">This review item changed or is no longer current.</p><button className="secondary" onClick={() => setBriefId(null)}>Return to review queue</button></section>
+  if (briefId) return <Brief id={briefId} portfolio={portfolio} enabled={enabled} onBack={() => { const id=briefId; setBriefId(null); requestAnimationFrame(() => document.getElementById(`review-${id}`)?.focus()) }} />
+  return <ReviewQueue portfolio={portfolio} onOpen={setBriefId} enabled={enabled} filters={filters} onFilters={onFilters} />
 }

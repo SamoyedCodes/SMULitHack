@@ -1,3 +1,5 @@
+import { useEffect } from 'react'
+import { actionGroups } from './presentation'
 import { AlertTriangle, CalendarClock } from 'lucide-react'
 import { Evidence as EvidenceLinks } from './Findings'
 import type { CalendarEvent, Evidence, Portfolio, ReviewIssue } from './api'
@@ -21,7 +23,7 @@ function DateTile({ day }: { day: string }) {
 }
 
 function EventRow({ event, stale, onEvidence }: { event: CalendarEvent; stale: boolean; onEvidence: (e: Evidence) => void }) {
-  return <article className="calendar-row">
+  return <article id={`event-${event.id}`} tabIndex={-1} className="calendar-row">
     <DateTile day={actionableDate(event)} />
     <div className="row-copy">
       <h3>{event.label}</h3>
@@ -40,17 +42,28 @@ function EventRow({ event, stale, onEvidence }: { event: CalendarEvent; stale: b
   </article>
 }
 
-export function Calendar({ portfolio, asOf, enabled, stale, onAsOf, onEvidence }: {
+export function Calendar({ portfolio, asOf, enabled, stale, onAsOf, onEvidence, focused = null, category = 'all', onCategory = () => {} }: {
   portfolio: Portfolio | null; asOf: string; enabled: boolean; stale: boolean
   onAsOf: (value: string) => void; onEvidence: (e: Evidence) => void
+  focused?: string | null; category?: 'all' | 'upcoming' | 'overdue' | 'events'; onCategory?: (value: 'all' | 'upcoming' | 'overdue' | 'events') => void
 }) {
-  const events = portfolio?.events ?? []
+  const allEvents = portfolio?.events ?? []
+  const events = category === 'all' ? allEvents : actionGroups(allEvents)[category]
+  const targetExists = Boolean(focused && allEvents.some(e => e.id === focused))
+  useEffect(() => {
+    if (focused && targetExists) {
+      const element = document.getElementById(`event-${focused}`)
+      element?.focus({preventScroll:true}); element?.scrollIntoView({block:'center'})
+    }
+  }, [focused, targetExists, category])
   const issues = (portfolio?.issues ?? []).filter((issue: ReviewIssue) => issue.kind === 'deadline')
   const coverage = portfolio?.coverage ?? {}
   const undated = (coverage.undated ?? 0) + (coverage.dates_unavailable ?? 0)
   return <>
     <section className="card calendar-controls">
-      <div className="section-heading"><h2>Upcoming dates{stale ? ' · stale' : ''}</h2><span className="badge">{events.length} in the next 90 days</span></div>
+      <div className="section-heading"><h2>Upcoming dates{stale ? ' · stale' : ''}</h2><span className="badge">{events.length} relevant dates · includes overdue</span></div>
+      <label>Show<select value={category} onChange={e => onCategory(e.target.value as typeof category)}><option value="all">All dates</option><option value="upcoming">Upcoming action deadlines</option><option value="overdue">Overdue actions</option><option value="events">Events without action deadlines</option></select></label>
+      {focused && !targetExists && <p role="alert">The selected event changed or is no longer in this date window.</p>}
       <label className="calendar-asof">As-of date (Singapore)
         <input type="date" value={asOf} disabled={!enabled} onChange={event => onAsOf(event.target.value)} />
       </label>
@@ -60,8 +73,8 @@ export function Calendar({ portfolio, asOf, enabled, stale, onAsOf, onEvidence }
 
     {!enabled && <section className="card foundation-empty"><CalendarClock size={30} /><h2>Calendar is unavailable</h2><p>The backend is not reporting the deadline capability, so no dates can be relied on here.</p></section>}
 
-    {enabled && !events.length && <section className="card foundation-empty"><CalendarClock size={30} /><h2>No dates found in the documents that were checked</h2>
-      <p>{coverage.dated ? `${coverage.dated} document(s) were checked and produced no event or deadline in this window.` : 'No document has completed analysis, so nothing has been checked for dates.'}
+    {enabled && !events.length && <section className="card foundation-empty"><CalendarClock size={30} /><h2>{allEvents.length ? 'No dates match this filter' : 'No dates found in the documents that were checked'}</h2>
+      <p>{allEvents.length ? 'Other dates exist in this window; choose All dates to see them.' : coverage.dated ? `${coverage.dated} document(s) were checked and produced no event or deadline in this window.` : 'No document has completed analysis, so nothing has been checked for dates.'}
         {undated ? ` ${undated} document(s) could not be checked and may contain deadlines.` : ''} An empty window is not a finding that no obligations exist.</p></section>}
 
     {enabled && groupByDate(events).map(([day, group]) => <section className="card calendar-day" key={day}>
@@ -86,17 +99,18 @@ export function Calendar({ portfolio, asOf, enabled, stale, onAsOf, onEvidence }
   </>
 }
 
-export function UpcomingActions({ portfolio, onOpen }: { portfolio: Portfolio | null; onOpen: () => void }) {
-  const events = (portfolio?.events ?? []).slice(0, 4)
+export function UpcomingActions({ portfolio, onOpen, onEvent, stale = false }: { portfolio: Portfolio | null; onOpen: () => void; onEvent?: (id:string) => void; stale?: boolean }) {
+  const groups = actionGroups(portfolio?.events ?? [])
   const coverage = portfolio?.coverage ?? {}
   const undated = (coverage.undated ?? 0) + (coverage.dates_unavailable ?? 0)
-  if (!events.length && !undated) return null
-  return <section className="card"><div className="section-heading"><h2>Next actions</h2><button className="text-button" onClick={onOpen}>Open calendar</button></div>
-    {events.map(event => <button className="action-row" key={event.id} onClick={onOpen}>
-      <DateTile day={actionableDate(event)} />
-      <span className="row-copy"><strong>{event.label}</strong><span className="due-label">{event.action}{event.action_date ? ` by ${event.action_date}` : ''}</span></span>
-      {event.overdue && <span className="badge amber">Overdue</span>}
-    </button>)}
-    {undated > 0 && <p className="subtle">{undated} document(s) have no established dates yet. This list covers only documents that finished analysis.</p>}
+  return <section className="card overview-actions"><div className="section-heading"><h2>Next actions{stale ? ' · stale' : ''}</h2><button className="text-button" onClick={onOpen}>Open calendar</button></div>
+    {([['overdue','Overdue actions'], ['upcoming','Upcoming action deadlines'], ['events','Events without action deadlines']] as const).map(([key,label]) => <section key={key}><h3>{label} ({groups[key].length})</h3>
+      {groups[key].length === 0 ? <p>No established items in this group.</p> : groups[key].slice(0,4).map(event => <button id={`action-${event.id}`} disabled={stale} className="action-row" key={event.id} onClick={() => onEvent ? onEvent(event.id) : onOpen()}>
+        <DateTile day={event.action_date ?? event.event_date} />
+        <span className="row-copy"><strong>{event.label}</strong><span className="due-label">{event.action}{event.action_date ? ` by ${event.action_date}` : ''} · {event.event_type} on {event.event_date}</span>
+        {event.window_start && <span>Window opens {event.window_start}</span>}</span>
+        {event.overdue && <span className="badge amber">Overdue · performance not established</span>}
+      </button>)}{groups[key].length > 4 && <p>Showing 4 of {groups[key].length}. Open calendar for every item.</p>}</section>)}
+    <p>{undated} document(s) have no established dates yet. This list covers only checked documents; an empty list is not an all-clear.</p>
   </section>
 }

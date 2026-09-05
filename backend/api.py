@@ -10,6 +10,9 @@ from fastapi import FastAPI, HTTPException, Request, Response, File, UploadFile,
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, FileResponse
+from .evaluation_report import EvaluationScorecard, load_scorecard, render_report
+from fastapi.responses import HTMLResponse
+
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from .config import VERSION, Config, libreoffice_path, tesseract_path
@@ -129,6 +132,26 @@ def create_app(config: Config | None = None, start_worker: bool = True):
                                    "dated": evaluated, "dates_unavailable": unavailable,
                                    "undated": sum(1 for d in docs if d.status not in ANALYZED)})
 
+    def saved_scorecard(request):
+        try:
+            return load_scorecard(request.app.state.config.evaluation_dir)
+        except FileNotFoundError:
+            raise HTTPException(404, "No saved evaluation scorecard is available.") from None
+        except (ValueError, OSError):
+            raise HTTPException(500, "The saved evaluation scorecard could not be read.") from None
+
+    @app.get("/api/evaluation/scorecard", response_model=EvaluationScorecard)
+    def evaluation_scorecard(request: Request, response: Response):
+        response.headers["Cache-Control"] = "no-store"
+        return saved_scorecard(request)
+
+    @app.get("/api/evaluation/report", response_class=HTMLResponse)
+    def evaluation_report(request: Request, run_sha256: str | None = None, generated_at: str | None = None):
+        card = saved_scorecard(request)
+        if (run_sha256 and card.run_sha256 != run_sha256) or (generated_at and card.generated_at.isoformat().replace("+00:00", "Z") != generated_at.replace("+00:00", "Z")):
+            raise HTTPException(409, "The evaluation snapshot changed. Refresh before downloading.")
+        return HTMLResponse(render_report(card), headers={"Content-Disposition": 'attachment; filename="aithena-evaluation.html"', "Cache-Control": "no-store"})
+
     @app.get("/api/documents/{document_id}", response_model=Document)
     def document(document_id: str, request: Request):
         doc = request.app.state.store.document(document_id)
@@ -205,15 +228,18 @@ def create_app(config: Config | None = None, start_worker: bool = True):
         return FileResponse(path, filename=doc.filename, media_type='application/octet-stream', headers={'X-Content-Type-Options':'nosniff'})
 
     @app.post("/api/extract", response_model=RetryResponse, status_code=202)
-    def extract(document_id: str, request: Request):
+    def extract(document_id: str, request: Request, visual_review: bool = False):
         import hashlib
         from .ingestion import source_path
         doc = document(document_id, request)
         source = source_path(request.app.state.config, doc.id, 'pages.json')
         cfg = request.app.state.config
-        key = 'extract:' + hashlib.sha256((doc.id + doc.sha256 + cfg.routing_identity + VERSION).encode() + source.read_bytes()).hexdigest()
+        if visual_review and not cfg.openrouter_api_key:
+            raise HTTPException(409, 'Visual review requires an OpenRouter API key.')
+        vision_identity = ':visual-triage-v1:' + cfg.vision_model if visual_review else ''
+        key = 'extract:' + hashlib.sha256((doc.id + doc.sha256 + cfg.routing_identity + VERSION + vision_identity).encode() + source.read_bytes()).hexdigest()
         try:
-            count = request.app.state.store.queue_extraction(doc.id, key)
+            count = request.app.state.store.queue_extraction(doc.id, key, visual_review)
         except ValueError as exc:
             raise HTTPException(409, str(exc)) from None
         return RetryResponse(resumed_jobs=count)

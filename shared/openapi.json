@@ -1280,6 +1280,347 @@
         "title": "ErrorResponse",
         "type": "object"
       },
+      "EvaluationBudgetSummary": {
+        "additionalProperties": false,
+        "properties": {
+          "ceiling_usd": {
+            "pattern": "^\\d+(\\.\\d+)?$",
+            "title": "Ceiling Usd",
+            "type": "string"
+          },
+          "charged_usd": {
+            "pattern": "^\\d+(\\.\\d+)?$",
+            "title": "Charged Usd",
+            "type": "string"
+          },
+          "requests": {
+            "minimum": 0.0,
+            "title": "Requests",
+            "type": "integer"
+          },
+          "unreconciled_requests": {
+            "minimum": 0.0,
+            "title": "Unreconciled Requests",
+            "type": "integer"
+          },
+          "unreconciled_reserved_usd": {
+            "pattern": "^\\d+(\\.\\d+)?$",
+            "title": "Unreconciled Reserved Usd",
+            "type": "string"
+          }
+        },
+        "required": [
+          "ceiling_usd",
+          "charged_usd",
+          "unreconciled_reserved_usd",
+          "requests",
+          "unreconciled_requests"
+        ],
+        "title": "EvaluationBudgetSummary",
+        "type": "object"
+      },
+      "EvaluationExample": {
+        "additionalProperties": false,
+        "properties": {
+          "confidence": {
+            "enum": [
+              "high",
+              "medium",
+              "low"
+            ],
+            "title": "Confidence",
+            "type": "string"
+          },
+          "expected": {
+            "title": "Expected",
+            "type": "string"
+          },
+          "explanation": {
+            "title": "Explanation",
+            "type": "string"
+          },
+          "finding_id": {
+            "title": "Finding Id",
+            "type": "string"
+          },
+          "observed": {
+            "title": "Observed",
+            "type": "string"
+          },
+          "sample": {
+            "title": "Sample",
+            "type": "string"
+          },
+          "split": {
+            "enum": [
+              "development",
+              "holdout"
+            ],
+            "title": "Split",
+            "type": "string"
+          }
+        },
+        "required": [
+          "sample",
+          "split",
+          "finding_id",
+          "confidence",
+          "expected",
+          "observed",
+          "explanation"
+        ],
+        "title": "EvaluationExample",
+        "type": "object"
+      },
+      "EvaluationFailure": {
+        "additionalProperties": false,
+        "properties": {
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "sample": {
+            "title": "Sample",
+            "type": "string"
+          },
+          "split": {
+            "enum": [
+              "development",
+              "holdout"
+            ],
+            "title": "Split",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "sample",
+          "split",
+          "status",
+          "message"
+        ],
+        "title": "EvaluationFailure",
+        "type": "object"
+      },
+      "EvaluationGroup": {
+        "additionalProperties": false,
+        "properties": {
+          "completed_documents": {
+            "minimum": 0.0,
+            "title": "Completed Documents",
+            "type": "integer"
+          },
+          "confidence": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/EvaluationRatio"
+            },
+            "propertyNames": {
+              "enum": [
+                "high",
+                "medium",
+                "low"
+              ]
+            },
+            "title": "Confidence",
+            "type": "object"
+          },
+          "documents": {
+            "minimum": 0.0,
+            "title": "Documents",
+            "type": "integer"
+          },
+          "fields_unreviewed": {
+            "minimum": 0.0,
+            "title": "Fields Unreviewed",
+            "type": "integer"
+          },
+          "metrics": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/EvaluationRatio"
+            },
+            "title": "Metrics",
+            "type": "object"
+          },
+          "pairs_unassessed": {
+            "minimum": 0.0,
+            "title": "Pairs Unassessed",
+            "type": "integer"
+          },
+          "predictions_unreviewed": {
+            "minimum": 0.0,
+            "title": "Predictions Unreviewed",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "documents",
+          "completed_documents",
+          "fields_unreviewed",
+          "predictions_unreviewed",
+          "pairs_unassessed",
+          "metrics",
+          "confidence"
+        ],
+        "title": "EvaluationGroup",
+        "type": "object"
+      },
+      "EvaluationRatio": {
+        "additionalProperties": false,
+        "properties": {
+          "correct": {
+            "minimum": 0.0,
+            "title": "Correct",
+            "type": "integer"
+          },
+          "rate": {
+            "anyOf": [
+              {
+                "maximum": 1.0,
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rate"
+          },
+          "total": {
+            "minimum": 0.0,
+            "title": "Total",
+            "type": "integer"
+          },
+          "unreviewed": {
+            "default": 0,
+            "minimum": 0.0,
+            "title": "Unreviewed",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "correct",
+          "total",
+          "rate",
+          "unreviewed"
+        ],
+        "title": "EvaluationRatio",
+        "type": "object"
+      },
+      "EvaluationScorecard": {
+        "additionalProperties": false,
+        "properties": {
+          "answer_key_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Answer Key Sha256",
+            "type": "string"
+          },
+          "as_of_dates": {
+            "items": {
+              "type": "string"
+            },
+            "title": "As Of Dates",
+            "type": "array"
+          },
+          "budget": {
+            "$ref": "#/components/schemas/EvaluationBudgetSummary"
+          },
+          "campaign_id": {
+            "title": "Campaign Id",
+            "type": "string"
+          },
+          "examples": {
+            "items": {
+              "$ref": "#/components/schemas/EvaluationExample"
+            },
+            "title": "Examples",
+            "type": "array"
+          },
+          "failures": {
+            "items": {
+              "$ref": "#/components/schemas/EvaluationFailure"
+            },
+            "title": "Failures",
+            "type": "array"
+          },
+          "generated_at": {
+            "format": "date-time",
+            "title": "Generated At",
+            "type": "string"
+          },
+          "groups": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/EvaluationGroup"
+            },
+            "propertyNames": {
+              "enum": [
+                "development",
+                "holdout",
+                "all"
+              ]
+            },
+            "title": "Groups",
+            "type": "object"
+          },
+          "limitations": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Limitations",
+            "type": "array"
+          },
+          "model": {
+            "title": "Model",
+            "type": "string"
+          },
+          "review_status": {
+            "title": "Review Status",
+            "type": "string"
+          },
+          "run_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Run Sha256",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": 1,
+            "default": 1,
+            "title": "Schema Version",
+            "type": "integer"
+          },
+          "stopped": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stopped"
+          }
+        },
+        "required": [
+          "schema_version",
+          "campaign_id",
+          "run_sha256",
+          "answer_key_sha256",
+          "generated_at",
+          "as_of_dates",
+          "model",
+          "review_status",
+          "stopped",
+          "budget",
+          "groups",
+          "failures",
+          "examples",
+          "limitations"
+        ],
+        "title": "EvaluationScorecard",
+        "type": "object"
+      },
       "Event": {
         "additionalProperties": false,
         "properties": {
@@ -1596,7 +1937,7 @@
             "type": "boolean"
           },
           "inference_notice": {
-            "default": "When analysis is enabled, extracted contract text is sent to OpenRouter and its model provider, or Gemini as secondary when OpenRouter is unavailable. Original files and saved results stay local.",
+            "default": "When analysis is enabled, extracted contract text is sent to OpenRouter and its model provider, or Gemini as secondary when OpenRouter is unavailable. Optional visual OCR review also sends rendered page images and flagged crops to the configured OpenRouter vision model. Original files and saved results stay local.",
             "title": "Inference Notice",
             "type": "string"
           },
@@ -1833,6 +2174,24 @@
             "title": "Status",
             "type": "string"
           },
+          "visual_review_note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Visual Review Note"
+          },
+          "visual_reviews": {
+            "items": {
+              "$ref": "#/components/schemas/VisualRegionReview"
+            },
+            "title": "Visual Reviews",
+            "type": "array"
+          },
           "warnings": {
             "items": {
               "type": "string"
@@ -1851,7 +2210,9 @@
           "height",
           "spans",
           "status",
-          "warnings"
+          "warnings",
+          "visual_reviews",
+          "visual_review_note"
         ],
         "title": "Page",
         "type": "object"
@@ -2066,6 +2427,21 @@
             "title": "Mode",
             "type": "string"
           },
+          "reason_codes": {
+            "items": {
+              "enum": [
+                "source_unreadable",
+                "missing_context",
+                "ambiguous_terms",
+                "unsupported_evidence",
+                "incomplete_analysis",
+                "not_established"
+              ],
+              "type": "string"
+            },
+            "title": "Reason Codes",
+            "type": "array"
+          },
           "title": {
             "title": "Title",
             "type": "string"
@@ -2077,6 +2453,7 @@
           }
         },
         "required": [
+          "reason_codes",
           "id",
           "document_ids",
           "title",
@@ -2240,6 +2617,21 @@
             "title": "Reason",
             "type": "string"
           },
+          "reason_codes": {
+            "items": {
+              "enum": [
+                "source_unreadable",
+                "missing_context",
+                "ambiguous_terms",
+                "unsupported_evidence",
+                "incomplete_analysis",
+                "not_established"
+              ],
+              "type": "string"
+            },
+            "title": "Reason Codes",
+            "type": "array"
+          },
           "status": {
             "enum": [
               "supported",
@@ -2254,9 +2646,52 @@
           "item_id",
           "status",
           "reason",
+          "reason_codes",
           "missing_context"
         ],
         "title": "Verdict",
+        "type": "object"
+      },
+      "VisualRegionReview": {
+        "additionalProperties": false,
+        "properties": {
+          "contains_meaningful_content": {
+            "title": "Contains Meaningful Content",
+            "type": "boolean"
+          },
+          "kind": {
+            "enum": [
+              "decoration",
+              "text",
+              "diagram",
+              "uncertain"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "model": {
+            "title": "Model",
+            "type": "string"
+          },
+          "reason": {
+            "maxLength": 800,
+            "minLength": 1,
+            "title": "Reason",
+            "type": "string"
+          },
+          "span_id": {
+            "title": "Span Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "span_id",
+          "kind",
+          "contains_meaningful_content",
+          "reason",
+          "model"
+        ],
+        "title": "VisualRegionReview",
         "type": "object"
       },
       "WorkerStatus": {
@@ -3427,6 +3862,216 @@
         "summary": "Page Image"
       }
     },
+    "/api/evaluation/report": {
+      "get": {
+        "operationId": "evaluation_report_api_evaluation_report_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "run_sha256",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Run Sha256"
+            }
+          },
+          {
+            "in": "query",
+            "name": "generated_at",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Generated At"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "403": {
+            "content": {
+              "text/html": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "text/html": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "text/html": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "413": {
+            "content": {
+              "text/html": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Request Entity Too Large"
+          },
+          "422": {
+            "content": {
+              "text/html": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "text/html": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "501": {
+            "content": {
+              "text/html": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Implemented"
+          }
+        },
+        "summary": "Evaluation Report"
+      }
+    },
+    "/api/evaluation/scorecard": {
+      "get": {
+        "operationId": "evaluation_scorecard_api_evaluation_scorecard_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EvaluationScorecard"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Request Entity Too Large"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Implemented"
+          }
+        },
+        "summary": "Evaluation Scorecard"
+      }
+    },
     "/api/extract": {
       "post": {
         "operationId": "extract_api_extract_post",
@@ -3438,6 +4083,16 @@
             "schema": {
               "title": "Document Id",
               "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "visual_review",
+            "required": false,
+            "schema": {
+              "default": false,
+              "title": "Visual Review",
+              "type": "boolean"
             }
           }
         ],
