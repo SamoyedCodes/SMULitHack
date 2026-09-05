@@ -29,7 +29,7 @@ def main():
                 raise SystemExit(f"Port {port} is unavailable. Stop its owner or change the configured port.") from None
     env = {**os.environ, "AITHENA_API_PORT": str(config.api_port), "AITHENA_WEB_PORT": str(config.web_port)}
     # Never forward provider credentials to the frontend child process.
-    web_env = {key: value for key, value in env.items() if key not in {"GEMINI_API_KEY", "GOOGLE_API_KEY"}}
+    web_env = {key: value for key, value in env.items() if key not in {"GEMINI_API_KEY", "GOOGLE_API_KEY", "OPENROUTER_API_KEY"}}
     children = []
     def stop(signum, frame):
         raise KeyboardInterrupt

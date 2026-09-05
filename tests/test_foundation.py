@@ -19,7 +19,7 @@ from backend.store import Store
 @pytest.fixture(autouse=True)
 def isolated(monkeypatch, tmp_path):
     monkeypatch.setattr(settings, 'ROOT', tmp_path)
-    for name in ('GEMINI_API_KEY', 'GOOGLE_API_KEY', 'AITHENA_DATA_DIR', 'AITHENA_API_PORT', 'AITHENA_WEB_PORT', 'AITHENA_LLM_INTERVAL'):
+    for name in ('OPENROUTER_API_KEY', 'OPENROUTER_MODEL', 'GEMINI_MODEL', 'GEMINI_API_KEY', 'GOOGLE_API_KEY', 'AITHENA_DATA_DIR', 'AITHENA_API_PORT', 'AITHENA_WEB_PORT', 'AITHENA_LLM_INTERVAL'):
         monkeypatch.delenv(name, raising=False)
     monkeypatch.setenv('TESSERACT_CMD', '/missing/tesseract')
     monkeypatch.setenv('LIBREOFFICE_CMD', '/missing/soffice')
@@ -43,8 +43,8 @@ def test_health_no_key_tools_optional_and_empty_portfolio(tmp_path):
         assert response.status_code == 200
         assert health.status == 'ready' and health.database.status == 'ready'
         assert not health.ocr_available and not health.docx_available and not health.key_configured
-        assert health.capabilities.ingestion and health.capabilities.extraction
-        assert not any(v for k, v in health.capabilities.model_dump().items() if k not in {"ingestion", "extraction"})
+        assert health.capabilities.ingestion and health.capabilities.extraction and health.capabilities.handoff
+        assert not any(v for k, v in health.capabilities.model_dump().items() if k not in {"ingestion", "extraction", "deadlines", "conflicts", "handoff"})
         assert not health.worker.enabled and app.state.worker is None
         portfolio = client.get('/api/portfolio?as_of=2026-09-05').json()
         assert portfolio['as_of'] == '2026-09-05' and portfolio['horizon_end'] == '2026-12-04'
@@ -113,6 +113,7 @@ def test_disabled_routes_do_not_mutate(tmp_path, method, path, monkeypatch):
     from backend.foundation import CAPABILITIES
     monkeypatch.setattr(CAPABILITIES, "ingestion", False)
     monkeypatch.setattr(CAPABILITIES, "extraction", False)
+    monkeypatch.setattr(CAPABILITIES, "handoff", False)
     with TestClient(create_app(Config(tmp_path), start_worker=False)) as client:
         response = client.request(method, path, content=b'not-even-a-valid-upload')
         assert response.status_code == 501 and response.json()['error']['code'] == 'feature_not_enabled'

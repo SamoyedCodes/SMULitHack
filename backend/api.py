@@ -13,8 +13,8 @@ from fastapi.responses import JSONResponse, FileResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from .config import VERSION, Config, libreoffice_path, tesseract_path
-from .foundation import CAPABILITIES, DatabaseStatus, ErrorResponse, HealthResponse, WorkerStatus
-from .models import Document, Page, Portfolio, BatchResponse, Job, RetryResponse, SmeSelection
+from .foundation import CAPABILITIES, DatabaseStatus, ErrorResponse, HealthResponse, WorkerStatus, ProviderStatus
+from .models import Brief, Document, Page, Portfolio, BatchResponse, Job, RetryResponse, SmeSelection, ConflictScan, ConflictScreen
 from .store import Store
 
 
@@ -65,6 +65,8 @@ def create_app(config: Config | None = None, start_worker: bool = True):
                 capability = "ingestion"
             elif re.fullmatch(r"/api/review/[^/]+/brief/?", path):
                 capability = "handoff"
+        if path.startswith('/api/conflicts/'):
+            capability = 'conflicts'
         if capability and not getattr(CAPABILITIES, capability):
             return error(501, "feature_not_enabled", f"{capability.replace('_', ' ').capitalize()} is not enabled in this build.")
         return await call_next(request)
@@ -93,8 +95,10 @@ def create_app(config: Config | None = None, start_worker: bool = True):
             ready = False
         if not ready:
             response.status_code = 503
-        configured = bool(cfg.api_key)
-        return HealthResponse(status="ready" if ready else "degraded", version=VERSION, model=cfg.model,
+        configured = bool(cfg.openrouter_api_key or cfg.api_key)
+        return HealthResponse(status="ready" if ready else "degraded", version=VERSION, model=cfg.openrouter_model,
+                              providers=[ProviderStatus(name="openrouter", role="primary", model=cfg.openrouter_model, key_configured=bool(cfg.openrouter_api_key)),
+                                         ProviderStatus(name="gemini", role="secondary", model=cfg.model, key_configured=bool(cfg.api_key))],
                               key_configured=configured, model_status="configured_unverified" if configured else "not_configured",
                               ocr_available=bool(tesseract_path()), docx_available=bool(libreoffice_path()),
                               database=DatabaseStatus(status="ready" if ready else "unavailable"),
@@ -102,19 +106,27 @@ def create_app(config: Config | None = None, start_worker: bool = True):
 
     @app.get("/api/portfolio", response_model=Portfolio)
     def portfolio(request: Request, mode: Literal["live", "sample"] = "live", as_of: date | None = None):
+        from .deadlines import ANALYZED, HORIZON_DAYS, project_deadlines
         store = request.app.state.store
         as_of = as_of or datetime.now(ZoneInfo("Asia/Singapore")).date()
         docs = store.documents(mode)
-        comparisons = store.comparisons(mode)
-        pairs = [j for j in store.jobs(mode) if j["kind"] == "conflict"]
-        return Portfolio(mode=mode, as_of=as_of.isoformat(), horizon_end=(as_of + timedelta(days=90)).isoformat(),
+        from .conflict_service import snapshot
+        scan, _, comparisons, conflict_issues = snapshot(request.app.state.config, store, mode)
+        events, projected, evaluated, unavailable = project_deadlines(docs, request.app.state.config, as_of)
+        merged = {}
+        for issue in [*(i for doc in docs for i in doc.issues), *projected, *conflict_issues]:
+            merged.setdefault(issue.id, issue)
+        return Portfolio(mode=mode, as_of=as_of.isoformat(), horizon_end=(as_of + timedelta(days=HORIZON_DAYS)).isoformat(),
                          sme=store.setting("sme:" + mode), parties=sorted({p for doc in docs for p in doc.parties}),
-                         documents=docs, events=[], issues=[i for doc in docs for i in doc.issues], conflicts=comparisons,
-                         comparisons={"pending": sum(j["state"] != "complete" for j in pairs), "assessed": len(comparisons),
-                                      "failed": sum(j["state"] in {"failed", "blocked"} for j in pairs)},
-                         coverage={"total": len(docs), "analyzed": sum(d.status in {"complete", "needs_review"} for d in docs),
+                         documents=docs, events=events, issues=list(merged.values()), conflicts=comparisons,
+                         conflict_scan=scan,
+                         comparisons={"pending": scan.unchecked + scan.queued + scan.running + scan.waiting, "assessed": scan.completed,
+                                      "failed": scan.failed + scan.blocked},
+                         coverage={"total": len(docs), "analyzed": sum(d.status in ANALYZED for d in docs),
                                    "pages": sum(d.page_count for d in docs), "pages_read": sum(d.pages_read for d in docs),
-                                   "pages_analyzed": sum(d.pages_analyzed for d in docs)})
+                                   "pages_analyzed": sum(d.pages_analyzed for d in docs),
+                                   "dated": evaluated, "dates_unavailable": unavailable,
+                                   "undated": sum(1 for d in docs if d.status not in ANALYZED)})
 
     @app.get("/api/documents/{document_id}", response_model=Document)
     def document(document_id: str, request: Request):
@@ -198,7 +210,7 @@ def create_app(config: Config | None = None, start_worker: bool = True):
         doc = document(document_id, request)
         source = source_path(request.app.state.config, doc.id, 'pages.json')
         cfg = request.app.state.config
-        key = 'extract:' + hashlib.sha256((doc.id + doc.sha256 + cfg.model + VERSION).encode() + source.read_bytes()).hexdigest()
+        key = 'extract:' + hashlib.sha256((doc.id + doc.sha256 + cfg.routing_identity + VERSION).encode() + source.read_bytes()).hexdigest()
         try:
             count = request.app.state.store.queue_extraction(doc.id, key)
         except ValueError as exc:
@@ -212,14 +224,46 @@ def create_app(config: Config | None = None, start_worker: bool = True):
         if selection.name is not None and selection.name not in parties:
             raise HTTPException(422, 'Choose a party established in this workspace.')
         store.set_setting('sme:' + selection.mode, selection.name)
+        from .conflict_service import reconcile
+        reconcile(request.app.state.config, store, selection.mode)
         return selection
+
+    @app.get('/api/conflicts/screening', response_model=list[ConflictScreen])
+    def conflict_screening(request: Request, mode: Literal['live','sample'] = 'live'):
+        from .conflict_service import snapshot
+        _, records, _, _ = snapshot(request.app.state.config, request.app.state.store, mode)
+        return [r for r in records if r.current]
+
+    @app.post('/api/conflicts/continue', response_model=ConflictScan)
+    def continue_conflicts(request: Request, idempotency_key: uuid.UUID = Header(...), mode: Literal['live','sample'] = 'live'):
+        from .conflict_service import reconcile, snapshot
+        try:
+            reconcile(request.app.state.config, request.app.state.store, mode, str(idempotency_key))
+        except ValueError as exc:
+            raise HTTPException(409, str(exc)) from None
+        return snapshot(request.app.state.config, request.app.state.store, mode)[0]
+
+    @app.post('/api/conflicts/{comparison_id}/retry', response_model=RetryResponse)
+    def retry_conflict(comparison_id: str, request: Request, mode: Literal['live','sample'] = 'live'):
+        from .conflict_service import retry_comparison
+        try:
+            count = retry_comparison(request.app.state.config, request.app.state.store, mode, comparison_id)
+        except ValueError as exc:
+            raise HTTPException(409, str(exc)) from None
+        return RetryResponse(resumed_jobs=count)
+
+    @app.get("/api/review/{issue_id}/brief", response_model=Brief)
+    def review_brief(issue_id: str, request: Request, mode: Literal["live", "sample"] = "live", as_of: date | None = None):
+        from .review import brief_for
+        cfg, store = request.app.state.config, request.app.state.store
+        as_of = as_of or datetime.now(ZoneInfo("Asia/Singapore")).date()
+        return brief_for(store, cfg, issue_id, mode, as_of)
 
     def disabled():
         raise HTTPException(501, "This feature is not implemented in Phase 3.")
 
     for path in ("/api/demo",):
         app.add_api_route(path, disabled, methods=["POST"], status_code=501)
-    app.add_api_route("/api/review/{issue_id}/brief", disabled, methods=["GET"])
     return app
 
 

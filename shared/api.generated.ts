@@ -34,6 +34,57 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/conflicts/continue": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Continue Conflicts */
+        post: operations["continue_conflicts_api_conflicts_continue_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/conflicts/screening": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Conflict Screening */
+        get: operations["conflict_screening_api_conflicts_screening_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/conflicts/{comparison_id}/retry": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Retry Conflict */
+        post: operations["retry_conflict_api_conflicts__comparison_id__retry_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/demo": {
         parameters: {
             query?: never;
@@ -211,8 +262,8 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Disabled */
-        get: operations["disabled_api_review__issue_id__brief_get"];
+        /** Review Brief */
+        get: operations["review_brief_api_review__issue_id__brief_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -271,6 +322,75 @@ export interface components {
         Body_upload_api_batches_post: {
             /** Files */
             files: string[];
+        };
+        /** Brief */
+        Brief: {
+            /** As Of */
+            as_of: string;
+            /** Confidence */
+            confidence: string | null;
+            /** Confidence Reason */
+            confidence_reason: string | null;
+            /** Coverage Warnings */
+            coverage_warnings: string[];
+            /**
+             * Disclaimer
+             * @default This brief summarizes grounded source evidence for human legal review. It is not legal advice, does not assert breach or enforceability, and was not sent anywhere automatically.
+             */
+            disclaimer: string;
+            /** Documents */
+            documents: components["schemas"]["BriefDocument"][];
+            /** Established */
+            established: string[];
+            /** Evidence */
+            evidence: components["schemas"]["Evidence"][];
+            /** Exceptions */
+            exceptions: string[];
+            /** Explanation */
+            explanation: string | null;
+            /** Generated At */
+            generated_at: string;
+            /** Id */
+            id: string;
+            /** Kind */
+            kind: string;
+            /** Lawyer Question */
+            lawyer_question: string;
+            /** Missing Facts */
+            missing_facts: string[];
+            /**
+             * Mode
+             * @default live
+             * @enum {string}
+             */
+            mode: "live" | "sample";
+            /** Provenance */
+            provenance: string;
+            /** Scope Comparison */
+            scope_comparison: {
+                [key: string]: string;
+            };
+            /**
+             * Source
+             * @enum {string}
+             */
+            source: "issue" | "conflict";
+            /** Title */
+            title: string;
+            /**
+             * Urgency
+             * @default Review before relying on this provision.
+             */
+            urgency: string;
+        };
+        /** BriefDocument */
+        BriefDocument: {
+            /** Filename */
+            filename: string;
+            /** Id */
+            id: string;
+            /** Title */
+            title: string;
         };
         /** Capabilities */
         Capabilities: {
@@ -359,16 +479,37 @@ export interface components {
             confidence: "medium" | "low";
             /** Confidence Reason */
             confidence_reason: string;
+            /**
+             * Created At
+             * @default
+             */
+            created_at: string;
+            /**
+             * Current
+             * @default false
+             */
+            current: boolean;
+            /** Dimension Evidence */
+            dimension_evidence: {
+                [key: string]: components["schemas"]["Evidence"][];
+            };
             /** Documents */
             documents: string[];
             /** Evidence */
             evidence: components["schemas"]["Evidence"][];
+            /** Exception Evidence */
+            exception_evidence: components["schemas"]["Evidence"][][];
             /** Exceptions */
             exceptions: string[];
             /** Explanation */
             explanation: string;
             /** Id */
             id: string;
+            /**
+             * Input Revision
+             * @default
+             */
+            input_revision: string;
             /** Lawyer Question */
             lawyer_question: string;
             /** Missing Facts */
@@ -379,6 +520,8 @@ export interface components {
              * @enum {string}
              */
             mode: "live" | "sample";
+            /** Model Usage */
+            model_usage: components["schemas"]["ModelUse"][];
             /**
              * Provenance
              * @enum {string}
@@ -393,6 +536,132 @@ export interface components {
              * @enum {string}
              */
             status: "potential_conflict" | "no_conflict_identified_for_this_rule" | "insufficient_evidence";
+        };
+        /** ConflictScan */
+        ConflictScan: {
+            /**
+             * Allowance
+             * @default 10
+             */
+            allowance: number;
+            /**
+             * Assigned
+             * @default 0
+             */
+            assigned: number;
+            /**
+             * Blocked
+             * @default 0
+             */
+            blocked: number;
+            /**
+             * Can Continue
+             * @default false
+             */
+            can_continue: boolean;
+            /**
+             * Candidates
+             * @default 0
+             */
+            candidates: number;
+            /**
+             * Completed
+             * @default 0
+             */
+            completed: number;
+            /**
+             * Excluded
+             * @default 0
+             */
+            excluded: number;
+            /**
+             * Failed
+             * @default 0
+             */
+            failed: number;
+            /**
+             * Needs Evidence
+             * @default 0
+             */
+            needs_evidence: number;
+            /**
+             * Queued
+             * @default 0
+             */
+            queued: number;
+            /**
+             * Running
+             * @default 0
+             */
+            running: number;
+            /**
+             * State
+             * @default disabled
+             * @enum {string}
+             */
+            state: "disabled" | "awaiting_sme" | "ready" | "running" | "paused" | "needs_review";
+            /**
+             * Total Pairs
+             * @default 0
+             */
+            total_pairs: number;
+            /**
+             * Unchecked
+             * @default 0
+             */
+            unchecked: number;
+            /**
+             * Unprocessed Documents
+             * @default 0
+             */
+            unprocessed_documents: number;
+            /**
+             * Unscreened
+             * @default 0
+             */
+            unscreened: number;
+            /**
+             * Waiting
+             * @default 0
+             */
+            waiting: number;
+        };
+        /** ConflictScreen */
+        ConflictScreen: {
+            /**
+             * Current
+             * @default true
+             */
+            current: boolean;
+            /** Documents */
+            documents: string[];
+            /** Error */
+            error: string | null;
+            /** Evidence */
+            evidence: components["schemas"]["Evidence"][];
+            /** Id */
+            id: string;
+            /** Job State */
+            job_state: string | null;
+            /** Missing Facts */
+            missing_facts: string[];
+            /**
+             * Mode
+             * @enum {string}
+             */
+            mode: "live" | "sample";
+            /**
+             * Outcome
+             * @enum {string}
+             */
+            outcome: "candidate" | "excluded" | "needs_evidence";
+            /**
+             * Priority
+             * @default 1
+             */
+            priority: number;
+            /** Reason */
+            reason: string;
         };
         /** DatabaseStatus */
         DatabaseStatus: {
@@ -479,6 +748,8 @@ export interface components {
             mode: "live" | "sample";
             /** Model */
             model: string;
+            /** Model Usage */
+            model_usage: components["schemas"]["ModelUse"][];
             /**
              * Page Count
              * @default 0
@@ -552,6 +823,11 @@ export interface components {
              * @enum {string}
              */
             confidence: "high" | "medium" | "low";
+            /**
+             * Confidence Reason
+             * @default
+             */
+            confidence_reason: string;
             /** Document Id */
             document_id: string;
             /** Event Date */
@@ -567,11 +843,21 @@ export interface components {
             /** Label */
             label: string;
             /**
+             * Occurrence
+             * @default 0
+             */
+            occurrence: number;
+            /**
+             * Overdue
+             * @default false
+             */
+            overdue: boolean;
+            /**
              * Provenance
              * @default calculated
-             * @constant
+             * @enum {string}
              */
-            provenance: "calculated";
+            provenance: "calculated" | "found";
             /** Window Start */
             window_start: string | null;
         };
@@ -642,7 +928,7 @@ export interface components {
             docx_available: boolean;
             /**
              * Inference Notice
-             * @default When analysis is enabled, extracted contract text is sent to Gemini. Original files and saved results stay local.
+             * @default When analysis is enabled, extracted contract text is sent to OpenRouter and its model provider, or Gemini as secondary when OpenRouter is unavailable. Original files and saved results stay local.
              */
             inference_notice: string;
             /** Key Configured */
@@ -657,6 +943,8 @@ export interface components {
             model_status: "not_configured" | "configured_unverified";
             /** Ocr Available */
             ocr_available: boolean;
+            /** Providers */
+            providers: components["schemas"]["ProviderStatus"][];
             /**
              * Status
              * @enum {string}
@@ -707,6 +995,27 @@ export interface components {
              */
             pages_per_file: number;
         };
+        /** ModelUse */
+        ModelUse: {
+            /**
+             * Cached
+             * @default false
+             */
+            cached: boolean;
+            /** Fallback Reason */
+            fallback_reason: string | null;
+            /** Model */
+            model: string;
+            /**
+             * Provider
+             * @enum {string}
+             */
+            provider: "openrouter" | "gemini";
+            /** Purpose */
+            purpose: string;
+            /** Requested Model */
+            requested_model: string;
+        };
         /** Page */
         Page: {
             /** Height */
@@ -734,6 +1043,7 @@ export interface components {
             comparisons: {
                 [key: string]: number;
             };
+            conflict_scan: components["schemas"]["ConflictScan"];
             /** Conflicts */
             conflicts: components["schemas"]["ConflictAssessment"][];
             /** Coverage */
@@ -754,6 +1064,29 @@ export interface components {
             parties: string[];
             /** Sme */
             sme: string | null;
+        };
+        /** ProviderStatus */
+        ProviderStatus: {
+            /** Key Configured */
+            key_configured: boolean;
+            /** Model */
+            model: string;
+            /**
+             * Name
+             * @enum {string}
+             */
+            name: "openrouter" | "gemini";
+            /**
+             * Role
+             * @enum {string}
+             */
+            role: "primary" | "secondary";
+            /**
+             * Status
+             * @default not_configured
+             * @enum {string}
+             */
+            status: "configured_unverified" | "not_configured";
         };
         /** RetryResponse */
         RetryResponse: {
@@ -1065,6 +1398,265 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["BatchResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request Entity Too Large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Implemented */
+            501: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    continue_conflicts_api_conflicts_continue_post: {
+        parameters: {
+            query?: {
+                mode?: "live" | "sample";
+            };
+            header: {
+                "idempotency-key": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConflictScan"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request Entity Too Large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Implemented */
+            501: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    conflict_screening_api_conflicts_screening_get: {
+        parameters: {
+            query?: {
+                mode?: "live" | "sample";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConflictScreen"][];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request Entity Too Large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Implemented */
+            501: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    retry_conflict_api_conflicts__comparison_id__retry_post: {
+        parameters: {
+            query?: {
+                mode?: "live" | "sample";
+            };
+            header?: never;
+            path: {
+                comparison_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RetryResponse"];
                 };
             };
             /** @description Forbidden */
@@ -1982,11 +2574,16 @@ export interface operations {
             };
         };
     };
-    disabled_api_review__issue_id__brief_get: {
+    review_brief_api_review__issue_id__brief_get: {
         parameters: {
-            query?: never;
+            query?: {
+                mode?: "live" | "sample";
+                as_of?: string | null;
+            };
             header?: never;
-            path?: never;
+            path: {
+                issue_id: string;
+            };
             cookie?: never;
         };
         requestBody?: never;
@@ -1997,7 +2594,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["Brief"];
                 };
             };
             /** @description Forbidden */

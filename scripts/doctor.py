@@ -16,5 +16,6 @@ if __name__ == "__main__":
         print(f"{name}: {'detected' if shutil.which(name) else 'missing; install before launching'}")
     for name, found in (("Tesseract", tesseract_path()), ("LibreOffice", libreoffice_path())):
         print(f"{name}: {'executable detected (not tested)' if found else 'not detected (required for its document format)'}")
-    print(f"Gemini: {'key configured, access unverified' if config.api_key else 'key not configured (required for its document format)'}")
+    print(f"OpenRouter primary ({config.openrouter_model}): {'key configured, access unverified' if config.openrouter_api_key else 'key not configured'}")
+    print(f"Gemini secondary ({config.model}): {'key configured, access unverified' if config.api_key else 'key not configured'}")
     print("Ingestion worker starts with the API. This diagnostic performs no conversion, OCR or provider requests.")

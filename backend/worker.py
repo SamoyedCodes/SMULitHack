@@ -37,6 +37,12 @@ class Worker:
         from .foundation import CAPABILITIES
         if CAPABILITIES.extraction:
             self.store.recover('extract')
+        if CAPABILITIES.conflicts:
+            from .conflicts import JOB_KIND, CONFLICT_VERSION
+            from .conflict_service import reconcile
+            self.store.recover(JOB_KIND, CONFLICT_VERSION)
+            for mode in ('live','sample'):
+                reconcile(self.config, self.store, mode)
         self.thread = threading.Thread(target=self.run, name='aithena-ingestion', daemon=True)
         self.thread.start()
 
@@ -65,9 +71,14 @@ class Worker:
         from .foundation import CAPABILITIES
         if not job and CAPABILITIES.extraction:
             job = self.store.claim('extract')
+        if not job and CAPABILITIES.conflicts:
+            from .conflicts import JOB_KIND, CONFLICT_VERSION
+            job = self.store.claim(JOB_KIND, CONFLICT_VERSION)
         if not job:
             return False
         try:
+            if job['kind'] == 'conflict-v1':
+                return self.run_conflict_job(job)
             if job['kind'] == 'extract':
                 return self.run_extraction_job(job)
             self.process_document(job['payload']['document_id'])
@@ -140,6 +151,11 @@ class Worker:
         try:
             self.extract_document(job['payload']['document_id'])
             self.store.job_state(job['id'], 'complete')
+            from .conflict_service import reconcile
+            try:
+                reconcile(self.config, self.store, job['payload']['mode'])
+            except Exception:
+                logger.exception('Conflict screening failed after extraction; extraction remains complete.')
         except ProviderUnavailable as exc:
             self.store.job_state(job['id'], 'blocked', str(exc))
             self.mark_doc(job, 'awaiting_key', str(exc))
@@ -160,7 +176,7 @@ class Worker:
         """Phase 3 stage: grounded extraction and support review over already-read pages."""
         from .config import VERSION
         from .evidence import apply_extraction, stable_id
-        from .llm import Gemini, text_chunks, text_context
+        from .llm import ModelClient, text_chunks, text_context
         from .models import Extraction, SupportReview, Verdict
         doc = self.store.document(document_id)
         if not doc:
@@ -172,11 +188,19 @@ class Worker:
         if not any(p.spans for p in pages):
             raise ValueError("No legible text could be extracted. The document has not been analyzed.")
         if self.llm is None:
-            self.llm = Gemini(self.config, self.store)
-        doc.model, doc.version = self.config.model, VERSION
+            self.llm = ModelClient(self.config, self.store)
+        doc.model, doc.version = self.config.routing_identity, VERSION
+        doc.model_usage = []
         doc.pages_analyzed = 0
         doc.status, doc.error = "extracting", None
         self.store.put_document(doc)
+        def record_model_use():
+            use = getattr(self.llm, 'last_use', None)
+            if use and use not in doc.model_usage:
+                doc.model_usage.append(use)
+                doc.model = ', '.join(sorted({f'{u.provider}:{u.model}' for u in doc.model_usage}))
+                self.store.put_document(doc)
+
         chunks = text_chunks(pages)
         extraction = Extraction(title=doc.filename)
         fingerprints = set()
@@ -186,6 +210,7 @@ class Worker:
             doc.stage = f"Extracting obligations · section {n+1} of {len(chunks)}"
             self.store.put_document(doc)
             part = self.llm.extract(doc.id, chunk)
+            record_model_use()
             extraction.parties.extend(part.parties)
             extraction.missing_context.extend(part.missing_context)
             for category in ("findings", "deadlines", "provisions"):
@@ -214,6 +239,7 @@ class Worker:
                 if self.stop_event.is_set():
                     raise Interrupted()
                 review = self.llm.review(context, [{"item_id": x.id, "item": x.model_dump()} for x in items[start:start+20]])
+                record_model_use()
                 verdicts.extend(review.verdicts)
         doc = apply_extraction(doc, extraction, SupportReview(verdicts=verdicts), pages)
         doc.pages_analyzed = doc.pages_read if len(context) <= 240000 else 0
@@ -221,3 +247,20 @@ class Worker:
         doc.stage = "Analysis complete; review unresolved items" if doc.status == "needs_review" else "Analysis complete"
         doc.error = None
         self.store.put_document(doc)
+
+    def run_conflict_job(self, job):
+        from .llm import ModelClient, ProviderUnavailable, ProviderFailure, QuotaWait
+        from .conflict_service import process_comparison
+        try:
+            if self.llm is None:
+                self.llm = ModelClient(self.config, self.store)
+            process_comparison(self.config, self.store, job, self.llm)
+        except ProviderUnavailable as exc:
+            self.store.job_state(job['id'], 'blocked', str(exc))
+        except QuotaWait as exc:
+            self.store.job_state(job['id'], 'waiting', str(exc), exc.delay)
+        except Exception as exc:
+            logger.exception('Conflict comparison %s failed', job['id'])
+            message = str(exc) if isinstance(exc, ProviderFailure) else 'Conflict comparison failed; retry or inspect the local service logs.'
+            self.store.job_state(job['id'], 'failed', message)
+        return True

@@ -40,3 +40,55 @@
 .confidence.low, .provenance.unresolved { background: #fff1d8; color: #805b17; }
 @media (max-width: 1250px) { .contract-detail { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 700px) { .extraction-action { flex-direction: column; align-items: stretch; } }
+
+/* Grounded deadline calendar: dates, their arithmetic and their sources must stay readable together. */
+.calendar-controls { padding: 24px; }
+.calendar-asof { display: inline-flex; flex-direction: column; gap: 6px; font-size: 13px; color: var(--muted); margin: 4px 0 14px; }
+.calendar-asof input { font: inherit; color: var(--ink); padding: 9px 12px; border: 1px solid var(--border); border-radius: 7px; background: #fff; }
+.calendar-asof input:disabled { background: #f2f5f9; color: var(--muted); }
+.calendar-day { padding: 0 0 8px; }
+.calendar-day .section-heading { padding: 20px 24px 4px; }
+.calendar-row > .date-tile { min-width: 0; }
+.calendar-row .row-copy { flex: 1 1 260px; }
+.calendar-row h3 { font-size: 15px; margin: 0; }
+.calendar-formula { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px; color: var(--ink); background: #f4f7fb; border-radius: 6px; padding: 7px 10px; display: inline-block; margin-top: 8px; }
+.calendar-badges { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; flex: 1 1 240px; }
+.calendar-badges .finding-reason, .calendar-badges .evidence { flex-basis: 100%; }
+.calendar-review .finding h3 { display: flex; align-items: center; gap: 7px; font-size: 15px; }
+.calendar-review .finding h4 { font-size: 12px; text-transform: uppercase; letter-spacing: .4px; color: var(--muted); margin-top: 14px; }
+.calendar-facts { margin: 8px 0 0 18px; font-size: 13.5px; color: #4d5b6c; }
+.calendar-facts li { margin-top: 5px; }
+.subtle { color: var(--muted); font-size: 13px; line-height: 1.6; }
+@media (max-width: 760px) { .calendar-badges, .calendar-row .row-copy { flex-basis: 100%; } .calendar-asof { width: 100%; } }
+
+/* Phase 6: unified review queue and printable/downloadable lawyer briefs. */
+.review-summary { padding: 0 23px 22px; margin-bottom: 24px; }
+.review-summary .section-heading { padding-left: 0; padding-right: 0; }
+.review-summary .stats { margin: 4px 0 0; }
+.review-summary .phase-notice { margin: 18px 0 0; }
+.review-stats { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.review-list .document-rows > li { align-items: flex-start; }
+.review-list small { margin-top: 6px; color: var(--muted); line-height: 1.55; }
+.brief-actions { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
+.brief-buttons { display: flex; gap: 10px; flex-wrap: wrap; }
+.brief-meta { color: var(--muted); font-size: .85rem; line-height: 1.6; margin: 12px 0 16px; }
+.brief-print-root .finding-badges { margin-bottom: 18px; }
+.brief-section { margin: 22px 0; }
+.brief-section h3 { margin-bottom: 10px; }
+.brief-section ul { margin: 0; padding-left: 20px; line-height: 1.7; color: #43566e; }
+.brief-section li { margin: 5px 0; }
+.brief-section table th { background: #f8fafc; }
+.brief-section table td { white-space: normal; }
+.brief-disclaimer { display: flex; align-items: flex-start; gap: 8px; color: var(--muted); font-size: .8rem; line-height: 1.6; margin-top: 26px; border-top: 1px solid var(--border); padding-top: 16px; }
+.review-question small { margin-top: 10px; }
+@media (max-width: 760px) { .review-stats { grid-template-columns: 1fr 1fr; } .brief-actions { flex-direction: column; align-items: stretch; } .brief-buttons button { flex: 1; } }
+
+@media print {
+  @page { margin: 16mm; }
+  .sidebar, .topbar, .page-heading, .phase-notice, .check-time, footer, .conflict-toast, .brief-print-root .contract-link, .brief-actions, .source-viewer, .review-summary, .review-list, .error { display: none !important; }
+  .main-shell { margin: 0 !important; width: 100% !important; }
+  main { padding: 0 !important; max-width: none !important; }
+  .brief-print-root { border: 0 !important; box-shadow: none !important; padding: 0 !important; max-width: none !important; }
+  .brief-print-root .error { display: block !important; }
+  .brief-section, .review-question, .source { break-inside: avoid; }
+}

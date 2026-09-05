@@ -13,7 +13,7 @@ class Capabilities(Record):
 
 
 # Enable a capability only when its route implementation and phase acceptance tests land.
-CAPABILITIES = Capabilities(ingestion=True, extraction=True)
+CAPABILITIES = Capabilities(ingestion=True, extraction=True, deadlines=True, conflicts=True, handoff=True)
 
 
 class DatabaseStatus(Record):
@@ -31,11 +31,23 @@ class Limits(Record):
     pages_per_file: int = 200
 
 
+class ProviderStatus(Record):
+    name: Literal["openrouter", "gemini"]
+    role: Literal["primary", "secondary"]
+    model: str
+    key_configured: bool
+    status: Literal["configured_unverified", "not_configured"] = "not_configured"
+
+    def model_post_init(self, context):
+        self.status = "configured_unverified" if self.key_configured else "not_configured"
+
+
 class HealthResponse(Record):
     api_version: Literal["1"] = "1"
     status: Literal["ready", "degraded"]
     version: str
     model: str
+    providers: list[ProviderStatus] = Field(default_factory=list)
     key_configured: bool
     model_status: Literal["not_configured", "configured_unverified"]
     ocr_available: bool
@@ -44,7 +56,7 @@ class HealthResponse(Record):
     worker: WorkerStatus = Field(default_factory=WorkerStatus)
     capabilities: Capabilities = Field(default_factory=lambda: CAPABILITIES.model_copy())
     limits: Limits = Field(default_factory=Limits)
-    inference_notice: str = "When analysis is enabled, extracted contract text is sent to Gemini. Original files and saved results stay local."
+    inference_notice: str = "When analysis is enabled, extracted contract text is sent to OpenRouter and its model provider, or Gemini as secondary when OpenRouter is unavailable. Original files and saved results stay local."
 
 
 class ErrorDetail(Record):

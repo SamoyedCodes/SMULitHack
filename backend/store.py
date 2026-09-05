@@ -36,6 +36,8 @@ class Store:
                 CREATE TABLE IF NOT EXISTS comparisons (
                     id TEXT PRIMARY KEY, mode TEXT NOT NULL, body TEXT NOT NULL
                 );
+                CREATE TABLE IF NOT EXISTS conflict_screens (id TEXT PRIMARY KEY, mode TEXT NOT NULL, body TEXT NOT NULL);
+                CREATE INDEX IF NOT EXISTS idx_conflict_screens_mode ON conflict_screens(mode);
                 CREATE TABLE IF NOT EXISTS batches (id TEXT PRIMARY KEY, body TEXT NOT NULL);
             """)
 
@@ -81,16 +83,16 @@ class Store:
             db.execute("INSERT OR IGNORE INTO jobs(id,cache_key,kind,payload,created_at) VALUES(?,?,?,?,?)",
                        (str(uuid.uuid4()), key, kind, json.dumps(payload), now()))
 
-    def recover(self, kind: str | None = None):
+    def recover(self, kind: str | None = None, version: str | None = None):
         with self.connection() as db:
-            db.execute("UPDATE jobs SET state='queued', error='Resumed after interruption' WHERE state='running' AND (? IS NULL OR kind=?)", (kind, kind))
+            db.execute("UPDATE jobs SET state='queued', error='Resumed after interruption' WHERE state='running' AND (? IS NULL OR kind=?) AND (? IS NULL OR json_extract(payload,'$.version')=?)", (kind, kind, version, version))
 
-    def claim(self, kind: str | None = None) -> dict | None:
+    def claim(self, kind: str | None = None, version: str | None = None) -> dict | None:
         with self.connection() as db:
             db.execute("BEGIN IMMEDIATE")
             row = db.execute(
-                "SELECT * FROM jobs WHERE state IN ('queued','waiting') AND next_run<=? AND (? IS NULL OR kind=?) ORDER BY created_at LIMIT 1",
-                (time.time(), kind, kind)).fetchone()
+                "SELECT * FROM jobs WHERE state IN ('queued','waiting') AND next_run<=? AND (? IS NULL OR kind=?) AND (? IS NULL OR json_extract(payload,'$.version')=?) ORDER BY created_at LIMIT 1",
+                (time.time(), kind, kind, version, version)).fetchone()
             if row:
                 db.execute("UPDATE jobs SET state='running', attempts=attempts+1 WHERE id=?", (row["id"],))
                 job = dict(row)
@@ -188,6 +190,6 @@ class Store:
             else:
                 db.execute('INSERT INTO jobs(id,cache_key,kind,payload,created_at) VALUES(?,?,?,?,?)',
                            (str(uuid.uuid4()), key, 'extract', json.dumps({'document_id':doc.id, 'mode':doc.mode}), now()))
-            doc.status, doc.stage, doc.error = 'extraction_queued', 'Queued for Gemini extraction and support review', None
+            doc.status, doc.stage, doc.error = 'extraction_queued', 'Queued for extraction and support review (OpenRouter primary, Gemini secondary)', None
             db.execute('UPDATE documents SET body=? WHERE id=?', (doc.model_dump_json(), doc.id))
             return 1

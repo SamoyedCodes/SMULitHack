@@ -97,6 +97,197 @@
         "title": "Body_upload_api_batches_post",
         "type": "object"
       },
+      "Brief": {
+        "additionalProperties": false,
+        "properties": {
+          "as_of": {
+            "title": "As Of",
+            "type": "string"
+          },
+          "confidence": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Confidence"
+          },
+          "confidence_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Confidence Reason"
+          },
+          "coverage_warnings": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Coverage Warnings",
+            "type": "array"
+          },
+          "disclaimer": {
+            "default": "This brief summarizes grounded source evidence for human legal review. It is not legal advice, does not assert breach or enforceability, and was not sent anywhere automatically.",
+            "title": "Disclaimer",
+            "type": "string"
+          },
+          "documents": {
+            "items": {
+              "$ref": "#/components/schemas/BriefDocument"
+            },
+            "title": "Documents",
+            "type": "array"
+          },
+          "established": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Established",
+            "type": "array"
+          },
+          "evidence": {
+            "items": {
+              "$ref": "#/components/schemas/Evidence"
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
+          "exceptions": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Exceptions",
+            "type": "array"
+          },
+          "explanation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Explanation"
+          },
+          "generated_at": {
+            "title": "Generated At",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "lawyer_question": {
+            "title": "Lawyer Question",
+            "type": "string"
+          },
+          "missing_facts": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Missing Facts",
+            "type": "array"
+          },
+          "mode": {
+            "default": "live",
+            "enum": [
+              "live",
+              "sample"
+            ],
+            "title": "Mode",
+            "type": "string"
+          },
+          "provenance": {
+            "title": "Provenance",
+            "type": "string"
+          },
+          "scope_comparison": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Scope Comparison",
+            "type": "object"
+          },
+          "source": {
+            "enum": [
+              "issue",
+              "conflict"
+            ],
+            "title": "Source",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "urgency": {
+            "default": "Review before relying on this provision.",
+            "title": "Urgency",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "source",
+          "kind",
+          "mode",
+          "generated_at",
+          "as_of",
+          "title",
+          "documents",
+          "established",
+          "missing_facts",
+          "lawyer_question",
+          "urgency",
+          "explanation",
+          "scope_comparison",
+          "exceptions",
+          "provenance",
+          "confidence",
+          "confidence_reason",
+          "evidence",
+          "coverage_warnings",
+          "disclaimer"
+        ],
+        "title": "Brief",
+        "type": "object"
+      },
+      "BriefDocument": {
+        "additionalProperties": false,
+        "properties": {
+          "filename": {
+            "title": "Filename",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "filename"
+        ],
+        "title": "BriefDocument",
+        "type": "object"
+      },
       "Capabilities": {
         "additionalProperties": false,
         "properties": {
@@ -345,6 +536,26 @@
             "title": "Confidence Reason",
             "type": "string"
           },
+          "created_at": {
+            "default": "",
+            "title": "Created At",
+            "type": "string"
+          },
+          "current": {
+            "default": false,
+            "title": "Current",
+            "type": "boolean"
+          },
+          "dimension_evidence": {
+            "additionalProperties": {
+              "items": {
+                "$ref": "#/components/schemas/Evidence"
+              },
+              "type": "array"
+            },
+            "title": "Dimension Evidence",
+            "type": "object"
+          },
           "documents": {
             "items": {
               "type": "string"
@@ -357,6 +568,16 @@
               "$ref": "#/components/schemas/Evidence"
             },
             "title": "Evidence",
+            "type": "array"
+          },
+          "exception_evidence": {
+            "items": {
+              "items": {
+                "$ref": "#/components/schemas/Evidence"
+              },
+              "type": "array"
+            },
+            "title": "Exception Evidence",
             "type": "array"
           },
           "exceptions": {
@@ -372,6 +593,11 @@
           },
           "id": {
             "title": "Id",
+            "type": "string"
+          },
+          "input_revision": {
+            "default": "",
+            "title": "Input Revision",
             "type": "string"
           },
           "lawyer_question": {
@@ -393,6 +619,13 @@
             ],
             "title": "Mode",
             "type": "string"
+          },
+          "model_usage": {
+            "items": {
+              "$ref": "#/components/schemas/ModelUse"
+            },
+            "title": "Model Usage",
+            "type": "array"
           },
           "provenance": {
             "enum": [
@@ -432,9 +665,232 @@
           "confidence",
           "confidence_reason",
           "provenance",
-          "mode"
+          "mode",
+          "input_revision",
+          "created_at",
+          "current",
+          "dimension_evidence",
+          "exception_evidence",
+          "model_usage"
         ],
         "title": "ConflictAssessment",
+        "type": "object"
+      },
+      "ConflictScan": {
+        "additionalProperties": false,
+        "properties": {
+          "allowance": {
+            "default": 10,
+            "title": "Allowance",
+            "type": "integer"
+          },
+          "assigned": {
+            "default": 0,
+            "title": "Assigned",
+            "type": "integer"
+          },
+          "blocked": {
+            "default": 0,
+            "title": "Blocked",
+            "type": "integer"
+          },
+          "can_continue": {
+            "default": false,
+            "title": "Can Continue",
+            "type": "boolean"
+          },
+          "candidates": {
+            "default": 0,
+            "title": "Candidates",
+            "type": "integer"
+          },
+          "completed": {
+            "default": 0,
+            "title": "Completed",
+            "type": "integer"
+          },
+          "excluded": {
+            "default": 0,
+            "title": "Excluded",
+            "type": "integer"
+          },
+          "failed": {
+            "default": 0,
+            "title": "Failed",
+            "type": "integer"
+          },
+          "needs_evidence": {
+            "default": 0,
+            "title": "Needs Evidence",
+            "type": "integer"
+          },
+          "queued": {
+            "default": 0,
+            "title": "Queued",
+            "type": "integer"
+          },
+          "running": {
+            "default": 0,
+            "title": "Running",
+            "type": "integer"
+          },
+          "state": {
+            "default": "disabled",
+            "enum": [
+              "disabled",
+              "awaiting_sme",
+              "ready",
+              "running",
+              "paused",
+              "needs_review"
+            ],
+            "title": "State",
+            "type": "string"
+          },
+          "total_pairs": {
+            "default": 0,
+            "title": "Total Pairs",
+            "type": "integer"
+          },
+          "unchecked": {
+            "default": 0,
+            "title": "Unchecked",
+            "type": "integer"
+          },
+          "unprocessed_documents": {
+            "default": 0,
+            "title": "Unprocessed Documents",
+            "type": "integer"
+          },
+          "unscreened": {
+            "default": 0,
+            "title": "Unscreened",
+            "type": "integer"
+          },
+          "waiting": {
+            "default": 0,
+            "title": "Waiting",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "state",
+          "allowance",
+          "assigned",
+          "total_pairs",
+          "unscreened",
+          "candidates",
+          "excluded",
+          "needs_evidence",
+          "unprocessed_documents",
+          "completed",
+          "unchecked",
+          "queued",
+          "running",
+          "waiting",
+          "blocked",
+          "failed",
+          "can_continue"
+        ],
+        "title": "ConflictScan",
+        "type": "object"
+      },
+      "ConflictScreen": {
+        "additionalProperties": false,
+        "properties": {
+          "current": {
+            "default": true,
+            "title": "Current",
+            "type": "boolean"
+          },
+          "documents": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Documents",
+            "type": "array"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "evidence": {
+            "items": {
+              "$ref": "#/components/schemas/Evidence"
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "job_state": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Job State"
+          },
+          "missing_facts": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Missing Facts",
+            "type": "array"
+          },
+          "mode": {
+            "enum": [
+              "live",
+              "sample"
+            ],
+            "title": "Mode",
+            "type": "string"
+          },
+          "outcome": {
+            "enum": [
+              "candidate",
+              "excluded",
+              "needs_evidence"
+            ],
+            "title": "Outcome",
+            "type": "string"
+          },
+          "priority": {
+            "default": 1,
+            "title": "Priority",
+            "type": "integer"
+          },
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "documents",
+          "mode",
+          "outcome",
+          "reason",
+          "evidence",
+          "missing_facts",
+          "priority",
+          "current",
+          "job_state",
+          "error"
+        ],
+        "title": "ConflictScreen",
         "type": "object"
       },
       "DatabaseStatus": {
@@ -670,6 +1126,13 @@
             "title": "Model",
             "type": "string"
           },
+          "model_usage": {
+            "items": {
+              "$ref": "#/components/schemas/ModelUse"
+            },
+            "title": "Model Usage",
+            "type": "array"
+          },
           "page_count": {
             "default": 0,
             "title": "Page Count",
@@ -764,6 +1227,7 @@
           "pagination",
           "parties",
           "findings",
+          "model_usage",
           "rules",
           "provisions",
           "reviews",
@@ -850,6 +1314,11 @@
             "title": "Confidence",
             "type": "string"
           },
+          "confidence_reason": {
+            "default": "",
+            "title": "Confidence Reason",
+            "type": "string"
+          },
           "document_id": {
             "title": "Document Id",
             "type": "string"
@@ -881,9 +1350,22 @@
             "title": "Label",
             "type": "string"
           },
+          "occurrence": {
+            "default": 0,
+            "title": "Occurrence",
+            "type": "integer"
+          },
+          "overdue": {
+            "default": false,
+            "title": "Overdue",
+            "type": "boolean"
+          },
           "provenance": {
-            "const": "calculated",
             "default": "calculated",
+            "enum": [
+              "calculated",
+              "found"
+            ],
             "title": "Provenance",
             "type": "string"
           },
@@ -911,7 +1393,10 @@
           "formula",
           "assumptions",
           "confidence",
+          "confidence_reason",
           "evidence",
+          "overdue",
+          "occurrence",
           "provenance"
         ],
         "title": "Event",
@@ -1111,7 +1596,7 @@
             "type": "boolean"
           },
           "inference_notice": {
-            "default": "When analysis is enabled, extracted contract text is sent to Gemini. Original files and saved results stay local.",
+            "default": "When analysis is enabled, extracted contract text is sent to OpenRouter and its model provider, or Gemini as secondary when OpenRouter is unavailable. Original files and saved results stay local.",
             "title": "Inference Notice",
             "type": "string"
           },
@@ -1138,6 +1623,13 @@
             "title": "Ocr Available",
             "type": "boolean"
           },
+          "providers": {
+            "items": {
+              "$ref": "#/components/schemas/ProviderStatus"
+            },
+            "title": "Providers",
+            "type": "array"
+          },
           "status": {
             "enum": [
               "ready",
@@ -1159,6 +1651,7 @@
           "status",
           "version",
           "model",
+          "providers",
           "key_configured",
           "model_status",
           "ocr_available",
@@ -1261,6 +1754,57 @@
         "title": "Limits",
         "type": "object"
       },
+      "ModelUse": {
+        "additionalProperties": false,
+        "properties": {
+          "cached": {
+            "default": false,
+            "title": "Cached",
+            "type": "boolean"
+          },
+          "fallback_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fallback Reason"
+          },
+          "model": {
+            "title": "Model",
+            "type": "string"
+          },
+          "provider": {
+            "enum": [
+              "openrouter",
+              "gemini"
+            ],
+            "title": "Provider",
+            "type": "string"
+          },
+          "purpose": {
+            "title": "Purpose",
+            "type": "string"
+          },
+          "requested_model": {
+            "title": "Requested Model",
+            "type": "string"
+          }
+        },
+        "required": [
+          "provider",
+          "requested_model",
+          "model",
+          "purpose",
+          "cached",
+          "fallback_reason"
+        ],
+        "title": "ModelUse",
+        "type": "object"
+      },
       "Page": {
         "additionalProperties": false,
         "properties": {
@@ -1325,6 +1869,9 @@
             },
             "title": "Comparisons",
             "type": "object"
+          },
+          "conflict_scan": {
+            "$ref": "#/components/schemas/ConflictScan"
           },
           "conflicts": {
             "items": {
@@ -1399,9 +1946,57 @@
           "issues",
           "conflicts",
           "comparisons",
+          "conflict_scan",
           "coverage"
         ],
         "title": "Portfolio",
+        "type": "object"
+      },
+      "ProviderStatus": {
+        "additionalProperties": false,
+        "properties": {
+          "key_configured": {
+            "title": "Key Configured",
+            "type": "boolean"
+          },
+          "model": {
+            "title": "Model",
+            "type": "string"
+          },
+          "name": {
+            "enum": [
+              "openrouter",
+              "gemini"
+            ],
+            "title": "Name",
+            "type": "string"
+          },
+          "role": {
+            "enum": [
+              "primary",
+              "secondary"
+            ],
+            "title": "Role",
+            "type": "string"
+          },
+          "status": {
+            "default": "not_configured",
+            "enum": [
+              "configured_unverified",
+              "not_configured"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "role",
+          "model",
+          "key_configured",
+          "status"
+        ],
+        "title": "ProviderStatus",
         "type": "object"
       },
       "RetryResponse": {
@@ -1689,7 +2284,7 @@
   },
   "info": {
     "title": "AITHENA evidence API",
-    "version": "2026-09-05.3"
+    "version": "2026-09-05.6"
   },
   "openapi": "3.1.0",
   "paths": {
@@ -2011,6 +2606,341 @@
           }
         },
         "summary": "Batch"
+      }
+    },
+    "/api/conflicts/continue": {
+      "post": {
+        "operationId": "continue_conflicts_api_conflicts_continue_post",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "mode",
+            "required": false,
+            "schema": {
+              "default": "live",
+              "enum": [
+                "live",
+                "sample"
+              ],
+              "title": "Mode",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "idempotency-key",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Idempotency-Key",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictScan"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Request Entity Too Large"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Implemented"
+          }
+        },
+        "summary": "Continue Conflicts"
+      }
+    },
+    "/api/conflicts/screening": {
+      "get": {
+        "operationId": "conflict_screening_api_conflicts_screening_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "mode",
+            "required": false,
+            "schema": {
+              "default": "live",
+              "enum": [
+                "live",
+                "sample"
+              ],
+              "title": "Mode",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ConflictScreen"
+                  },
+                  "title": "Response Conflict Screening Api Conflicts Screening Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Request Entity Too Large"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Implemented"
+          }
+        },
+        "summary": "Conflict Screening"
+      }
+    },
+    "/api/conflicts/{comparison_id}/retry": {
+      "post": {
+        "operationId": "retry_conflict_api_conflicts__comparison_id__retry_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "comparison_id",
+            "required": true,
+            "schema": {
+              "title": "Comparison Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "mode",
+            "required": false,
+            "schema": {
+              "default": "live",
+              "enum": [
+                "live",
+                "sample"
+              ],
+              "title": "Mode",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RetryResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Request Entity Too Large"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Implemented"
+          }
+        },
+        "summary": "Retry Conflict"
       }
     },
     "/api/demo": {
@@ -3038,12 +3968,56 @@
     },
     "/api/review/{issue_id}/brief": {
       "get": {
-        "operationId": "disabled_api_review__issue_id__brief_get",
+        "operationId": "review_brief_api_review__issue_id__brief_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "issue_id",
+            "required": true,
+            "schema": {
+              "title": "Issue Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "mode",
+            "required": false,
+            "schema": {
+              "default": "live",
+              "enum": [
+                "live",
+                "sample"
+              ],
+              "title": "Mode",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "as_of",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "As Of"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/Brief"
+                }
               }
             },
             "description": "Successful Response"
@@ -3119,7 +4093,7 @@
             "description": "Not Implemented"
           }
         },
-        "summary": "Disabled"
+        "summary": "Review Brief"
       }
     },
     "/api/settings/sme": {

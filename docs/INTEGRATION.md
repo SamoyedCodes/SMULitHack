@@ -20,23 +20,26 @@ The earlier `shared/types.ts`, `shared/sample-portfolio.json`, `frontend/src/dat
 
 When reusing the prototype's visual components, consume canonical records directly. Do not flatten away evidence, multiple findings, unknowns, parties, conditional dates, or the scope of a conflict assessment. The synthetic prototype is not a calibrated extraction evaluation or a lawyer handoff implementation.
 
-## Ingestion endpoints retained from Phase 2
+## Current endpoints
 
 All paths start with `/api`. The browser connects only to FastAPI via Vite's proxy. No provider credentials or direct Gemini calls belong in the browser.
 
 | Method / path | Current behavior |
 |---|---|
 | GET `/health` | Typed health; 200 ready, 503 degraded database |
-| GET `/portfolio?mode=live&as_of=2026-09-05` | Typed saved portfolio, no date calculation; fresh arrays are empty |
-| GET `/jobs?mode=live` | Typed saved jobs; only ingestion jobs are processed |
+| GET `/portfolio?mode=live&as_of=2026-09-05` | Read-only deadline projection plus current/stale conflict snapshot, issues and coverage; no jobs/model calls |
+| GET `/jobs?mode=live` | Typed saved jobs; one worker prioritizes ingestion, extraction, then versioned conflicts |
 | GET `/documents/{id}` | Saved Document or 404 |
 | GET `/batches/{id}` | Typed persisted receipt and current progress or 404 |
 | GET `/batches?limit=1` | Most recent persisted receipts (limit 1–20) |
 | POST `/batches` | Multipart `files`, optional UUID `Idempotency-Key`; typed 202 receipt |
 | POST `/retry?document_id=...` | Queue eligible source-reading retry; typed resumed count |
 | GET `/documents/{id}/pages`, `/documents/{id}/pages/{number}/image`, `/documents/{id}/original` | Canonical page records, physical PNG rendering and preserved original |
-| POST `/settings/sme` | 501 until extraction implementation |
-| GET `/review/{id}/brief` | 501 until handoff implementation |
+| POST `/settings/sme` | Established-party selection and conflict reconciliation |
+| GET `/review/{id}/brief?mode=live&as_of=2026-09-05` | Typed read-only brief; issue IDs and conflict wrapper IDs resolve to the same underlying record |
+| GET `/conflicts/screening` | Current screening decisions |
+| POST `/conflicts/continue` | UUID Idempotency-Key adds ten slots when paused |
+| POST `/conflicts/{id}/retry` | Retry an eligible current comparison without a new slot |
 | POST `/demo` | 501 until sample workspace implementation |
 
 Disabled routes are gated before multipart/body parsing. Error shape:
@@ -47,13 +50,13 @@ Disabled routes are gated before multipart/body parsing. Error shape:
 
 Other codes: `not_found`, `validation_error`, `forbidden`, `internal_error`. Validation errors omit submitted inputs. Internal errors do not return stack traces or filesystem paths. A degraded health response retains the health schema, not the error envelope.
 
-Health has separate local service/database, model configuration, executable detection, worker, capability and limit fields. The frontend must require a current successful connection and the relevant capability before offering an action. A key or installed executable alone never enables a feature. The UI offers ingestion/extraction only with current health and the matching capability. It polls every three seconds. Extraction is a separate explicit request; deadline/conflict/brief features remain disabled.
+Health has separate local service/database, model configuration, executable detection, worker, capability and limit fields. The frontend must require a current successful connection and the relevant capability before offering an action. A key or installed executable alone never enables a feature. Every action requires current health and its matching capability. Polling repeats every three seconds; explicit extraction and automatic bounded conflict comparisons use the worker, while deadlines and briefs are local read projections.
 
-`mode=sample` reads are separate from `mode=live`; loading samples remains disabled. Events are not recomputed during Phase 1; an empty event list cannot establish an absence of deadlines in stored documents.
+`mode=sample` reads are separate from `mode=live`; loading samples remains disabled. Deadline projection uses the requested Singapore as-of date; an empty event list cannot establish an absence of deadlines in stored documents.
 
 ## Storage and lifecycle
 
-SQLite retains tables `documents`, `jobs`, `settings`, `llm_cache`, `comparisons`, `batches`. Initialization is in FastAPI lifespan only. Schema export and module import have no storage/model side effects. The single worker is constructed and started in lifespan by default. `start_worker=False` is reserved for isolated tests. It lazily imports the provider only for explicit extraction, recovers/claims ingestion and extraction jobs, and holds an exclusive process lock. Old document/conflict jobs remain idle. The original coupled worker is retained as an inactive draft in `analysis_worker.py`.
+SQLite retains tables `documents`, `jobs`, `settings`, `llm_cache`, `comparisons`, `batches`, `conflict_screens`. Initialization is in FastAPI lifespan only. Schema export and module import have no storage/model side effects. The single worker is constructed and started in lifespan by default. `start_worker=False` is reserved for isolated tests. It lazily imports the provider for extraction or versioned comparisons, recovers/claims those jobs after ingestion priority, and holds an exclusive process lock. Old document/conflict jobs remain idle. The original coupled worker is retained as an inactive draft in `analysis_worker.py`.
 
 Domain values and serialized field names are preserved. The additive Pydantic schema setting `json_schema_serialization_defaults_required` makes generated *response* types accurately require default values that Python serializes; it does not change input validation or stored values.
 
@@ -69,7 +72,7 @@ Ingestion caches are keyed by bytes, normalized format, workspace and ingestion 
 
 Statuses for new files: `queued` → `processing` → `text_ready` / `needs_source_review` / `failed`. Blank/error pages remain in the page list with warnings. A document over 200 pages is rejected in full. Source reads never create missing document directories, and resolved file paths are confined to their document directory.
 
-## Phase 3 integration additions
+## Historical Phase 3 integration additions
 
 - `POST /api/extract?document_id=...` returns HTTP 202 `RetryResponse {resumed_jobs}`. One means queued/retried; zero means active, quota-waiting or matching completed work. Key includes source checkpoint, document/hash, model and processing version. Waiting jobs retain their delay. Failed/blocked jobs can be explicitly retried. This endpoint is capability/origin guarded.
 - `POST /api/settings/sme` accepts `SmeSelection {name: string|null, mode: live|sample}` and returns the selection. Unknown or other-workspace names produce 422; null clears. OpenAPI distinguishes `SmeSelection-Input` and `SmeSelection-Output` because defaults are required in responses.
@@ -78,3 +81,15 @@ Statuses for new files: `queued` → `processing` → `text_ready` / `needs_sour
 - Keep source-reading retry separate from extraction retry. Re-reading beneath a queued/saved extraction is currently disallowed; replace a damaged source with a new corrected upload. Earlier reading checkpoints and original-file hashes remain intact.
 - Incomplete page sets, source warnings or missing context prevent high-confidence complete analysis and supported machine rules. Missing support for machine rules/provisions creates review issues. OCR remains marked OCR even if numeric reading confidence is absent.
 - See `PHASE_3_INTEGRATION.md` for checks and `PHASE_4_HANDOFF.md` for parallel calendar/conflict contracts. No Phase 4/5 behavior is enabled by this merge.
+
+## Provider update after Phase 3
+
+OpenRouter is primary and Gemini secondary through `backend.llm.ModelClient`. See `MODEL_PROVIDERS.md` for configuration, fallback behavior, cache identities, `HealthResponse.providers` and additive `Document.model_usage`. Existing references to Gemini-only extraction above describe the preceding checkpoint. No date/conflict capability is activated.
+
+## Combined Phase 4–6 integration
+
+See [verification and limits](PHASE_4_6_INTEGRATION.md). `project_deadlines` is shared by portfolio and brief lookup, including missing/corrupt source and incomplete-analysis issue IDs. Neither route writes results, grants comparison allowance or invokes a provider.
+
+The review queue excludes historical assessments and deduplicates `conflict:<assessment-id>` wrappers. Brief lookup accepts either identifier and uses the conflict snapshot to label historical results stale. Existing `Brief.coverage_warnings` reports unreadable checkpoints and failed page/span/quotation/coordinate revalidation. Brief requests retain `mode` and selected `as_of`; canceled or outdated responses cannot enable current exports.
+
+Models remain additive. `Event` adds confidence reasons, overdue/occurrence fields and found/calculated provenance; conflict records retain revision/source metadata; `Brief` and `BriefDocument` define the handoff response. Generate all artifacts with Python 3.12 before TypeScript generation. Processing version is `2026-09-05.6`; conflict version and persistent allowance are retained. No database reset or destructive migration is required.

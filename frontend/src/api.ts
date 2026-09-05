@@ -1,3 +1,6 @@
+export type Brief = components['schemas']['Brief']
+export type ReviewIssue = components['schemas']['ReviewIssue']
+export type CalendarEvent = components['schemas']['Event']
 import Ajv2020 from 'ajv/dist/2020'
 import spec from '../../shared/openapi.json'
 import type { components } from '../../shared/api.generated'
@@ -40,8 +43,8 @@ export async function fetchHealth(signal?: AbortSignal): Promise<Health> {
   if (!validateHealth(body)) throw new ApiError('validation', 'The backend health response does not match this build. Restart matching frontend and backend versions.')
   return body
 }
-export async function fetchLivePortfolio(signal?: AbortSignal): Promise<Portfolio> {
-  const body = await apiRequest('/portfolio', { signal })
+export async function fetchLivePortfolio(signal?: AbortSignal, asOf?: string): Promise<Portfolio> {
+  const body = await apiRequest(`/portfolio${asOf ? `?as_of=${encodeURIComponent(asOf)}` : ''}`, { signal })
   if (!validatePortfolio(body) || body.mode !== 'live') throw new ApiError('validation', 'The portfolio response does not match the live workspace contract.')
   return body
 }
@@ -88,4 +91,32 @@ export async function setSme(name: string | null): Promise<void> {
 export async function extractDocument(id: string): Promise<void> {
   const body = await apiRequest(`/extract?document_id=${encodeURIComponent(id)}`, { method: 'POST' })
   if (!validateRetry(body)) throw new ApiError('validation', 'The extraction response does not match this build.')
+}
+
+export type ConflictAssessment = components['schemas']['ConflictAssessment']
+export type ConflictScreen = components['schemas']['ConflictScreen']
+const validateScreens = ajv.compile<ConflictScreen[]>({type:'array',items:{$ref:'aithena#/components/schemas/ConflictScreen'}})
+const validateScan = ajv.compile<components['schemas']['ConflictScan']>({$ref:'aithena#/components/schemas/ConflictScan'})
+export async function fetchConflictScreens(signal?:AbortSignal):Promise<ConflictScreen[]> {
+  const data=await apiRequest('/conflicts/screening',{signal})
+  if(!validateScreens(data))throw new ApiError('validation','Conflict screening does not match this build.')
+  return data
+}
+export async function continueConflicts(key:string) {
+  const data=await apiRequest('/conflicts/continue',{method:'POST',headers:{'Idempotency-Key':key}},false,120000)
+  if(!validateScan(data))throw new ApiError('validation','The conflict allowance response does not match this build.')
+  return data
+}
+export async function retryConflict(id:string) {
+  const data=await apiRequest(`/conflicts/${encodeURIComponent(id)}/retry`,{method:'POST'})
+  if(!validateRetry(data))throw new ApiError('validation','The comparison retry response does not match this build.')
+  return data
+}
+
+const validateBrief = ajv.compile<Brief>({ $ref: 'aithena#/components/schemas/Brief' })
+export async function fetchBrief(id: string, signal?: AbortSignal, context?: Pick<Portfolio, 'mode' | 'as_of'>): Promise<Brief> {
+  const query = context ? `?${new URLSearchParams({mode: context.mode, as_of: context.as_of})}` : ''
+  const body = await apiRequest(`/review/${encodeURIComponent(id)}/brief${query}`, { signal })
+  if (!validateBrief(body)) throw new ApiError('validation', 'The lawyer brief response does not match this build.')
+  return body
 }

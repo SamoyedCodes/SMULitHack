@@ -71,13 +71,17 @@ def unresolved_finding(field: FieldName, document_id: str, reason: str) -> Findi
                    provenance="unresolved", confidence="low", confidence_reason=reason)
 
 
+def pages_complete(doc: Document, pages: list[Page]) -> bool:
+    # Every physical page must be present and legible before an absence can mean anything.
+    return (bool(pages) and len(pages) == doc.page_count
+            and {p.number for p in pages} == set(range(1, doc.page_count + 1))
+            and all(p.status == "read" and p.spans and not p.warnings for p in pages))
+
+
 def apply_extraction(doc: Document, extraction: Extraction, review: SupportReview, pages: list[Page]) -> Document:
     verdicts = {v.item_id: v for v in review.verdicts}
     findings, issues = [], []
-    complete = (bool(pages) and len(pages) == doc.page_count
-                and {p.number for p in pages} == set(range(1, doc.page_count + 1))
-                and not extraction.missing_context
-                and all(p.status == "read" and p.spans and not p.warnings for p in pages))
+    complete = pages_complete(doc, pages) and not extraction.missing_context
     for draft in extraction.findings:
         evidence, errors = resolve_citations(draft.citations, pages, {doc.id})
         verdict = verdicts.get(draft.id)

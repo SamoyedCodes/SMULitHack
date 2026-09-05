@@ -168,14 +168,22 @@ class Event(Record):
     formula: str
     assumptions: list[str]
     confidence: Literal["high", "medium", "low"]
+    confidence_reason: str = ""
     evidence: list[Evidence]
-    provenance: Literal["calculated"] = "calculated"
+    # Overdue is a calendar comparison against the selected date, never a finding of non-performance.
+    overdue: bool = False
+    occurrence: int = 0
+    # "found" is an explicit source date; "calculated" means arithmetic ran on cited inputs.
+    provenance: Literal["calculated", "found"] = "calculated"
 
 
 class ConflictDraft(Record):
     status: Literal["potential_conflict", "no_conflict_identified_for_this_rule", "insufficient_evidence"]
     documents: list[str]
     scope_comparison: dict[str, str]
+    dimension_citations: dict[str, list[Citation]] = Field(default_factory=dict)
+    exception_citations: list[list[Citation]] = Field(default_factory=list)
+    time_overlap: Literal["yes", "no", "unknown"] = "unknown"
     citations: list[Citation]
     exceptions: list[str]
     missing_facts: list[str]
@@ -197,6 +205,52 @@ class ConflictAssessment(Record):
     confidence_reason: str
     provenance: Literal["inferred", "unresolved"]
     mode: Literal["live", "sample"] = "live"
+    input_revision: str = ""
+    created_at: str = ""
+    current: bool = False
+    dimension_evidence: dict[str, list[Evidence]] = Field(default_factory=dict)
+    exception_evidence: list[list[Evidence]] = Field(default_factory=list)
+    model_usage: list[ModelUse] = Field(default_factory=list)
+
+
+class BriefDocument(Record):
+    id: str
+    title: str
+    filename: str
+
+
+class Brief(Record):
+    id: str
+    source: Literal["issue", "conflict"]
+    kind: str
+    mode: Literal["live", "sample"] = "live"
+    generated_at: str
+    as_of: str
+    title: str
+    documents: list[BriefDocument] = Field(default_factory=list)
+    established: list[str] = Field(default_factory=list)
+    missing_facts: list[str] = Field(default_factory=list)
+    lawyer_question: str
+    urgency: str = "Review before relying on this provision."
+    explanation: str | None = None
+    scope_comparison: dict[str, str] = Field(default_factory=dict)
+    exceptions: list[str] = Field(default_factory=list)
+    provenance: str
+    confidence: str | None = None
+    confidence_reason: str | None = None
+    evidence: list[Evidence] = Field(default_factory=list)
+    coverage_warnings: list[str] = Field(default_factory=list)
+    disclaimer: str = ("This brief summarizes grounded source evidence for human legal review. "
+                       "It is not legal advice, does not assert breach or enforceability, and was not sent anywhere automatically.")
+
+
+class ModelUse(Record):
+    provider: Literal["openrouter", "gemini"]
+    requested_model: str
+    model: str
+    purpose: str
+    cached: bool = False
+    fallback_reason: str | None = None
 
 
 class Document(Record):
@@ -215,6 +269,7 @@ class Document(Record):
     pagination: str = "original"
     parties: list[str] = Field(default_factory=list)
     findings: list[Finding] = Field(default_factory=list)
+    model_usage: list[ModelUse] = Field(default_factory=list)
     rules: list[DeadlineRule] = Field(default_factory=list)
     provisions: list[CommercialProvision] = Field(default_factory=list)
     reviews: list[Verdict] = Field(default_factory=list)
@@ -223,6 +278,40 @@ class Document(Record):
     created_at: str
     model: str
     version: str
+
+
+class ConflictScreen(Record):
+    id: str
+    documents: list[str]
+    mode: Literal["live", "sample"]
+    outcome: Literal["candidate", "excluded", "needs_evidence"]
+    reason: str
+    evidence: list[Evidence] = Field(default_factory=list)
+    missing_facts: list[str] = Field(default_factory=list)
+    priority: int = 1
+    current: bool = True
+    job_state: str | None = None
+    error: str | None = None
+
+
+class ConflictScan(Record):
+    state: Literal["disabled", "awaiting_sme", "ready", "running", "paused", "needs_review"] = "disabled"
+    allowance: int = 10
+    assigned: int = 0
+    total_pairs: int = 0
+    unscreened: int = 0
+    candidates: int = 0
+    excluded: int = 0
+    needs_evidence: int = 0
+    unprocessed_documents: int = 0
+    completed: int = 0
+    unchecked: int = 0
+    queued: int = 0
+    running: int = 0
+    waiting: int = 0
+    blocked: int = 0
+    failed: int = 0
+    can_continue: bool = False
 
 
 class Portfolio(Record):
@@ -236,6 +325,7 @@ class Portfolio(Record):
     issues: list[ReviewIssue]
     conflicts: list[ConflictAssessment]
     comparisons: dict[str, int]
+    conflict_scan: ConflictScan = Field(default_factory=ConflictScan)
     coverage: dict[str, int]
 
 

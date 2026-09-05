@@ -23,6 +23,7 @@ from scripts.make_ingestion_fixtures import fixtures, native_pdf
 
 @pytest.fixture
 def client(tmp_path, monkeypatch):
+    monkeypatch.delenv('OPENROUTER_API_KEY', raising=False)
     monkeypatch.delenv('GEMINI_API_KEY', raising=False); monkeypatch.delenv('GOOGLE_API_KEY', raising=False)
     app = create_app(Config(tmp_path), start_worker=False)
     with TestClient(app) as client:
@@ -84,7 +85,7 @@ def test_native_sources_coordinates_original_and_no_llm(client):
     # Phase 3 tests import Gemini during collection; isolate the ingestion-only import check.
     import subprocess
     subprocess.run([sys.executable, '-c', "from backend.worker import Worker; import sys; assert 'backend.llm' not in sys.modules and 'google.genai' not in sys.modules"], check=True)
-    assert not any(client.get('/api/health').json()['capabilities'][k] for k in ['conflicts','deadlines','handoff','sample_workspace'])
+    assert not any(client.get('/api/health').json()['capabilities'][k] for k in ['sample_workspace'])
 
 
 def test_bad_pdf_and_page_limit_are_visible_failures(client):

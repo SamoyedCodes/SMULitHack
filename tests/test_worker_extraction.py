@@ -18,7 +18,7 @@ DOC = "docA"
 @pytest.fixture(autouse=True)
 def isolated(monkeypatch, tmp_path):
     monkeypatch.setattr(settings, "ROOT", tmp_path)
-    for name in ("GEMINI_API_KEY", "GOOGLE_API_KEY", "AITHENA_DATA_DIR",
+    for name in ("OPENROUTER_API_KEY", "OPENROUTER_MODEL", "GEMINI_MODEL", "GEMINI_API_KEY", "GOOGLE_API_KEY", "AITHENA_DATA_DIR",
                  "AITHENA_API_PORT", "AITHENA_WEB_PORT", "AITHENA_LLM_INTERVAL"):
         monkeypatch.delenv(name, raising=False)
 
@@ -199,3 +199,28 @@ def test_extraction_recovery_is_explicit_and_capability_gated(tmp_path, monkeypa
     assert store.jobs('live')[0]['state'] == 'queued'
     assert Worker(config, store, llm=FakeLLM()).run_once()
     assert store.jobs('live')[0]['state'] == 'complete'
+
+
+def test_worker_persists_secondary_provider_and_model_metadata(tmp_path, monkeypatch):
+    from backend.llm import ModelClient, OpenRouter
+    monkeypatch.setenv('OPENROUTER_API_KEY', 'primary')
+    monkeypatch.setenv('GEMINI_API_KEY', 'secondary')
+    monkeypatch.setenv('AITHENA_LLM_INTERVAL', '0')
+    config, store = Config(tmp_path), Store(tmp_path)
+    _seed(store, config)
+    fake = FakeLLM()
+    def unavailable(*args):
+        raise ProviderUnavailable('OpenRouter access unavailable (HTTP 401).')
+    def secondary(self, purpose, serialized, schema):
+        data = __import__('json').loads(serialized)
+        result = fake.extract(DOC, data['text']) if schema is Extraction else fake.review(data['complete_document_text'], data['items'])
+        return result.model_dump_json(), 'gemini-actual-version'
+    monkeypatch.setattr(OpenRouter, 'request', unavailable)
+    monkeypatch.setattr(Gemini, 'request', secondary)
+    _run_extract_job(store, Worker(config, store, llm=ModelClient(config, store)))
+    doc = store.document(DOC)
+    assert doc.status == 'needs_review'
+    assert {use.purpose for use in doc.model_usage} == {'Extraction', 'SupportReview'}
+    assert all(use.provider == 'gemini' and '401' in use.fallback_reason for use in doc.model_usage)
+    assert doc.model == 'gemini:gemini-actual-version'
+    assert all(f.evidence for f in doc.findings if f.provenance == 'found')

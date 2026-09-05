@@ -1,8 +1,24 @@
 {
   "api_version": "1",
   "status": "ready",
-  "version": "2026-09-05.3",
-  "model": "gemini-3.8-flash",
+  "version": "2026-09-05.6",
+  "model": "openrouter/free",
+  "providers": [
+    {
+      "name": "openrouter",
+      "role": "primary",
+      "model": "openrouter/free",
+      "key_configured": false,
+      "status": "not_configured"
+    },
+    {
+      "name": "gemini",
+      "role": "secondary",
+      "model": "gemini-3.8-flash",
+      "key_configured": false,
+      "status": "not_configured"
+    }
+  ],
   "key_configured": false,
   "model_status": "not_configured",
   "ocr_available": false,
@@ -17,9 +33,9 @@
   "capabilities": {
     "ingestion": true,
     "extraction": true,
-    "deadlines": false,
-    "conflicts": false,
-    "handoff": false,
+    "deadlines": true,
+    "conflicts": true,
+    "handoff": true,
     "sample_workspace": false
   },
   "limits": {
@@ -27,5 +43,5 @@
     "megabytes_per_file": 25,
     "pages_per_file": 200
   },
-  "inference_notice": "When analysis is enabled, extracted contract text is sent to Gemini. Original files and saved results stay local."
+  "inference_notice": "When analysis is enabled, extracted contract text is sent to OpenRouter and its model provider, or Gemini as secondary when OpenRouter is unavailable. Original files and saved results stay local."
 }

@@ -59,7 +59,7 @@ it('starts with a live checking state, disabled ingestion and no invented SME or
 
 it('marks stale local checks and does not claim a configured key was verified', () => {
   // Fixture is generated directly from the typed backend response.
-  const markup = renderToStaticMarkup(<Readiness health={{ ...health, api_version: '1', status: 'ready', model_status: 'configured_unverified', key_configured: true, database: {status:'ready'} }} stale />)
+  const markup = renderToStaticMarkup(<Readiness health={{ ...health, api_version: '1', status: 'ready', model_status: 'configured_unverified', key_configured: true, providers: [{name:'openrouter',role:'primary',model:'openrouter/free',key_configured:true,status:'configured_unverified'}], database: {status:'ready'} }} stale />)
   expect(markup).toContain('Configured, not verified · stale')
   expect(markup).toContain('Last response · stale')
 })

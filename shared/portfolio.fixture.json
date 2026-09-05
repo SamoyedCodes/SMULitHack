@@ -13,11 +13,33 @@
     "assessed": 0,
     "failed": 0
   },
+  "conflict_scan": {
+    "state": "disabled",
+    "allowance": 10,
+    "assigned": 0,
+    "total_pairs": 0,
+    "unscreened": 0,
+    "candidates": 0,
+    "excluded": 0,
+    "needs_evidence": 0,
+    "unprocessed_documents": 0,
+    "completed": 0,
+    "unchecked": 0,
+    "queued": 0,
+    "running": 0,
+    "waiting": 0,
+    "blocked": 0,
+    "failed": 0,
+    "can_continue": false
+  },
   "coverage": {
     "total": 0,
     "analyzed": 0,
     "pages": 0,
     "pages_read": 0,
-    "pages_analyzed": 0
+    "pages_analyzed": 0,
+    "dated": 0,
+    "dates_unavailable": 0,
+    "undated": 0
   }
 }

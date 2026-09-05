@@ -2,12 +2,12 @@
 
 ## Read this first
 
-This is AITHENA, the SMU legal-tech hackathon contract-obligation project. Work in this repository, preserve Builder B's frontend, and implement the solution one phase at a time. Phases 1–3 are integrated; verification limits are recorded in `docs/PHASE_3_INTEGRATION.md`. Builder 2 is assigned Phase 4 via `docs/PHASE_4_HANDOFF.md`; the user owns Phase 5 on a separate branch. Finish the assigned checkpoint only.
+This is AITHENA, the SMU legal-tech hackathon contract-obligation project. Work in this repository and preserve Builder B's frontend. Phases 1–6 are integrated; read `docs/PHASE_4_6_INTEGRATION.md` for the current checkpoint and verification limits. Phase 7 evaluation/demo is not implemented; finish only the explicitly assigned checkpoint.
 
 This file records both the inspected implementation and the agreed destination. A planned feature, a sample screen, or a draft in another workspace is not a completed feature. Recheck the source and update this file when changes land. User instructions take precedence over this guidance.
 
 **Snapshot date:** 5 September 2026, Asia/Singapore.
-**Integrated baseline:** main combines Phase 2 checkpoint `f467ea8` and Phase 3 branch `460049c`, with integration fixes. Existing `.env.example` deletion and unrelated `.claude/` work are preserved. The user authorized this local merge; no push was requested.
+**Integrated baseline:** main combines `011376d`, Phase 4 `4bc742c`, Phase 5 `dd50bbf` (including provider prerequisite `e69f758`), and Phase 6 `9e887f0`, with cross-phase compatibility fixes. The user authorized integration and pushing main. Unrelated `.claude/` work and the existing `.env.example` deletion are preserved; the accidental Phase 6 worktree gitlink is excluded.
 **Repository:** `SMULitHack` (the saved Codex project may be named “SMU Hack”). An older folder also named “SMU Hack” contains a separate scaffold and planning material; do not confuse it with this Git repository or overwrite this frontend with that scaffold.
 
 ## Product scope
@@ -31,19 +31,19 @@ General legal chat, Singapore-law retrieval, authentication, drive integrations,
 
 ## What is actually in this repository
 
-The repository now contains the **Phase 3 ingestion, grounded extraction and source viewer**, preserving Builder B's design. Extraction is explicitly requested per document. Calendar, conflict and handoff modules remain disabled drafts. Live model accuracy is unverified.
+The repository contains **Phases 1–6**, preserving Builder B's design. Local reading and explicit extraction feed the deterministic calendar, bounded automatic distribution comparisons, and a current review queue with printable/downloadable lawyer briefs. Only the sample/demo capability remains disabled. Live model access, accuracy and calibration remain unverified.
 
 | Area | Current implementation | Important limit |
 | --- | --- | --- |
 | Frontend | React 19, TypeScript, Vite 6, Tailwind CSS 4, Lucide icons; Zod for prototype data and Ajv for live response validation | Preserve the existing stack and blue/ink visual design. This checkout is not the older Vinext/Sites scaffold. |
-| Live screens | Overview/readiness, Contracts, Calendar, Conflicts, Needs review | Add contracts uploads files/folders; Contracts shows reading progress, source pages and highlights. Extracted findings retain all obligations per field and link to source highlights. SME selection uses established parties; later views remain disabled. |
-| Backend | FastAPI/Pydantic, root configuration, SQLite persistence, typed health/errors, read-only saved metadata | One locked worker handles `ingestion` and explicit `extract` jobs. Both capabilities are enabled; other job types remain idle. |
+| Live screens | Overview/readiness, Contracts, Calendar, Conflicts, Needs review | Add contracts uploads files/folders; Contracts shows reading progress, source pages and highlights. Extracted findings retain all obligations per field and link to source highlights. SME selection uses established parties. Calendar, Conflicts and Needs review are live; brief downloads are self-contained HTML and browser printing supports PDF. |
+| Backend | FastAPI/Pydantic, root configuration, SQLite persistence, typed health/errors, read-only saved metadata | One locked worker prioritizes ingestion, explicit extraction, then versioned `conflict-v1` jobs. Legacy unversioned jobs remain idle; deadline/brief GETs enqueue nothing. |
 | API contract | Relative `/api`, Vite proxy, OpenAPI snapshot and generated TypeScript types | Legacy sample types are isolated and must not become the live contract. |
 | Samples | Four synthetic agreements; original dashboard retained in `PrototypeDashboard.tsx` | Not loaded by the live application. Fixed as-of date `2026-09-05`; sample confidence is illustrative, not calibrated. |
 | Evidence | Prototype text-page dialogs; canonical page/span and coordinate models in Python | Live source pages and coordinate highlights are implemented. New generated fixtures include actual scanned PDFs; prototype OCR remains illustrative. |
 | Uploads | Prototype picker/drag-drop retained; live ingestion routes guarded | Live batch/folder ingestion, duplicate/rejection receipts, checkpoints and explicit retries are implemented. |
-| Dates and conflicts | Sample presentation preserved; Python processing modules carried forward as drafts | No deadline or semantic conflict engine is enabled or certified. |
-| Briefs | Prototype conflict JSON export retained | No live review/handoff export is enabled. |
+| Dates and conflicts | Deterministic deadline projection and conservative distribution comparisons are enabled | Calculated deadlines are capped at medium confidence; semantic accuracy is unverified. |
+| Briefs | Current review queue, typed briefs, source revalidation, HTML download and browser print | Historical comparisons are labeled stale; no brief is sent automatically. |
 | Validation/tests | Backend foundation tests; prototype checks; canonical API/readiness tests; build/schema drift checks | Foundation validation does not prove extraction correctness or confidence calibration. |
 | WebMCP | Original prototype's optional read-only tool retained | Not part of the live readiness app; supporting-browser registration remains unverified. |
 
@@ -63,7 +63,8 @@ The repository now contains the **Phase 3 ingestion, grounded extraction and sou
 - `backend/ingestion.py`, `documents.py`, `worker.py`: active local upload/reading pipeline and explicitly queued extraction. Provider imports are lazy; local reading needs no key.
 - `backend/llm.py`, `evidence.py`: active extraction/support review and evidence checks; no live model accuracy claim.
 - `frontend/src/Findings.tsx`: extraction request, full findings/evidence and SME selector.
-- `backend/analysis_worker.py`, `deadlines.py`, `conflicts.py`: inactive drafts; never start the old coupled worker.
+- `backend/analysis_worker.py`: inactive reference; never start the old coupled worker. `deadlines.py`, `conflicts.py`, `conflict_service.py` and `review.py` are active.
+- `frontend/src/Conflicts.tsx`, `Review.tsx`, `Brief.tsx`: live comparisons/notifications, deduplicated current review queue and source-linked exports.
 - `shared/openapi.json`, `shared/api.generated.ts`: canonical API snapshot and generated types.
 - `shared/health.fixture.json`, `shared/portfolio.fixture.json`: backend-derived non-legal API fixtures.
 - `shared/types.ts`, `shared/sample-portfolio.json`: **legacy prototype v1.0**, not the live API payload.
@@ -71,6 +72,8 @@ The repository now contains the **Phase 3 ingestion, grounded extraction and sou
 - `scripts/dev.py`, `doctor.py`, `export_openapi.py`, `export_fixtures.py`: launch, diagnostics and contract generation.
 - `tests/test_foundation.py`, `test_ingestion.py`: isolated foundation, local ingestion, 80-file load, restart, source, OCR/DOCX and boundary checks.
 - `scripts/make_ingestion_fixtures.py`: seven synthetic mixed-format ingestion files; no extraction answer key implied.
+- `backend/deadlines.py`, `frontend/src/Calendar.tsx`: Phase 4 deterministic date projection and its calendar view; no model call is made to build the calendar.
+- `docs/PHASE_4_COMPLETION.md`, `docs/PHASE_4_MERGE_NOTES.md`: Phase 4 verification/limits and the Phase 5 merge contract.
 - `README.md`, `docs/INTEGRATION.md`: current startup and integration guidance.
 - `IMPLEMENTATION_PLAN.md`, `PHASE_1_COMPLETION.md`, `docs/PHASE_2_HANDOFF.md`: phase boundaries, recorded verification and next-builder extension points.
 
@@ -87,16 +90,16 @@ The original dashboard's automatic sample selection, URL-based “Connected” b
 
 ## Phase status and checkpoints
 
-**Current checkpoint: Phase 3 integrated with Phase 2.** Read `docs/PHASE_3_INTEGRATION.md` for verification and limits, and `docs/PHASE_4_HANDOFF.md` for Builder 2. Phases 4–7 are not complete. The sample dashboard previews later UI only. Do not import temporary work or overwrite another active builder's changes without checking the repository.
+**Current checkpoint: Phases 1–6 integrated.** Read `docs/PHASE_4_6_INTEGRATION.md` for combined verification, and the individual phase completion reports for historical results and semantic limits. Phase 7 remains unimplemented. Preserve other builders' work and do not start further phases without assignment.
 
 | Phase | Scope and completion gate | Status at this snapshot |
 | --- | --- | --- |
 | 1 — Runnable foundation | Preserve the frontend shell; add FastAPI/SQLite, validated configuration, real health/capability reporting, stable generated interfaces, portable startup and smoke tests. Runs without a Gemini key. | Implemented; remaining checks listed below. |
 | 2 — Ingestion and pages | Up to 80 mixed-format files, originals/hashes, durable local queue, conversion/OCR, page coverage/errors, deduplication, restart recovery, source viewer. Local reading must work without a key. | Implemented and tested, including real OCR/DOCX and 80-file ingestion; no model calls. |
 | 3 — Grounded extraction | Gemini structured extraction and support review, Python citation checks, all required fields, explained provenance/confidence, completeness and SME selection. | Integrated and tested with fake-provider fixtures; live model access and extraction accuracy remain unverified. |
-| 4 — Deadlines | Tested Python rules, notice windows, ambiguity stops, adjustable as-of date, 90-day/overdue events with cited calculations. | Planned; sample date display and disabled drafts only. |
-| 5 — Conflicts | Conservative Python candidate selection, LLM comparison of both agreements, evidence validation, cached/pending assessments and uncertainty. | Planned; sample conflict display and disabled drafts only. |
-| 6 — Review and handoff | Dedicated review queue, missing facts, urgency, source excerpts and a specific lawyer question; printable/downloadable briefs. | Planned; sample conflict JSON export only exists. |
+| 4 — Deadlines | Tested Python rules, notice windows, ambiguity stops, adjustable as-of date, 90-day/overdue events with cited calculations. | Integrated and tested with synthetic fixtures; see `docs/PHASE_4_COMPLETION.md`. Per-input grounding of offset/unit/direction remains unverified, so calculated dates are capped at medium confidence. |
+| 5 — Conflicts | Conservative Python candidate selection, LLM comparison of both agreements, evidence validation, cached/pending assessments and uncertainty. | Integrated; automatic screening, versioned comparisons, persistent allowance and evidence validation. Live model accuracy remains unverified. |
+| 6 — Review and handoff | Dedicated review queue, missing facts, urgency, source excerpts and a specific lawyer question; printable/downloadable briefs. | Integrated; current review queue, source-validated briefs, HTML download and browser printing. |
 | 7 — Evaluation and demo | Mixed-quality corpus and reviewed answer key, grouped holdout, quality/calibration metrics, 80-file ingestion test and reproducible demonstration. | Planned; four synthetic examples are not an evaluation corpus. |
 
 Complete the explicitly assigned phase, run appropriate acceptance checks, record actual results and remaining limits, and stop at the checkpoint. Do not silently enable the next phase.
@@ -122,9 +125,9 @@ flowchart TB
     COMPARE <--> GEMINI
 ```
 
-Phases 2–3 add local upload, OCR/conversion, source viewing and explicit Gemini extraction/support review. Deadline, conflict and handoff nodes remain disabled. Later stages use the Google Gemini SDK with configurable `GEMINI_MODEL`; the agreed provisional default is `gemini-3.8-flash`. Model availability, key validity and free-tier capacity must be verified in the extraction phase; naming a default does not verify access. Never silently switch to paid inference.
+Phases 2–3 add local upload, OCR/conversion, source viewing and explicit provider extraction/support review. Deadline, conflict and handoff nodes are enabled; deterministic calendar and brief assembly make no model calls. OpenRouter is primary via existing httpx with `OPENROUTER_API_KEY`/`OPENROUTER_MODEL` (default `openrouter/free`), with the Google Gemini SDK as secondary and configurable `GEMINI_MODEL`; the agreed provisional default is `gemini-3.8-flash`. Model availability, key validity and free-tier capacity must be verified in the extraction phase; naming a default does not verify access. Never silently switch to paid inference.
 
-Conversion/OCR run locally. When model analysis is enabled, extracted text is sent to Gemini. Keys stay in the backend. The browser communicates only with FastAPI; no credentials belong in `VITE_*` variables.
+Conversion/OCR run locally. When model analysis is enabled, extracted text is sent to OpenRouter and its model provider, or Gemini as secondary. Keys stay in the backend. The browser communicates only with FastAPI; no credentials belong in `VITE_*` variables.
 
 ### Historical Phase 1 contract and continuing invariants
 
@@ -147,14 +150,15 @@ Conversion/OCR run locally. When model analysis is enabled, extracted text is se
 | Route | Current behavior | Later implementation |
 | --- | --- | --- |
 | `GET /api/health` | Typed readiness/capabilities | Shared foundation |
-| `GET /api/portfolio` | Canonical live shape; empty on fresh storage; read stored results without recomputation | Portfolio aggregation |
+| `GET /api/portfolio` | Canonical live shape; deterministic as-of events, conflict snapshot, combined issues and coverage; no queued work | Portfolio aggregation |
 | `GET /api/jobs`, `GET /api/batches/{id}`, `GET /api/documents/{id}` | Read existing metadata only | Progress and inspection |
 | `POST /api/batches` | Enabled; typed 202 receipt, optional UUID `Idempotency-Key` | Batch multipart `files`, max 80; backend enforces limits |
 | `GET /api/batches?limit=1` | Latest persisted receipts (limit 1–20) | Receipt history |
 | `POST /api/retry?document_id=...` | Enabled for failed/source-review ingestion only | Resume eligible local jobs |
 | `GET /api/documents/{id}/pages`, `GET /api/documents/{id}/pages/{number}/image`, `GET /api/documents/{id}/original` | Enabled with path confinement | Source inspection |
-| `POST /api/settings/sme` | Disabled/501 | Established party selection |
-| `GET /api/review/{id}/brief` | Disabled/501 | Lawyer brief |
+| `POST /api/settings/sme` | Established party selection and comparison reconciliation | Shared selection |
+| `GET /api/review/{id}/brief` | Typed read-only brief with mode/as_of, source warnings and historical status | Download/print in browser |
+| `GET /api/conflicts/screening`, `POST /api/conflicts/continue`, `POST /api/conflicts/{id}/retry` | Current screens, idempotent ten-slot continuation and same-slot retry | Bounded comparison workflow |
 | `POST /api/demo` | Disabled/501 | Isolated evaluated sample workspace |
 
 Health advertises limits of 25 MiB/file, 80 files/batch and 200 pages/file; ignore the legacy prototype's 20 MiB setting when ingestion lands. Do not accept files and pretend to process them while ingestion is disabled.
@@ -259,7 +263,7 @@ Still unverified: exact default `3000 → 8000` proxy path (3000 was occupied), 
 
 Phase 2 verification: **37 backend tests and 25 frontend tests passed**, including real clean/degraded scans, mixed/blank pages, DOCX, images, duplicate/idempotent/concurrent uploads, errors/retries, process-lock/restart behavior, path confinement and an 80-file ingestion run. Source coordinates and rotated page geometry are checked. Browser verification exercised native PDF/scan/DOCX upload and visible source highlights. See `PHASE_2_COMPLETION.md` for final checks and limits; Phase 1's old out-of-scope list above is historical.
 
-Phase 3 integration: read `docs/PHASE_3_INTEGRATION.md`. The active `worker.py` retains local ingestion and claims explicit `extract` jobs with a lazy provider; old `document` and `conflict` jobs remain idle. `analysis_worker.py` is an inactive reference. Keep source checkpoints, warnings, lock/recovery, generated contracts and three-second polling intact. Only ingestion/extraction capabilities are enabled. Builder 2's Phase 4 ownership and Phase 5 compatibility are specified in `docs/PHASE_4_HANDOFF.md`.
+Phase 3 integration: read `docs/PHASE_3_INTEGRATION.md`. The active `worker.py` retains local ingestion and claims explicit `extract` jobs with a lazy provider; old `document` and `conflict` jobs remain idle. `analysis_worker.py` is an inactive reference. Keep source checkpoints, warnings, lock/recovery, generated contracts and three-second polling intact. This Phase 3 record is historical; ingestion/extraction/deadlines/conflicts/handoff are now enabled. Builder 2's Phase 4 ownership and Phase 5 compatibility are specified in `docs/PHASE_4_HANDOFF.md`.
 
 ## Skills and local tooling
 
@@ -302,3 +306,15 @@ Ponytail's help identifies Codex mentions such as `@ponytail`, `@ponytail-review
 - Azure deployment, document/presentation/spreadsheet creation and image-generation skills are not required for Phase 1. Do not add infrastructure or artifacts outside the requested phase.
 
 Keep this file current as implementation replaces the prototype: update the inspected baseline, phase status, live routes/schema, commands, verification evidence and remaining gaps. Clearly separate facts, plans and unverified assumptions.
+
+## Provider routing update
+
+Use `backend.llm.ModelClient` for extraction/review and Phase 5 comparison work: OpenRouter primary, Gemini secondary. Read `docs/MODEL_PROVIDERS.md`; primary/secondary caches and cooldowns are separate, failed/refused answers do not trigger fallback, and per-document model usage stays separate from evidence/confidence. Health reports both providers without exposing keys; original data and inference capability boundaries are unchanged. Phase 4 makes no model calls. Preserve the additive schema fields when merging other builders’ branches. Live provider access/accuracy remain unverified.
+
+## Historical Phase 5 branch checkpoint
+
+`codex/phase-5-conflicts` was delivered separately and is now integrated; the remaining paragraph describes its original delivery boundary. `backend/conflicts.py` and `conflict_service.py` now implement conservative screening, evidence validation and persistent comparison scheduling; `worker.py` claims only `conflict-v1` with the current conflict version after ingestion/extraction. `frontend/src/Conflicts.tsx` contains the live view and notification flow. Older table/file-map entries above describing conflict drafts are historical and superseded by this checkpoint. Calendar/deadlines and Phase 6 remain excluded from this branch. Follow the manual integration notes rather than replacing shared files wholesale. API models/types/fixtures are additive and regenerated. Full verification and conservative semantic limits are recorded in `docs/PHASE_5_COMPLETION.md`.
+
+## Current combined verification
+
+The Phase 4–6 integration preserves all source branches, the provider prerequisite, SQLite data/allowances and the one-worker lock. See `docs/PHASE_4_6_INTEGRATION.md` for actual backend, frontend, schema and browser results. Review counts share one current-item selector; deadline briefs share portfolio projection and selected dates. Evidence is revalidated against parsed source pages and failed checks remain visible. Legacy support issues and missing arithmetic-input issues remain separate when their IDs and questions differ. Phase 7 and live-provider accuracy/calibration are not claimed.

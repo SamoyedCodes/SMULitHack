@@ -1,9 +1,9 @@
 # AITHENA — local contract workspace
 
-> Current checkpoint: Phases 1–3 are integrated. Uploads read locally; open a document and choose **Extract obligations** to queue Gemini extraction/support review. Missing key/quota failures remain visible. Only ingestion and extraction are enabled. See [Phase 3 integration](docs/PHASE_3_INTEGRATION.md) and [Builder 2 Phase 4 handoff](docs/PHASE_4_HANDOFF.md). Later Phase 1/2 verification records below are historical.
+> Current checkpoint: Phases 1–6 are integrated. Local ingestion, explicit OpenRouter/Gemini extraction, grounded deadline calculations, automatic distribution comparisons, and review/printable lawyer briefs are enabled. Phase 7 evaluation and sample loading remain outside this checkpoint. See [combined integration verification](docs/PHASE_4_6_INTEGRATION.md).
 
 
-Phase 2 adds batch ingestion and real source viewing to Builder 2's React interface and the local FastAPI/SQLite foundation. Upload PDFs, DOCX, PNGs or JPEGs (including scans), inspect every physical page, and select text blocks to highlight their source locations. No Gemini key is needed and no provider requests are made.
+Phase 2 adds batch ingestion and real source viewing to Builder 2's React interface and the local FastAPI/SQLite foundation. Upload PDFs, DOCX, PNGs or JPEGs (including scans), inspect every physical page, and select text blocks to highlight their source locations. Local reading needs no model key. Requested extraction and automatically allowed conflict comparisons send extracted text to a configured provider.
 
 The navy/blue dashboard styling and navigation are retained. The earlier synthetic dashboard is preserved in `frontend/src/PrototypeDashboard.tsx` for component reuse and fixture tests; it is not loaded by the application. Its legacy sample schema is **not** the backend integration contract. Live types are generated from Python into `shared/api.generated.ts`.
 
@@ -37,7 +37,9 @@ Nonempty process environment values override repository-root `.env`, then defaul
 | `AITHENA_API_PORT` | `8000` | API loopback port |
 | `AITHENA_WEB_PORT` | `3000` | UI loopback port; must differ from API port |
 | `AITHENA_DATA_DIR` | `data` | Local SQLite and future originals/results |
-| `GEMINI_API_KEY` | absent | Optional backend credential; `GOOGLE_API_KEY` is the fallback |
+| `OPENROUTER_API_KEY` | absent | Primary backend provider credential |
+| `OPENROUTER_MODEL` | `openrouter/free` | Primary model/route; set a supported model explicitly for reproducible evaluation |
+| `GEMINI_API_KEY` | absent | Secondary backend credential; `GOOGLE_API_KEY` is its alias |
 | `GEMINI_MODEL` | `gemini-3.8-flash` | Planned configurable model; access has not been verified |
 | `AITHENA_LLM_INTERVAL` | `12` | Future request spacing; finite and nonnegative |
 | `TESSERACT_CMD` | discovery | Optional executable override; an invalid override reports unavailable |
@@ -83,10 +85,10 @@ Neither schema export nor app import initializes storage or starts a worker. Tes
 - **Configured, not verified** means only that a backend API key exists. Model availability/quota are not tested.
 - **Disconnected / stale** means the current check failed; previous results cannot be treated as current. Checks repeat every three seconds; Check connection retries immediately when no check is active.
 - A fresh workspace has no analyzed contracts. No SME is assumed, and no zero-obligation or all-clear conclusion is shown.
-- Ingestion and source viewing are enabled. Extraction, deadlines, conflict detection, lawyer briefs and sample loading remain disabled and return structured 501 errors.
-- Existing saved metadata/settings are preserved. Only ingestion jobs are recovered/claimed/retried. Legacy analysis and conflict jobs remain idle.
+- Ingestion/source viewing, extraction, deadlines, conflicts and lawyer briefs are enabled. Sample loading remains disabled with a structured 501 error.
+- Existing metadata/settings, comparison allowances and provider cooldowns are preserved. One worker handles ingestion, extraction and versioned conflict jobs in that priority order. Legacy unversioned analysis/conflict jobs remain idle.
 
-Draft later-phase modules remain disconnected, including the original coupled worker preserved in `backend/analysis_worker.py`. The active worker performs local reading only. Enabling capability flags alone does not implement a later phase.
+The original coupled worker in `backend/analysis_worker.py` remains inactive. Calendar projection and lawyer brief assembly are read-only and do not call a model or enqueue work.
 
 See [integration contract](docs/INTEGRATION.md), [phased implementation plan](IMPLEMENTATION_PLAN.md), [Phase 2 verification](PHASE_2_COMPLETION.md) and [Phase 3 handoff](docs/PHASE_3_HANDOFF.md).
 
@@ -107,3 +109,15 @@ To generate seven synthetic test files (native PDF, real scanned PDF, degraded s
 These fixtures are for ingestion verification only. They are not reviewed extraction ground truth. The native integration tests require installed Tesseract/LibreOffice and otherwise report explicit skips; all other tests still run. The 80-file ingestion test is separate from any future extraction evaluation.
 
 Maximum document size is 200 pages; oversized/password-protected/damaged PDFs fail visibly. DOCX conversion has a 90-second timeout and a 100 MiB expanded archive limit; images have a 40-megapixel limit. Multi-frame images are rejected rather than reading only the first frame. New ingestion jobs use a cache version independent of Gemini model/key configuration. A process lock ensures one worker per data directory.
+
+## Provider configuration
+
+See [MODEL_PROVIDERS.md](docs/MODEL_PROVIDERS.md) for OpenRouter primary/Gemini secondary setup, fallback conditions and provider provenance. Local reading still requires no key; provider access and quality are unverified until tested with your configured account/model.
+
+## Calendar, conflicts and lawyer review
+
+Choose a Singapore as-of date in Calendar. Events include action deadlines within the next 90 days even when the related expiry is outside that horizon; overdue labels do not establish non-performance. Follow evidence links to the highlighted physical source page.
+
+After selecting an established SME and requesting extraction, Conflicts automatically allows the first ten candidate pair revisions. Continue adds ten more; Retry retains the original slot and provider cooldowns. Missing schedules and unresolved scope remain visible, and historical comparisons are marked stale.
+
+Needs review counts each current assessment once alongside distinct extraction and deadline issues. Open a brief to inspect facts, missing context, confidence explanations and source excerpts. It uses the selected calendar date. Print / Save as PDF invokes browser printing; Download brief saves self-contained HTML. Disconnected or changing context disables export until the brief is current. Briefs are never sent automatically.
