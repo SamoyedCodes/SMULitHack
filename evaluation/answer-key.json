@@ -1,0 +1,1907 @@
+{
+  "version": 1,
+  "review_status": "provisional_pending_independent_review",
+  "prepared_before_inference": true,
+  "rubric": "A fact passes only if its substantive value, party direction and material conditions are faithfully represented with source support. An unanswerable fact passes only if the missing information is explicitly unresolved or escalated; silence alone is not a pass. Numeric accuracy includes currency. Count all material false extra assertions against their field. This provisional key covers identified substantive obligations in eight fields; completeness itself awaits independent review. No statement of legal enforceability is evaluated.",
+  "documents": {
+    "s01": {
+      "source": "northstar.txt",
+      "facts": [
+        {
+          "id": "parties-1",
+          "field": "parties",
+          "expected": "Meridian Pte Ltd and Northstar Trading Pte Ltd",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 1,
+              "clause": null,
+              "quote": "Meridian Pte Ltd and Northstar Trading Pte Ltd"
+            }
+          ]
+        },
+        {
+          "id": "term-1",
+          "field": "term",
+          "expected": "1 January 2026 to 31 December 2026",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 1,
+              "clause": null,
+              "quote": "The term runs from 1 January 2026 to 31 December 2026."
+            }
+          ]
+        },
+        {
+          "id": "renewal-1",
+          "field": "renewal",
+          "expected": "Expiry 31 December 2026 unless renewed in writing; no automatic continuation.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 1,
+              "clause": null,
+              "quote": "The agreement expires on 31 December 2026 unless renewed in writing."
+            }
+          ]
+        },
+        {
+          "id": "termination-1",
+          "field": "termination",
+          "expected": "Either party may terminate for material breach not remedied within 30 days of written notice; actual breach and notice date unknown.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 1,
+              "clause": null,
+              "quote": "Either party may terminate for a material breach not remedied within 30 days of written \nnotice."
+            }
+          ]
+        },
+        {
+          "id": "notice-1",
+          "field": "notice",
+          "expected": "Breach cure period is 30 days from written notice; delivery mechanics and actual notice date are not supplied.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 1,
+              "clause": null,
+              "quote": "Either party may terminate for a material breach not remedied within 30 days of written \nnotice."
+            }
+          ]
+        },
+        {
+          "id": "payments-1",
+          "field": "payments",
+          "expected": "S$8,000 monthly, payable within 30 days of invoice; actual invoice date unknown.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 2,
+              "clause": null,
+              "quote": "S$8,000 monthly, payable within 30 days of invoice."
+            }
+          ]
+        },
+        {
+          "id": "payments-2",
+          "field": "payments",
+          "expected": "No actual invoice date is supplied; do not invent a dated invoice payment deadline.",
+          "answerable": false,
+          "evidence": []
+        },
+        {
+          "id": "liability-1",
+          "field": "liability",
+          "expected": "Aggregate cap S$50,000; no party direction or exceptions should be invented.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 2,
+              "clause": null,
+              "quote": "Aggregate liability shall not exceed S$50,000."
+            }
+          ]
+        },
+        {
+          "id": "restrictions-1",
+          "field": "restrictions",
+          "expected": "Meridian appoints Northstar exclusive Atlas distributor in Singapore during the term.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 2,
+              "clause": null,
+              "quote": "Meridian appoints Northstar as its exclusive distributor for the Atlas product in Singapore \nduring the term."
+            }
+          ]
+        }
+      ]
+    },
+    "s02": {
+      "source": "cloud.txt",
+      "facts": [
+        {
+          "id": "parties-1",
+          "field": "parties",
+          "expected": "Meridian Pte Ltd and Cloudline Pte Ltd",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 1,
+              "clause": null,
+              "quote": "SYNTHETIC HACKATHON FIXTURE — NOT A REAL AGREEMENT Meridian Pte Ltd and Cloudline Pte Ltd The term runs from 1 December 2025 to 30 November 2026."
+            }
+          ]
+        },
+        {
+          "id": "term-1",
+          "field": "term",
+          "expected": "1 December 2025 to 30 November 2026",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 1,
+              "clause": null,
+              "quote": "SYNTHETIC HACKATHON FIXTURE — NOT A REAL AGREEMENT Meridian Pte Ltd and Cloudline Pte Ltd The term runs from 1 December 2025 to 30 November 2026."
+            }
+          ]
+        },
+        {
+          "id": "renewal-1",
+          "field": "renewal",
+          "expected": "One-year renewal unless either party gives written notice at least 60 calendar days before 30 November 2026. Continued operation remains unconfirmed.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 1,
+              "clause": null,
+              "quote": "The subscription renews for one year unless either party gives written notice at least 60 calendar days before 30 November 2026."
+            }
+          ]
+        },
+        {
+          "id": "termination-1",
+          "field": "termination",
+          "expected": "Either party may terminate for material breach not remedied within 30 days of written notice; actual breach and notice date unknown.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 1,
+              "clause": null,
+              "quote": "Either party may terminate for a material breach not remedied within 30 days of written notice."
+            }
+          ]
+        },
+        {
+          "id": "notice-1",
+          "field": "notice",
+          "expected": "Breach cure period is 30 days from written notice; delivery mechanics and actual notice date are not supplied.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 1,
+              "clause": null,
+              "quote": "Either party may terminate for a material breach not remedied within 30 days of written notice."
+            }
+          ]
+        },
+        {
+          "id": "payments-1",
+          "field": "payments",
+          "expected": "S$40,000 annually, payable within 30 days of invoice. Scan visually shows S$, OCR has $$; currency needs source review if not recovered.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 2,
+              "clause": null,
+              "quote": "$$40,000 annually, payable within 30 days of invoice. Aggregate liability is capped at fees paid in the preceding 12 months."
+            }
+          ]
+        },
+        {
+          "id": "payments-2",
+          "field": "payments",
+          "expected": "No actual invoice date is supplied; do not invent a dated invoice payment deadline.",
+          "answerable": false,
+          "evidence": []
+        },
+        {
+          "id": "notice-2",
+          "field": "notice",
+          "expected": "Either party gives written non-renewal notice at least 60 calendar days before 30 November 2026; no receipt versus sending convention is expressly established.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 1,
+              "clause": null,
+              "quote": "The subscription renews for one year unless either party gives written notice at least 60 calendar days before 30 November 2026."
+            }
+          ]
+        },
+        {
+          "id": "liability-1",
+          "field": "liability",
+          "expected": "Aggregate liability capped at fees paid in preceding 12 months; actual monetary cap cannot be known without fees paid.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 2,
+              "clause": null,
+              "quote": "$$40,000 annually, payable within 30 days of invoice. Aggregate liability is capped at fees paid in the preceding 12 months."
+            }
+          ]
+        },
+        {
+          "id": "restrictions-1",
+          "field": "restrictions",
+          "expected": "Neither party may disclose the other party’s confidential information.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 2,
+              "clause": null,
+              "quote": "Neither party shall disclose the other party’s confidential information."
+            }
+          ]
+        }
+      ]
+    },
+    "s03": {
+      "source": "harbour.txt",
+      "facts": [
+        {
+          "id": "parties-1",
+          "field": "parties",
+          "expected": "Meridian Pte Ltd and Harbour Retail Pte Ltd",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 1,
+              "clause": null,
+              "quote": "Meridian Pte Ltd and Harbour Retail Pte Ltd"
+            }
+          ]
+        },
+        {
+          "id": "term-1",
+          "field": "term",
+          "expected": "1 September 2026 to 31 October 2026",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 1,
+              "clause": null,
+              "quote": "The term runs from 1 September 2026 to 31 October 2026."
+            }
+          ]
+        },
+        {
+          "id": "renewal-1",
+          "field": "renewal",
+          "expected": "No automatic renewal.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 1,
+              "clause": null,
+              "quote": "This agreement does not renew automatically."
+            }
+          ]
+        },
+        {
+          "id": "termination-1",
+          "field": "termination",
+          "expected": "Either party may terminate if the other becomes insolvent.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 1,
+              "clause": null,
+              "quote": "Either party may terminate if the other party becomes insolvent."
+            }
+          ]
+        },
+        {
+          "id": "notice-1",
+          "field": "notice",
+          "expected": "Notice mechanics/period are not supplied; do not infer a notice requirement.",
+          "answerable": false,
+          "evidence": []
+        },
+        {
+          "id": "payments-1",
+          "field": "payments",
+          "expected": "S$12,000 for Atlas product payable on delivery; the agreement separately schedules sale for 15 October 2026, not necessarily delivery.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 2,
+              "clause": null,
+              "quote": "S$12,000 for the Atlas product, payable on delivery."
+            }
+          ]
+        },
+        {
+          "id": "liability-1",
+          "field": "liability",
+          "expected": "Aggregate cap S$12,000.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 2,
+              "clause": null,
+              "quote": "Aggregate liability shall not exceed S$12,000."
+            }
+          ]
+        },
+        {
+          "id": "restrictions-1",
+          "field": "restrictions",
+          "expected": "Meridian must sell Atlas directly to Harbour for resale in Singapore on 15 October 2026; ordinary resale grant can be relevant to another exclusive grant.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 2,
+              "clause": null,
+              "quote": "Meridian shall sell the Atlas product directly to Harbour for resale in Singapore on 15 October\n2026."
+            }
+          ]
+        }
+      ]
+    },
+    "s04": {
+      "source": "studio.txt",
+      "facts": [
+        {
+          "id": "parties-1",
+          "field": "parties",
+          "expected": "Meridian Pte Ltd and Studio Eight Pte Ltd",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 1,
+              "clause": null,
+              "quote": "SYNTHETIC HACKATHON FIXTURE — NOT A REAL AGREEMENT Meridian Pte Ltd and Studio Eight Pte Ltd"
+            }
+          ]
+        },
+        {
+          "id": "term-1",
+          "field": "term",
+          "expected": "1 January 2026 to 31 October 2026",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 1,
+              "clause": null,
+              "quote": "The term runs from 1 January 2026 to 31 October 2026."
+            }
+          ]
+        },
+        {
+          "id": "renewal-1",
+          "field": "renewal",
+          "expected": "Extension requires a new written agreement.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 1,
+              "clause": null,
+              "quote": "Any extension requires a new written agreement."
+            }
+          ]
+        },
+        {
+          "id": "termination-1",
+          "field": "termination",
+          "expected": "The tenant may terminate with two months written notice; which named party is tenant is not established.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 1,
+              "clause": null,
+              "quote": "The tenant may terminate by giving two months’ written notice. $$4,500 monthly, payable on the first day of each month."
+            }
+          ]
+        },
+        {
+          "id": "notice-1",
+          "field": "notice",
+          "expected": "Two months written termination notice; do not treat it as an expiry-linked automatic notice deadline.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 1,
+              "clause": null,
+              "quote": "The tenant may terminate by giving two months’ written notice. $$4,500 monthly, payable on the first day of each month."
+            }
+          ]
+        },
+        {
+          "id": "payments-1",
+          "field": "payments",
+          "expected": "S$4,500 monthly on the first day of each month; visual source shows S$, OCR has $$; no unsupported currency certainty.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 1,
+              "clause": null,
+              "quote": "The tenant may terminate by giving two months’ written notice. $$4,500 monthly, payable on the first day of each month."
+            }
+          ]
+        },
+        {
+          "id": "liability-1",
+          "field": "liability",
+          "expected": "The liability amount is unanswerable; supplied scan explicitly contains illegible text. Do not invent a cap.",
+          "answerable": false,
+          "evidence": []
+        },
+        {
+          "id": "restrictions-1",
+          "field": "restrictions",
+          "expected": "Premises may be used only as an office.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 1,
+              "clause": null,
+              "quote": "The premises may be used only as an office."
+            }
+          ]
+        }
+      ]
+    },
+    "s05": {
+      "source": "sample contact 1.pdf",
+      "facts": [
+        {
+          "id": "parties-1",
+          "field": "parties",
+          "expected": "JTC Corporation is offeror/landlord; UNIVERSAL (FAR EAST) PTE. LTD. is tenant.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 2,
+              "clause": null,
+              "quote": "UNIVERSAL (FAR EAST) PTE. LTD.\n \n \n \nThe JTC Summit"
+            }
+          ]
+        },
+        {
+          "id": "term-1",
+          "field": "term",
+          "expected": "Further term three years commencing 16 June 2007, under prior tenancy covenants except specified changes; no evidence of current 2026 tenancy.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 2,
+              "clause": null,
+              "quote": "you that we are prepared to renew the Tenancy at the Premises for a further term of 3 years (“Term”)"
+            }
+          ]
+        },
+        {
+          "id": "renewal-1",
+          "field": "renewal",
+          "expected": "Prior tenancy conditions continue except the Option for Renewal and express changes; do not infer automatic renewal.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 2,
+              "clause": null,
+              "quote": "commencing from 16 June 2007 (“Commencement Date”) upon the same covenants, terms and conditions\nas set out in the Tenancy except for the Option for Renewal and the following:"
+            }
+          ]
+        },
+        {
+          "id": "notice-1",
+          "field": "notice",
+          "expected": "Offer lapses unless signed acceptance and payment received by 16 August 2007.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 4,
+              "clause": "2",
+              "quote": "2\n  Please note that this offer shall lapse if we do not receive the following by 16 August 2007:"
+            }
+          ]
+        },
+        {
+          "id": "termination-1",
+          "field": "termination",
+          "expected": "Full termination rights cannot be determined without the incorporated prior tenancy.",
+          "answerable": false,
+          "evidence": []
+        },
+        {
+          "id": "payments-1",
+          "field": "payments",
+          "expected": "Tenant pays building rent $10.50 per square metre monthly in advance on first day without demand/deduction.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 2,
+              "clause": "1.1",
+              "quote": "1.1   $10.50 per square metre per month (“Building Rent”) on the Area from the Commencement Date,"
+            }
+          ]
+        },
+        {
+          "id": "payments-2",
+          "field": "payments",
+          "expected": "Tenant pays service charge $2.25 per square metre monthly with rent, subject to revision.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 2,
+              "clause": "1.2",
+              "quote": "1.2  $2.25 per square metre per month (“Service Charge”) on the Area as charges for services rendered"
+            }
+          ]
+        },
+        {
+          "id": "payments-3",
+          "field": "payments",
+          "expected": "Security deposit is one month rent/service charge under off-budget GIRO concession, rather than ordinary three months; maintain and top up after increases/deductions.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 4,
+              "clause": null,
+              "quote": "acceptance of the Offer, be required to place with us a deposit equivalent to one (1) month’s Building Rent"
+            }
+          ]
+        },
+        {
+          "id": "payments-4",
+          "field": "payments",
+          "expected": "If GIRO stops, tenant adds two months rent/service charge within two weeks; if concession withdrawn, add two months when required in writing.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 4,
+              "clause": null,
+              "quote": "two (2) weeks of the date of discontinuance of your GIRO payment, the additional sum equivalent to two"
+            }
+          ]
+        },
+        {
+          "id": "payments-5",
+          "field": "payments",
+          "expected": "Deposit refundable without interest after term/guarantee expiry subject to deductions.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 4,
+              "clause": null,
+              "quote": "to you without interest, or returned to you for cancellation, after the termination of the Term (by expiry"
+            }
+          ]
+        },
+        {
+          "id": "payments-6",
+          "field": "payments",
+          "expected": "Cheque $96 due by 16 August 2007; $1,044.72 scheduled GIRO deduction in August 2007.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 8,
+              "clause": null,
+              "quote": "Please let us have your cheque for $96/- by 16 August 2007."
+            }
+          ]
+        },
+        {
+          "id": "liability-1",
+          "field": "liability",
+          "expected": "No aggregate cap established by this letter; incorporated prior tenancy is needed, not proof of no liability.",
+          "answerable": false,
+          "evidence": []
+        },
+        {
+          "id": "restrictions-1",
+          "field": "restrictions",
+          "expected": "Waiver must be specific and written; variations agreed by both parties and reduced to writing. Statutory-controls schedule is referenced but not substantively supplied.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 5,
+              "clause": null,
+              "quote": "unless agreed by both parties and reduced in writing by us. No terms or representation or otherwise, whether\nexpress or implied, shall form part of this offer other than what is contained in this letter."
+            }
+          ]
+        }
+      ]
+    },
+    "s06": {
+      "source": "Singapore lease agreement.pdf",
+      "facts": [
+        {
+          "id": "parties-1",
+          "field": "parties",
+          "expected": "HSBC Institutional Trust Services (Singapore) Limited as trustee of Ascendas REIT is landlord; ULTRATECH (SINGAPORE) PTE. LTD. is tenant.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 1,
+              "clause": null,
+              "quote": "On behalf of HSBC Institutional Trust Services (Singapore) Limited As Trustee of Ascendas Real Estate Investment Trust (“the\nLandlord”), we are pleased to offer you a tenancy for the above premises (the “Demised Premises”) located at 1 Kaki Bukit View\nTechview (the “Building”) subject to the following terms and conditions:\n \n1.1\nUSE"
+            }
+          ]
+        },
+        {
+          "id": "term-1",
+          "field": "term",
+          "expected": "Three-year tenancy 15 June 2010 to 14 June 2013. Possession targeted 15 March 2010 is distinct from commencement.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 1,
+              "clause": null,
+              "quote": "The tenancy shall be for a period of 3 years commencing on 15 June 2010 and expiring on 14 June 2013 (the “Term”)."
+            }
+          ]
+        },
+        {
+          "id": "renewal-1",
+          "field": "renewal",
+          "expected": "Three-year renewal option at mutually agreed revised net rent/service charge/modified terms, conditional on no breach; no automatic renewal.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 1,
+              "clause": null,
+              "quote": "You shall have the option to renew the tenancy for another 3 years at revised net rent to be mutually agreed, service charge and\nany modified/or additional terms and conditions provided that there is no breach of any of the terms, conditions and stipulations\nin the Tenancy Agreement.\n \n1.3\nDEMISED PREMISES"
+            }
+          ]
+        },
+        {
+          "id": "notice-1",
+          "field": "notice",
+          "expected": "Acceptance deadline 10 March 2010 unless extension requested and agreed.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 9,
+              "clause": null,
+              "quote": "(e)\nPlease complete and return us the attached form.\n \n4\nThis offer shall lapse if it is not accepted by 10 March 2010 unless an extension time has been requested and agreed by us.\n \n5\nCONTACT DETAILS"
+            }
+          ]
+        },
+        {
+          "id": "termination-1",
+          "field": "termination",
+          "expected": "Landlord may terminate by written notice for listed post-acceptance breaches/failure to execute or take possession or winding up, forfeit deposit and claim rent-loss damages.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 3,
+              "clause": null,
+              "quote": "(c)\nIn the event after acceptance of this offer, you fail to observe or perform (or you threaten to commit a breach of or not to\nperform) your obligations under this letter, or you fail to execute the Tenancy Agreement (hereinafter referred to) or to take\npossession of the Demised Premises in accordance with the terms and conditions of this letter, or winding up/bankruptcy\nproceedings are commenced against you, then without prejudice to any other rights or remedies available to the Landlord, at\nlaw or in equity, the Landlord may terminate this agreement by written notice to you, whereupon the Landlord may forfeit\nand retain for its own benefit the deposit without prejudice to any other rights and remedy of the Landlord, and you shall\npay to the Landlord compensation and damages for loss of Gross Rent suffered by the Landlord.\n \n1.7\nRENOVATION DEPOSIT"
+            }
+          ]
+        },
+        {
+          "id": "payments-1",
+          "field": "payments",
+          "expected": "Monthly net rent $25,169.76 plus $6,652.80 service charge = $31,822.56 before GST; GIRO monthly in advance on first day.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 2,
+              "clause": null,
+              "quote": "Rent\n#02-01\n  \n$ 20.43  \n$\n5.40  \n$ 25.83  \n$25,169.76  \n$6,652.80  \n$31,822.56"
+            }
+          ]
+        },
+        {
+          "id": "payments-2",
+          "field": "payments",
+          "expected": "Service-charge increase reflects increased service cost and is limited to aggregate 30% of preceding year service charge.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 2,
+              "clause": null,
+              "quote": "(c)\nIf the cost of services undertaken by the Landlord shall increase the monthly service charge may be revised in writing to\nyou to reflect this. Any increase in the service charge payable in any year during the Term shall not exceed an aggregate\nsum of 30% of the service charge payable in the preceding year and such revised service charge will be payable as from the\ndate specified on the said notice."
+            }
+          ]
+        },
+        {
+          "id": "payments-3",
+          "field": "payments",
+          "expected": "Tenant pays apportioned air-conditioning operating costs at schedule rates, subject to revision, and funds own extra equipment.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 2,
+              "clause": null,
+              "quote": "(a)\nIn addition to the rent, you are required to pay all direct operating costs for the supply of air-conditioning to the Demised\nPremises as apportioned by the Landlord at the following rates:"
+            }
+          ]
+        },
+        {
+          "id": "payments-4",
+          "field": "payments",
+          "expected": "Security deposit/acceptable banker guarantee $95,467.68, three months gross rent; guarantee furnished by 10 March 2010 and lasting six months beyond term.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 3,
+              "clause": null,
+              "quote": "(a)\nYou will be required to place with the Landlord a cash deposit of $95,467.68 equivalent to 3.00 months’ Gross Rent (the\n“Security Deposit Amount”) as security deposit against any possible breach on your part of any of the terms, conditions and\nstipulations of the Tenancy Agreement."
+            }
+          ]
+        },
+        {
+          "id": "payments-5",
+          "field": "payments",
+          "expected": "Renovation deposit $10 per square metre, minimum $1,000 maximum $20,000; damage-cost shortfall payable within one week of written notice.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 3,
+              "clause": null,
+              "quote": "(c)\nThe renovation deposit will be used to offset any actual cost incurred by the Landlord in rectifying any damages caused in\nthe course of the renovation (if any). Should the renovation deposit be insufficient to cover the actual cost of rectifying the\ndamages caused during the renovation, you are required to pay the outstanding amount to the Landlord within one (1) week\nof written notice to you."
+            }
+          ]
+        },
+        {
+          "id": "payments-6",
+          "field": "payments",
+          "expected": "Legal charges, stamp duty and GST payable by tenant.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 4,
+              "clause": null,
+              "quote": "You shall execute and return to us the Tenancy Agreement within fourteen (14) days from the date of the Tenancy Agreement is\nsent to you for execution.\n \n1.9\nLEGAL CHARGES AND STAMP DUTY FOR TENANCY AGREEMENT"
+            }
+          ]
+        },
+        {
+          "id": "payments-7",
+          "field": "payments",
+          "expected": "Late interest 10% per annum; landlord reserves revision through statement of accounts.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 5,
+              "clause": null,
+              "quote": "You will be required to pay interest at the rate of 10% per annum on monies owing to the Landlord and not settled on due dates.\nThe Landlord reserves the right to revise the interest rate from time to time by reflecting this in its statement of accounts to you.\n \n1.12 POSSESSION OF PREMISES"
+            }
+          ]
+        },
+        {
+          "id": "payments-8",
+          "field": "payments",
+          "expected": "Rent-free 15 March–14 June 2010 is conditional; on landlord termination for tenant breach, rent clawback within seven days of written notice.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 5,
+              "clause": null,
+              "quote": "Please note that the Landlord is agreeable to granting such rent free period on condition that you comply with all the terms and\nconditions of this letter and the Tenancy Agreement throughout the Term. If the Term is terminated by the Landlord pursuant to\nyour breach of the provisions of this letter or the Tenancy Agreement, you shall without prejudice to the other rights and remedies\nof the Landlord, be required to pay the Landlord the Gross Rent for the rent free period within 7 days from the date of Landlord’s\nnotice in writing to you."
+            }
+          ]
+        },
+        {
+          "id": "payments-9",
+          "field": "payments",
+          "expected": "Tenant bears electricity meter installation/maintenance/removal and consumption costs.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 6,
+              "clause": null,
+              "quote": "(4)\nAll charges for consumption of electricity at the Demised Premises shall be borne by you. The Landlord will give written\nnotice to you of the monthly electricity charges payable by you for each month. In the absence of manifest error, you will\naccept the Landlord’s notice as binding and conclusive and pay the Landlord the amount specified in such notice within 7\ndays from the date of"
+            }
+          ]
+        },
+        {
+          "id": "notice-2",
+          "field": "notice",
+          "expected": "Execute and return tenancy within 14 days of being sent for execution; actual sending date missing.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 4,
+              "clause": null,
+              "quote": "You shall execute and return to us the Tenancy Agreement within fourteen (14) days from the date of the Tenancy Agreement is\nsent to you for execution.\n \n1.9\nLEGAL CHARGES AND STAMP DUTY FOR TENANCY AGREEMENT"
+            }
+          ]
+        },
+        {
+          "id": "liability-1",
+          "field": "liability",
+          "expected": "Cannot establish a comprehensive aggregate cap from supplied offer; attached tenancy text is not fully present. Deposit/insurance amounts are not a liability cap.",
+          "answerable": false,
+          "evidence": []
+        },
+        {
+          "id": "restrictions-1",
+          "field": "restrictions",
+          "expected": "Only installing and servicing photolithography equipment for electronics industry is permitted.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 1,
+              "clause": null,
+              "quote": "Installing and servicing photolithography equipment for electronics industry.\n \n1.2\nTERM OF TENANCY"
+            }
+          ]
+        },
+        {
+          "id": "restrictions-2",
+          "field": "restrictions",
+          "expected": "Air-conditioning installation requires written landlord permission; electricity purchase/account from another supplier requires prior written consent, not unreasonably withheld/delayed.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 6,
+              "clause": null,
+              "quote": "(a)\nenter into or agree to enter into an energy purchase from any other person or party other than the Landlord unless\nthe prior written consent of the Landlord is obtained; and"
+            }
+          ]
+        },
+        {
+          "id": "notice-3",
+          "field": "notice",
+          "expected": "Three-working-day option exercise lacks grant date/business-day convention; missing intervening text and degraded plan prevent complete certainty.",
+          "answerable": false,
+          "evidence": []
+        }
+      ]
+    },
+    "s07": {
+      "source": "Exhibit 10.21 - Singapore Lease.pdf",
+      "facts": [
+        {
+          "id": "parties-1",
+          "field": "parties",
+          "expected": "Landlord HSBC Institutional Trust Services (Singapore) Limited as trustee of Ascendas REIT; tenant FLUIDIGM SINGAPORE PTE. LTD.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 1,
+              "clause": null,
+              "quote": "On behalf of HSBC Institutional Trust Services (Singapore) Limited As Trustee of Ascendas Real Estate Investment Trust\n(‘Landlord’), we are pleased to offer you, FLUIDIGM SINGAPORE PTE. LTD. (‘Tenant’), a lease of the premises (‘Premises’)\n(described below in paragraph 1.1) which forms part of the building (‘Building’) located at Block 5008 Ang Mo Kio Avenue 5 TECHpIace\nII Singapore 569874, subject to the Standard Terms, Covenants and Conditions attached in Appendix 1 (‘Covenants’) and the following\nterms, covenants and conditions (where the definitions set out in the Covenants have been adopted):"
+            }
+          ]
+        },
+        {
+          "id": "term-1",
+          "field": "term",
+          "expected": "96 months from 2 June 2014; possession 2 March 2014 is distinct. Do not assume renewal has occurred.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 2,
+              "clause": "96",
+              "quote": "96 months commencing on: where the TOP has already been\nissued: 02 June 2014 (the ‘Commencement Date’)."
+            }
+          ]
+        },
+        {
+          "id": "renewal-1",
+          "field": "renewal",
+          "expected": "Conditional 60-month further lease of whole premises: tenant notice at least six months before expiry and no breach; market rent and similar terms, not automatic.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 15,
+              "clause": null,
+              "quote": "(a) The Landlord shall grant to the Tenant a further lease of the whole Premises for sixty (60) months (“Renewal Term”),"
+            }
+          ]
+        },
+        {
+          "id": "notice-1",
+          "field": "notice",
+          "expected": "Landlord responds with proposed renewal rent within one month; tenant accepts in writing within two weeks of receipt (or agreed longer) and signs new lease within two weeks of receipt.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 15,
+              "clause": null,
+              "quote": "(c) Within two (2) weeks of receipt of the Landlord’s proposal for the revised rent or such longer period as may be mutually"
+            }
+          ]
+        },
+        {
+          "id": "notice-2",
+          "field": "notice",
+          "expected": "All acceptance items must be received within seven working days of offer unless otherwise agreed; unknown business-day convention prevents guessed date.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 8,
+              "clause": "2.3",
+              "quote": "2.3\nPayments made prior to the receipt of the last Acceptance Item may be cleared by the Landlord upon receipt. However, if the\nremaining Acceptance Items are not received by the Landlord within 7 working days from the date of this Offer Letter (the\n‘Acceptance Period’),(or such other date as the Landlord may agree), the offer herein shall, unless the Landlord otherwise\nagrees, lapse and there shall be no contract between the Tenant and the Landlord in respect of the lease of the Premises. All\npayments received by the Landlord from the Tenant pursuant to this letter shall be forfeited without affecting any other rights or\nremedies of the Landlord and the Tenant shall have no claim of whatever nature against the Landlord."
+            }
+          ]
+        },
+        {
+          "id": "notice-3",
+          "field": "notice",
+          "expected": "Written notices: tenant by hand or registered post; landlord by registered post to registered/notified address. Hand deemed served same day and registered post after 24 hours.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 49,
+              "clause": "8.4.3",
+              "quote": "8.4.3\nA notice to the Landlord is only valid if sent by registered post to the registered office for the time being of the Landlord or any other address notified by the\nLandlord to the Tenant."
+            }
+          ]
+        },
+        {
+          "id": "notice-4",
+          "field": "notice",
+          "expected": "Registered post service deemed 24 hours after posting.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 50,
+              "clause": null,
+              "quote": "(b)\n(for notice by registered post) twenty-four (24) hours after posting and in proving it, it will be adequate to show that the envelope containing the\nnotice was addressed, stamped and posted."
+            }
+          ]
+        },
+        {
+          "id": "termination-1",
+          "field": "termination",
+          "expected": "Failure to supply declaration by 14 October 2013 permits landlord termination with at least one month written notice and forfeiture provisions.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 8,
+              "clause": "3.1",
+              "quote": "3.1\nThe Tenant shall furnish to the Landlord the completed and executed Declaration Form attached as Attachment 4 by 14 October\n2013. If the Tenant fails to furnish the said Declaration Form by the specified date mentioned above (or such other date or dates\nas the Landlord may agree), the Landlord may terminate the lease by giving to the Tenant not less than one (1) month’s notice in\nwriting."
+            }
+          ]
+        },
+        {
+          "id": "termination-2",
+          "field": "termination",
+          "expected": "Tenant premature exit requires acceptable incoming tenant, all costs/documentation/conditions and any lower-rent differential through term end payable on demand.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 19,
+              "clause": null,
+              "quote": "(a)\nan in-coming tenant acceptable to the Landlord (“Incoming Tenant”) has been sourced by the Tenant to either"
+            }
+          ]
+        },
+        {
+          "id": "termination-3",
+          "field": "termination",
+          "expected": "Landlord re-entry for rent seven days overdue; remediable nonmoney default 14 days or stipulated cure period; undischarged distress seven days; insolvency events.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 49,
+              "clause": null,
+              "quote": "(a)\nthe Tenant fails to pay the Gross Rent or any other sum payable under the Lease within seven (7) days after the due date (whether or not formally\ndemanded);. or"
+            }
+          ]
+        },
+        {
+          "id": "termination-4",
+          "field": "termination",
+          "expected": "Landlord may terminate on authority acquisition notice without compensation; prior default rights preserved.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 49,
+              "clause": "8.2",
+              "quote": "8.2\nGovernment Acquisition"
+            }
+          ]
+        },
+        {
+          "id": "termination-5",
+          "field": "termination",
+          "expected": "After renewal signed, pre-renewal tenant default permits termination of renewal on notice received.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 15,
+              "clause": null,
+              "quote": "(f)\nIf after the new lease document for the Renewal Term has been signed but the Tenant is in default of the provisions of the\nLease before the commencement of the Renewal Term, the Landlord is entitled to terminate the lease for the Renewal Term\nby giving notice to the Tenant. Upon receipt of the notice, the lease for the Renewal Term will be terminated without affecting\nthe rights of the Landlord against the Tenant in respect of the default (including, without limitation, compensation for loss of\nrent for the Renewal Term)."
+            }
+          ]
+        },
+        {
+          "id": "payments-1",
+          "field": "payments",
+          "expected": "Staggered monthly net rents $52,725 / $54,723 / $56,721 / $60,717 / $62,715 / $64,676 for the six stated periods through 1 June 2022, each plus $8,991 service charge before GST.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 3,
+              "clause": null,
+              "quote": "$14.25\n$2.43\n$16.68\n$52,725.00\n$8,991.00\n$61,716.00\n02 Jun 2014 to\n01Jun 2016"
+            }
+          ]
+        },
+        {
+          "id": "payments-2",
+          "field": "payments",
+          "expected": "Gross rent monthly in advance on first day; partial month pro-rata actual days; one full month including GST on acceptance.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 4,
+              "clause": null,
+              "quote": "(d)\nUnless otherwise provided in this letter (‘Offer Letter’) or in any side/amendment/variation letters (‘Side Letters’), the\nTenant must pay the Monthly Gross Rent monthly in advance, on the first day of each month of the Term. The pro-rated\nMonthly Gross Rent for any part of a month must be paid in advance on the first day of that month, which will be\napportioned on a daily basis (based on the actual number of days in that month)."
+            }
+          ]
+        },
+        {
+          "id": "payments-3",
+          "field": "payments",
+          "expected": "Conditional three-month rent-free period 2 March–1 June 2014; gross rent clawback on demand on premature termination or landlord default re-entry.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 4,
+              "clause": null,
+              "quote": "(c)\nThe Landlord has agreed to grant the Rent Free Period to the Tenant on the basis that the Tenant will complete the entire\nTerm. If the Term is prematurely terminated by the Tenant for any reason whatsoever or if the Lease is determined by the\nLandlord under Clause 8.1 of the Covenants, then in addition to and without prejudice to any other rights or remedies of the\nLandlord, the Tenant shall compensate and pay to the Landlord on demand the Gross Rent for the entire Rent Free Period."
+            }
+          ]
+        },
+        {
+          "id": "payments-4",
+          "field": "payments",
+          "expected": "Security deposit $589,336, eight months gross rent, cash on acceptance; reducing to six months is discretionary subject to landlord financial assessment.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 5,
+              "clause": null,
+              "quote": "Security Deposit Amount    :    $589,336.00"
+            }
+          ]
+        },
+        {
+          "id": "payments-5",
+          "field": "payments",
+          "expected": "Six-month security deposit is only something landlord agrees to consider, not an established reduction.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 17,
+              "clause": null,
+              "quote": "The Landlord is agreeable to consider lowering the Security Deposit Amount from eight (8) month’s Gross Rent as reflected\nin Clause 1.8 hereof, to a sum equivalent to six (6) month’s Gross Rent, subject to the Landlord’s assessment of the\nTenant’s financial standing. In this respect, the Landlord may request the Tenant for its latest audited accounts at any time\nduring the Term. For the avoidance of doubt, the Landlord’s assessment of the Tenant’s financial standing shall be made\nbased on the Landlord’s criteria and the Tenant shall not be entitled to object to the Landlord’s decision on the same."
+            }
+          ]
+        },
+        {
+          "id": "payments-6",
+          "field": "payments",
+          "expected": "Renovation deposit $37,000 at $10/sqm and minimum $2,000 on acceptance.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 5,
+              "clause": null,
+              "quote": "subject to a minimum of $2,000.00, the Renovation Deposit of $37,000.00 for the\nproposed Fitting Out Works must be placed with the Landlord on acceptance of this offer."
+            }
+          ]
+        },
+        {
+          "id": "payments-7",
+          "field": "payments",
+          "expected": "Tenant pays head-landlord approval/subletting fees and reimburses landlord advances.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 6,
+              "clause": null,
+              "quote": "(b)\nThe Tenant shall furnish any information and/or documents forthwith to the Landlord upon the Landlord’s request to assist\nthe Landlord to obtain the approval from the Head Landlord for the lease of the Premises to the Tenant. The Tenant shall\npay all fees charged or chargeable by the Head Landlord in respect of approval for the subletting of the Premises by the\nLandlord to the Tenant for the Term (including any subletting fees). The Tenant shall reimburse the Landlord for any fees\npaid by the Landlord to the Head Landlord in advance and on the Tenant’s behalf."
+            }
+          ]
+        },
+        {
+          "id": "payments-8",
+          "field": "payments",
+          "expected": "On failed requisite approvals, deposits refunded within one month of receipt of landlord notice with deductions; unspent legal/stamp fees refundable, occupation charges and reinstatement still payable.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 6,
+              "clause": null,
+              "quote": "(c)\nIn the event that the aforesaid approval/s is/are not obtained, it is hereby agreed between the parties hereto that the\nLandlord shall give written notice to the Tenant of such fact, and the Landlord shall, within one (1) month of the Tenant’s\nreceipt of the Landlord notice, refund to the Tenant all deposits paid hereunder by the Tenant without interest (subject\nhowever to appropriate deductions for any breach or damage done to the Premises and/or the Building by the Tenant). The\nLandlord shall also refund back to the Tenant the legal fees and/or stamp duties paid by the Tenant provided always that\nthe same have not been expended for legal work rendered or for payment of stamp duty. The Tenant shall, however, be\nliable for payment of all rent, service charge, air-con charges, utilities and other charges payable hereunder for the period of\ntime that the Tenant had occupied the Premises until and including the day that the Premises is handed back to the\nLandlord in the state and condition satisfactory to the Landlord. Prior to the handing over of the Premises back to the\nLandlord, the Tenant shall, at its own costs and expense, reinstate the Premises back to its original bare state and\ncondition. Thereafter, this Agreement shall be null and void and neither party shall have any claims against the other in\nrespect of any damages, compensation, costs, expenses, losses or otherwise arising out of or in connection therewith, save\nas provided in this Clause."
+            }
+          ]
+        },
+        {
+          "id": "payments-9",
+          "field": "payments",
+          "expected": "Tenant bears legal/stamp/negotiation/administrative costs on full indemnity basis on demand.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 7,
+              "clause": null,
+              "quote": "Any costs and expenses incurred by the Landlord to draw up this Offer Letter and the Covenants and as a result of any\nnegotiation to amend this Offer Letter or the Covenants shall be borne by the Tenant on a full indemnity basis and paid on\ndemand including but not limited to legal fees, stamp duties payable on this Offer Letter and payable as a result of an increase in\nGross Floor Area pursuant to paragraph 1.2(a) above and the Landlord’s administrative charges."
+            }
+          ]
+        },
+        {
+          "id": "payments-10",
+          "field": "payments",
+          "expected": "Default allows staggered rent adjustment to original $15.60/sqm from commencement with arrears due seven days from adjustment notice; premature end brings differential for entire term.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 16,
+              "clause": null,
+              "quote": "The Landlord has agreed to the staggered rent arrangement set out in this Offer Letter at the Tenant’s request subject to the\ncondition that the Tenant will perform all terms, covenants and conditions in accordance with the provisions of the Lease\nincluding fulfilling all payment obligations. If the Tenant fails to do so, the Landlord shall, without prejudice to its other rights\nand remedies, be entitled to adjust the rent payment schedule by issuing a written notice (‘Adjustment Notice’) to the\nTenant requiring the Tenant to pay Gross Rent based on the net rent rate of $15.60 per square metre per month (‘Original\nRent Rate’) with effect from the Commencement Date. After the issuance of the Adjustment Notice, the Tenant shall pay\nGross Rent based on the Original Rent Rate on the Payment Dates. The additional Gross Rent payable for the period of the\nTerm prior to the issuance of the Adjustment Notice shall be paid within seven (7) days from the date of the Adjustment\nNotice. If the Lease is determined for any reason prior to the expiry of the Term, the Tenant shall, without prejudice to the\nLandlord’s other rights and remedies, pay to the Landlord a lump sum representing the difference between the Gross Rent\nbased on the Original Rent Rate for the entire Term and the Gross Rent already paid."
+            }
+          ]
+        },
+        {
+          "id": "payments-11",
+          "field": "payments",
+          "expected": "Tenant installs/maintains own air-conditioning at own cost under GreenMark requirements.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 16,
+              "clause": null,
+              "quote": "The Tenant shall, at its own costs and expense, install and maintain its own air-conditioning unit(s) at the Premises. In this\nrespect, the Tenant shall ensure that all air-conditioning and mechanical ventilation installed at the Premises shall comply\nwith the GreenMark Requirements as imposed or to be imposed by the relevant Authorities from time to time throughout the\nTerm."
+            }
+          ]
+        },
+        {
+          "id": "payments-12",
+          "field": "payments",
+          "expected": "Signage licence/approval/maintenance costs borne by tenant subject to consents.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 17,
+              "clause": null,
+              "quote": "(c)\npay all monthly license fees and other charges imposed by the Landlord in respect of the display of the Signage; and"
+            }
+          ]
+        },
+        {
+          "id": "payments-13",
+          "field": "payments",
+          "expected": "Service-charge increases reflect total outgoings and notice; manifest error exception; backdated charges delayed for documentation errors until corrected.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 20,
+              "clause": null,
+              "quote": "(c)\nthe Increase Notice shall be accepted by the Tenant as conclusive and binding of the matters so stated (save\nfor manifest error);"
+            }
+          ]
+        },
+        {
+          "id": "payments-14",
+          "field": "payments",
+          "expected": "Monthly electricity due seven days from landlord statement with manifest-error protection; other charges delayed for documentation errors; electricity deposit deficit seven days from written request.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 21,
+              "clause": null,
+              "quote": "documentation error(s), in which case the payment will be delayed until the error(s) is/are corrected by the\nLandlord."
+            }
+          ]
+        },
+        {
+          "id": "payments-15",
+          "field": "payments",
+          "expected": "Security deposit replenishment within seven days of demand; increase with gross rent; return after term with deductions and conditions, without interest; no setoff.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 41,
+              "clause": "5.7.3",
+              "quote": "5.7.3\nThe Tenant must pay to the Landlord an amount equal to the amount applied by the Landlord under Clause 5.7.2, as replacement of the whole or part of the\nSecurity Deposit Amount applied, within seven (7) days of demand."
+            }
+          ]
+        },
+        {
+          "id": "payments-16",
+          "field": "payments",
+          "expected": "Tenant funds property and public liability insurance; public liability at least S$3 million or landlord-required higher sum, not an aggregate contractual liability cap.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 42,
+              "clause": null,
+              "quote": "(ii)\nin an amount not less than the sum of Singapore Dollars Three Million (S$3,000,000.00) or such higher amount as may from time to time be\nrequired by the Landlord; and"
+            }
+          ]
+        },
+        {
+          "id": "liability-1",
+          "field": "liability",
+          "expected": "Tenant indemnifies landlord for relevant occurrence/default injury/loss claims; do not mislabel insurance/deposits as cap.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 45,
+              "clause": "5.19",
+              "quote": "5.19\nIndemnity by Tenant"
+            }
+          ]
+        },
+        {
+          "id": "liability-2",
+          "field": "liability",
+          "expected": "Landlord exclusions under 7.1 cover enumerated service, negligence, defects and other risks; scope limited to enumerated categories, no enforceability conclusion.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 48,
+              "clause": "7.1",
+              "quote": "7.1\nNo Claim by Tenant"
+            }
+          ]
+        },
+        {
+          "id": "liability-3",
+          "field": "liability",
+          "expected": "Special condition modifies entry liability: landlord must minimize disruption, act reasonably and make good damage without unreasonable delay despite no-compensation language.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 22,
+              "clause": null,
+              "quote": "the Tenant. Nonetheless, the Landlord will endeavour to cause as little disturbance as is reasonably possible in the\ncircumstances. Provided always that the Landlord (or other person so entering) shall take steps to minimize the\ndisruption to the Tenant’s business operations, and exercise such right in a reasonable manner and make good any\ndamage caused to the Premises without unreasonable delay.”"
+            }
+          ]
+        },
+        {
+          "id": "restrictions-1",
+          "field": "restrictions",
+          "expected": "R&D/manufacturing fluidic chips and microfluidic systems for tenant only; necessary approvals at tenant cost.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 2,
+              "clause": null,
+              "quote": "R&D and manufacturing of fluidic chips and microfludic system for\nthe business of the Tenant and not for any other purpose.\n(b) Business Licence / Approval :"
+            }
+          ]
+        },
+        {
+          "id": "restrictions-2",
+          "field": "restrictions",
+          "expected": "Tenant works require prior written landlord consent and Tenants Guide compliance.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 5,
+              "clause": null,
+              "quote": "The Tenant must obtain the prior written consent of the Landlord for the Tenant’s Works in respect of the Premises which may be\nrequired by the Tenant for the use and enjoyment of the Premises and comply with all other stipulations set out in Clause 4.1 of\nthe Covenants and the Tenants’ Guide."
+            }
+          ]
+        },
+        {
+          "id": "restrictions-3",
+          "field": "restrictions",
+          "expected": "Rights of first refusal for listed storeys valid 2 June 2014–1 June 2015, once per storey; written acceptance/full payment within seven days including weekends from grant.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 18,
+              "clause": null,
+              "quote": "days (weekends inclusive) from the grant of the Option/s by the Landlord to the Tenant, failing which the Option/s\nshall be deemed null and void and the Landlord shall be free to lease the same to other interested parties without any\nfurther reference to the Tenant and the Tenant shall not, thereafter, have any claims against the Landlord for any\ndamages arising out of or in connection therewith."
+            }
+          ]
+        },
+        {
+          "id": "restrictions-4",
+          "field": "restrictions",
+          "expected": "No assignment/subletting/sharing/third-party rights without required prior landlord consent; control/shareholder changes treated as assignment; landlord can condition consent.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 46,
+              "clause": "5.20.3",
+              "quote": "5.20.3\nWhere the Tenant is a company, any change in the management control or majority shareholders of the Tenant made without the prior consent of the\nLandlord will be treated as an assignment of the Lease."
+            }
+          ]
+        },
+        {
+          "id": "restrictions-5",
+          "field": "restrictions",
+          "expected": "Tenant confidentiality permits law-required disclosure, prior consent and information public without tenant breach under overriding special condition.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 22,
+              "clause": null,
+              "quote": "Without prejudice to any other rights or remedies the Landlord is entitled to, the Tenant will not disclose to any third\nparty any information in respect of or arising from or in connection with the terms, conditions and provisions of the\nlease of the Premises whether contained in the Lease or in previous or subsequent correspondence or otherwise,\nunless such disclosure is required by Law or with the prior consent of the Landlord or to the extent that such\ninformation has become public knowledge not due to the Tenant’s breach of this undertaking.”"
+            }
+          ]
+        },
+        {
+          "id": "restrictions-6",
+          "field": "restrictions",
+          "expected": "Special Conditions prevail over Offer Letter inconsistency; side letters take priority over offer then covenants. Preserve amended repair/renovation/electricity conditions.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 9,
+              "clause": "4.4",
+              "quote": "4.4\nIn the event of any inconsistency between the provisions of this Offer Letter, the Covenants and/or the Side Letter(s), if any,\npriority shall be given in the following order in order to resolve the inconsistency:-"
+            }
+          ]
+        },
+        {
+          "id": "notice-5",
+          "field": "notice",
+          "expected": "Unknown notice/invoice/possession/renewal acceptance facts prevent calculating current trigger-based dates; no presumed 2026 continuation.",
+          "answerable": false,
+          "evidence": []
+        }
+      ]
+    },
+    "s08": {
+      "source": "Exclusive_Distribution_Rights_Agreement.pdf",
+      "facts": [
+        {
+          "id": "parties-1",
+          "field": "parties",
+          "expected": "SEYCHELLE ENVIRONMENTAL PRODUCTS, INC. is grantor; AQUAPURE DISTRIBUTION PTE. LTD. is distributor; do not treat INC. and PTE. LTD. as aliases.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 1,
+              "clause": null,
+              "quote": "(2) AQUAPURE DISTRIBUTION PTE. LTD., a company incorporated under the laws of the Republic of\nSingapore, having its registered office at 8 Marina Boulevard, #15-01, Singapore 018981 (“DISTRIBUTOR”)."
+            }
+          ]
+        },
+        {
+          "id": "term-1",
+          "field": "term",
+          "expected": "1 June 2007 to 31 May 2011; distinct from execution/effective date; signature blanks do not prove execution.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 1,
+              "clause": "1.3",
+              "quote": "1.3 “Initial Term” means the initial period of four (4) years commencing on 1 June 2007 and expiring on 31 May\n2011, subject to earlier termination in accordance with this Agreement."
+            }
+          ]
+        },
+        {
+          "id": "liability-1",
+          "field": "liability",
+          "expected": "No express aggregate liability cap is established; do not invent one or claim absence of liability.",
+          "answerable": false,
+          "evidence": []
+        },
+        {
+          "id": "renewal-1",
+          "field": "renewal",
+          "expected": "Automatic successive two-year renewals unless either party gives at least 90 days written non-renewal notice before then-current expiry; later occurrences conditional on continuation.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 2,
+              "clause": "3.2",
+              "quote": "3.2 Automatic Renewal. Upon expiry of the Initial Term, this Agreement shall automatically renew for\nsuccessive two (2) year Renewal Terms, unless either Party gives the other Party written notice of its intention\nnot to renew this Agreement at least ninety (90) days prior to the expiry of the then-current term."
+            }
+          ]
+        },
+        {
+          "id": "notice-1",
+          "field": "notice",
+          "expected": "Written notices delivered to addresses; actual delivery deemed receipt, registered post subject to unspecified applicable postal rules.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 3,
+              "clause": null,
+              "quote": "A notice shall be deemed received upon actual delivery or, where sent by registered post, in accordance with the\napplicable postal delivery rules."
+            }
+          ]
+        },
+        {
+          "id": "termination-1",
+          "field": "termination",
+          "expected": "Either party may terminate for material breach uncured 30 days after RECEIVING written cure notice.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 3,
+              "clause": "10.1",
+              "quote": "10.1 Termination for Material Breach. Either Party may terminate this Agreement by written notice if the other\nParty commits a material breach of this Agreement and fails to remedy such breach within thirty (30) days after\nreceiving written notice requiring it to do so."
+            }
+          ]
+        },
+        {
+          "id": "payments-1",
+          "field": "payments",
+          "expected": "During initial term distributor must buy at least 10,000 units annually; price/payment timing not supplied.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 2,
+              "clause": "6.1",
+              "quote": "6.1 Minimum Annual Purchase. During the Initial Term, DISTRIBUTOR shall purchase from SEYCHELLE a\nminimum of 10,000 units of the Products per annum."
+            }
+          ]
+        },
+        {
+          "id": "payments-2",
+          "field": "payments",
+          "expected": "No actual unit price, payment timing or invoice event supplied.",
+          "answerable": false,
+          "evidence": []
+        },
+        {
+          "id": "restrictions-1",
+          "field": "restrictions",
+          "expected": "AquaPure exclusive distributor/reseller for products in Singapore and Malaysia; no other appointment or direct supply except through distributor; Exhibit A product table is blank.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 1,
+              "clause": "2.1",
+              "quote": "2.1 Appointment. SEYCHELLE hereby appoints DISTRIBUTOR, and DISTRIBUTOR hereby accepts\nappointment, as the exclusive distributor and reseller of the Products within the Territory during the Term."
+            }
+          ]
+        },
+        {
+          "id": "restrictions-2",
+          "field": "restrictions",
+          "expected": "Distributor must not knowingly supply outside territory without prior written consent or modify/relabel products without prior written consent.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 2,
+              "clause": "4.2",
+              "quote": "4.2 Sales Outside Territory. DISTRIBUTOR shall not knowingly distribute, sell, resell, export or otherwise\nsupply any Products outside the Territory without SEYCHELLE’s prior written consent."
+            }
+          ]
+        },
+        {
+          "id": "restrictions-3",
+          "field": "restrictions",
+          "expected": "Missing 10,000-unit minimum allows discretionary conversion to non-exclusive, only after 30 days written notice; no assumption condition occurred.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 2,
+              "clause": "6.3",
+              "quote": "6.3 Notice. Before exercising its right under Clause 6.2, SEYCHELLE shall provide DISTRIBUTOR with thirty\n(30) days’ written notice of the proposed conversion from exclusive to non-exclusive distribution rights."
+            }
+          ]
+        },
+        {
+          "id": "restrictions-4",
+          "field": "restrictions",
+          "expected": "Confidentiality survives termination with prior-consent, need-to-know/adviser and required-law exceptions.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 2,
+              "clause": "8.2",
+              "quote": "8.2 Confidentiality Obligation. Each Party shall keep such confidential information confidential and shall not\ndisclose it to any third party except: (a) with the prior written consent of the other Party; (b) to its employees,\nprofessional advisers or representatives who have a legitimate need to know such information and are subject to\nappropriate confidentiality obligations; or (c) where disclosure is required by law or by a competent governmental\nauthority."
+            }
+          ]
+        },
+        {
+          "id": "restrictions-5",
+          "field": "restrictions",
+          "expected": "Post-termination cease exclusive representation/IP use, return/destroy confidential information subject to retention law; accrued rights survive.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 3,
+              "clause": "10.2",
+              "quote": "10.2 Effect of Termination. Upon expiry or termination of this Agreement: (a) DISTRIBUTOR shall cease\nrepresenting itself as an authorised exclusive distributor of SEYCHELLE; (b) DISTRIBUTOR shall cease using\nSEYCHELLE’s trademarks and other intellectual property except as otherwise agreed in writing; (c) each Party\nshall return or destroy confidential information belonging to the other Party, subject to applicable legal retention\nrequirements; and (d) termination shall not affect any rights, obligations or liabilities that accrued before the\neffective date of termination."
+            }
+          ]
+        },
+        {
+          "id": "restrictions-6",
+          "field": "restrictions",
+          "expected": "Assignment requires prior written consent subject to stated exception; amendments written signed by both.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 4,
+              "clause": "14.3",
+              "quote": "14.3 Assignment. Neither Party may assign or transfer its rights or obligations under this Agreement to any third\nparty without the prior written consent of the other Party, except where such assignment is permitted by\napplicable law and agreed in writing."
+            }
+          ]
+        },
+        {
+          "id": "restrictions-7",
+          "field": "restrictions",
+          "expected": "Actual product list is unanswerable because Exhibit A is blank; no invented product scope.",
+          "answerable": false,
+          "evidence": []
+        }
+      ]
+    },
+    "s09": {
+      "source": "seychelle and confident.pdf",
+      "facts": [
+        {
+          "id": "parties-1",
+          "field": "parties",
+          "expected": "SEYCHELLE ENVIRONMENTAL PRODUCTS PTE. LTD. is grantor; CONFIDENT DISTRIBUTION PTE. LTD. is distributor; do not treat INC. and PTE. LTD. as aliases.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 1,
+              "clause": null,
+              "quote": "​(2) CONFIDENT DISTRIBUTION PTE. LTD.​, a company incorporated in Singapore with its​\n​registered office at 60 Robinson Road, #12-01, Singapore 068892 (“DISTRIBUTOR”).​"
+            }
+          ]
+        },
+        {
+          "id": "term-1",
+          "field": "term",
+          "expected": "1 April 2026 to 31 March 2031; distinct from execution/effective date; signature blanks do not prove execution.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 1,
+              "clause": null,
+              "quote": "​“​Term​” means the period commencing on 1 April 2026 and ending on 31 March 2031.​"
+            }
+          ]
+        },
+        {
+          "id": "liability-1",
+          "field": "liability",
+          "expected": "No express aggregate liability cap is established; do not invent one or claim absence of liability.",
+          "answerable": false,
+          "evidence": []
+        },
+        {
+          "id": "renewal-1",
+          "field": "renewal",
+          "expected": "No renewal mechanism supplied; fixed term does not establish automatic continuation.",
+          "answerable": false,
+          "evidence": []
+        },
+        {
+          "id": "notice-1",
+          "field": "notice",
+          "expected": "Notices in writing by hand, registered post or email to notified address; no deemed-receipt timing supplied.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 2,
+              "clause": null,
+              "quote": "​8.1 Any notice under this Agreement shall be in writing and delivered by hand, registered post or​\n​email to the address notified by the relevant Party.​"
+            }
+          ]
+        },
+        {
+          "id": "payments-1",
+          "field": "payments",
+          "expected": "Distributor bears own marketing/distribution expenses; each order price/delivery negotiated in writing, not fixed payment deadline.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 2,
+              "clause": null,
+              "quote": "​3.3 DISTRIBUTOR shall bear its own costs and expenses incurred in connection with the marketing​\n​and distribution of the Products.​"
+            }
+          ]
+        },
+        {
+          "id": "restrictions-1",
+          "field": "restrictions",
+          "expected": "Both parties keep confidential information confidential after termination.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 2,
+              "clause": null,
+              "quote": "​7.2 This obligation shall survive termination of this Agreement.​"
+            }
+          ]
+        },
+        {
+          "id": "restrictions-2",
+          "field": "restrictions",
+          "expected": "SEYCHELLE uses reasonable commercial efforts to fulfil properly submitted orders; distributor reasonable efforts to market and compliance with applicable Singapore regulations.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 2,
+              "clause": null,
+              "quote": "​4.1 SEYCHELLE shall use reasonable commercial efforts to fulfil orders properly submitted by​\n​DISTRIBUTOR.​"
+            }
+          ]
+        },
+        {
+          "id": "restrictions-3",
+          "field": "restrictions",
+          "expected": "Variation requires writing signed by/on behalf of both parties.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 3,
+              "clause": null,
+              "quote": "​10.1 No variation of this Agreement shall be effective unless it is in writing and signed by or on behalf​\n​of both Parties.​"
+            }
+          ]
+        },
+        {
+          "id": "termination-1",
+          "field": "termination",
+          "expected": "Either party material breach uncured 30 days after RECEIVING cure notice; SEYCHELLE immediate written termination for distributor insolvency or ceasing business.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 2,
+              "clause": null,
+              "quote": "​6.1 Either Party may terminate this Agreement by written notice if the other Party commits a material​\n​breach and fails to remedy that breach within thirty (30) days after receiving written notice requiring it​\n​to do so.​"
+            }
+          ]
+        },
+        {
+          "id": "restrictions-4",
+          "field": "restrictions",
+          "expected": "CONFIDENT exclusive distributor for Schedule 1 products in Singapore for term; SEYCHELLE must not appoint other distributors, grant resale rights or knowingly supply resale into Singapore.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 1,
+              "clause": null,
+              "quote": "​(c) knowingly supply Products to another person where SEYCHELLE knows or reasonably ought to​\n​know that the Products are intended for resale or distribution in Singapore.​"
+            }
+          ]
+        },
+        {
+          "id": "restrictions-5",
+          "field": "restrictions",
+          "expected": "All Singapore purchase/distribution enquiries and orders referred to CONFIDENT unless parties agree otherwise in writing.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 2,
+              "clause": null,
+              "quote": "​2.3 SEYCHELLE shall refer to DISTRIBUTOR all enquiries and orders received from persons​\n​seeking to purchase or distribute the Products in Singapore, except where otherwise agreed in​\n​writing by the Parties.​"
+            }
+          ]
+        },
+        {
+          "id": "restrictions-6",
+          "field": "restrictions",
+          "expected": "Schedule 1 expressly contains environmental filtration systems, water treatment equipment and replacement components/accessories; it is present, not missing.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 3,
+              "clause": null,
+              "quote": "​1.​ ​Environmental filtration systems​\n​2.​ ​Water treatment equipment​\n​3.​ ​Related replacement components and accessories​"
+            }
+          ]
+        }
+      ]
+    },
+    "s10": {
+      "source": "seychelle and pacific.pdf",
+      "facts": [
+        {
+          "id": "parties-1",
+          "field": "parties",
+          "expected": "SEYCHELLE ENVIRONMENTAL PRODUCTS PTE. LTD. is grantor; PACIFIC TRADE SOLUTIONS PTE. LTD. is distributor; do not treat INC. and PTE. LTD. as aliases.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 1,
+              "clause": null,
+              "quote": "​(2) PACIFIC TRADE SOLUTIONS PTE. LTD.​, a company incorporated​​in Singapore with its registered office​\n​at 30 Cecil Street, #19-08, Singapore 049712 (“DISTRIBUTOR”).​"
+            }
+          ]
+        },
+        {
+          "id": "term-1",
+          "field": "term",
+          "expected": "1 January 2027 to 31 December 2027; distinct from execution/effective date; signature blanks do not prove execution.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 1,
+              "clause": null,
+              "quote": "​“​Distribution Period​” means the period commencing​​on 1 January 2027 and ending on 31 December 2027.​"
+            }
+          ]
+        },
+        {
+          "id": "liability-1",
+          "field": "liability",
+          "expected": "No express aggregate liability cap is established; do not invent one or claim absence of liability.",
+          "answerable": false,
+          "evidence": []
+        },
+        {
+          "id": "renewal-1",
+          "field": "renewal",
+          "expected": "No renewal mechanism supplied; fixed term does not establish automatic continuation.",
+          "answerable": false,
+          "evidence": []
+        },
+        {
+          "id": "notice-1",
+          "field": "notice",
+          "expected": "Notices in writing by hand, registered post or email to notified address; no deemed-receipt timing supplied.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 2,
+              "clause": null,
+              "quote": "​8.1 Any notice under this Agreement shall be in writing and delivered by hand, registered post or email to the​\n​address notified by the relevant Party.​"
+            }
+          ]
+        },
+        {
+          "id": "payments-1",
+          "field": "payments",
+          "expected": "Distributor bears own marketing/distribution expenses; each order price/delivery negotiated in writing, not fixed payment deadline.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 2,
+              "clause": null,
+              "quote": "​3.3 DISTRIBUTOR shall be responsible for its own marketing, sales and promotional expenses.​"
+            }
+          ]
+        },
+        {
+          "id": "restrictions-1",
+          "field": "restrictions",
+          "expected": "Both parties keep confidential information confidential after termination.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 2,
+              "clause": null,
+              "quote": "​7.2 This obligation shall survive termination of this Agreement.​"
+            }
+          ]
+        },
+        {
+          "id": "restrictions-2",
+          "field": "restrictions",
+          "expected": "SEYCHELLE uses reasonable commercial efforts to fulfil properly submitted orders; distributor reasonable efforts to market and compliance with applicable Singapore regulations.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 2,
+              "clause": null,
+              "quote": "​4.1 SEYCHELLE shall use reasonable commercial efforts to fulfil orders properly submitted by DISTRIBUTOR.​"
+            }
+          ]
+        },
+        {
+          "id": "restrictions-3",
+          "field": "restrictions",
+          "expected": "Variation requires writing signed by/on behalf of both parties.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 2,
+              "clause": null,
+              "quote": "​10.1 No variation of this Agreement shall be effective unless it is in writing and signed by or on behalf of both​\n​Parties.​"
+            }
+          ]
+        },
+        {
+          "id": "termination-1",
+          "field": "termination",
+          "expected": "Either party can terminate with 30 days written notice; either may terminate immediately in writing for irremediable material breach.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 2,
+              "clause": null,
+              "quote": "​6.1 Either Party may terminate this Agreement by giving thirty (30) days' written notice to the other Party.​"
+            }
+          ]
+        },
+        {
+          "id": "restrictions-4",
+          "field": "restrictions",
+          "expected": "PACIFIC is authorised distributor of environmental products in Singapore in 2027 with resale to customers/resellers. Do not infer it is exclusive or screen it out because exclusivity is unstated.",
+          "answerable": true,
+          "evidence": [
+            {
+              "page": 1,
+              "clause": null,
+              "quote": "​(C) SEYCHELLE wishes to appoint DISTRIBUTOR as an authorised distributor in Singapore on the terms of​\n​this Agreement.​"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "deadlines": [
+    {
+      "sample": "s01",
+      "as_of": "2026-12-01",
+      "event_date": "2026-12-31",
+      "action_date": null,
+      "event_type": "expiry"
+    },
+    {
+      "sample": "s02",
+      "as_of": "2026-09-05",
+      "event_date": "2026-11-30",
+      "action_date": "2026-10-01",
+      "event_type": "renewal"
+    },
+    {
+      "sample": "s03",
+      "as_of": "2026-09-05",
+      "event_date": "2026-10-31",
+      "action_date": null,
+      "event_type": "expiry"
+    },
+    {
+      "sample": "s04",
+      "as_of": "2026-09-05",
+      "event_date": "2026-10-31",
+      "action_date": null,
+      "event_type": "expiry"
+    }
+  ],
+  "pairs": [
+    {
+      "samples": [
+        "s01",
+        "s03"
+      ],
+      "sme": "Meridian Pte Ltd",
+      "must_retain": true,
+      "status": "potential_conflict",
+      "reason": "Exclusive Atlas distribution vs direct sale to another reseller, same product/territory and overlapping term; potential only."
+    },
+    {
+      "samples": [
+        "s09",
+        "s10"
+      ],
+      "sme": "SEYCHELLE ENVIRONMENTAL PRODUCTS PTE. LTD.",
+      "must_retain": true,
+      "status": "potential_conflict",
+      "reason": "Explicit ban on other distributor/resale grants vs ordinary Pacific grant in Singapore during overlapping 2027 term; no breach determination."
+    },
+    {
+      "samples": [
+        "s08",
+        "s09"
+      ],
+      "sme": "SEYCHELLE ENVIRONMENTAL PRODUCTS PTE. LTD.",
+      "must_retain": true,
+      "status": "insufficient_evidence",
+      "reason": "INC. is not a proven alias of PTE. LTD.; blank Exhibit A and unconfirmed historical renewals prevent supported compatibility conclusion."
+    },
+    {
+      "samples": [
+        "s08",
+        "s10"
+      ],
+      "sme": "SEYCHELLE ENVIRONMENTAL PRODUCTS PTE. LTD.",
+      "must_retain": true,
+      "status": "insufficient_evidence",
+      "reason": "Unknown identity relationship/product scope and conditional historical renewal; no invented alias."
+    }
+  ],
+  "deadline_rubric": "Keyed explicit expiry/renewal events only. Invoice/breach, ambiguous notice mechanics and discretionary renewal dates require escalation. Additional emitted dates must be source-reviewed rather than presumed correct. Scores are against the frozen keyed set."
+}
