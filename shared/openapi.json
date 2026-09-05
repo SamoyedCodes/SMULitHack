@@ -1,0 +1,2383 @@
+{
+  "components": {
+    "schemas": {
+      "Capabilities": {
+        "additionalProperties": false,
+        "properties": {
+          "conflicts": {
+            "default": false,
+            "title": "Conflicts",
+            "type": "boolean"
+          },
+          "deadlines": {
+            "default": false,
+            "title": "Deadlines",
+            "type": "boolean"
+          },
+          "extraction": {
+            "default": false,
+            "title": "Extraction",
+            "type": "boolean"
+          },
+          "handoff": {
+            "default": false,
+            "title": "Handoff",
+            "type": "boolean"
+          },
+          "ingestion": {
+            "default": false,
+            "title": "Ingestion",
+            "type": "boolean"
+          },
+          "sample_workspace": {
+            "default": false,
+            "title": "Sample Workspace",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "ingestion",
+          "extraction",
+          "deadlines",
+          "conflicts",
+          "handoff",
+          "sample_workspace"
+        ],
+        "title": "Capabilities",
+        "type": "object"
+      },
+      "Citation": {
+        "additionalProperties": false,
+        "properties": {
+          "document_id": {
+            "title": "Document Id",
+            "type": "string"
+          },
+          "quote": {
+            "title": "Quote",
+            "type": "string"
+          },
+          "span_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Span Ids",
+            "type": "array"
+          }
+        },
+        "required": [
+          "document_id",
+          "span_ids",
+          "quote"
+        ],
+        "title": "Citation",
+        "type": "object"
+      },
+      "CommercialProvision": {
+        "additionalProperties": false,
+        "properties": {
+          "activity": {
+            "title": "Activity",
+            "type": "string"
+          },
+          "beneficiary": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Beneficiary"
+          },
+          "channel": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Channel"
+          },
+          "citations": {
+            "items": {
+              "$ref": "#/components/schemas/Citation"
+            },
+            "title": "Citations",
+            "type": "array"
+          },
+          "customers": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Customers"
+          },
+          "ends_on": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ends On"
+          },
+          "exceptions": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Exceptions",
+            "type": "array"
+          },
+          "exclusive": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Exclusive"
+          },
+          "grantor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Grantor"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "distribution",
+              "other",
+              "unknown"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "missing_context": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Missing Context",
+            "type": "array"
+          },
+          "product": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Product"
+          },
+          "starts_on": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Starts On"
+          },
+          "territory": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Territory"
+          }
+        },
+        "required": [
+          "id",
+          "citations",
+          "grantor",
+          "beneficiary",
+          "activity",
+          "kind",
+          "exclusive",
+          "product",
+          "territory",
+          "channel",
+          "customers",
+          "starts_on",
+          "ends_on",
+          "exceptions",
+          "missing_context"
+        ],
+        "title": "CommercialProvision",
+        "type": "object"
+      },
+      "ConflictAssessment": {
+        "additionalProperties": false,
+        "properties": {
+          "confidence": {
+            "enum": [
+              "medium",
+              "low"
+            ],
+            "title": "Confidence",
+            "type": "string"
+          },
+          "confidence_reason": {
+            "title": "Confidence Reason",
+            "type": "string"
+          },
+          "documents": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Documents",
+            "type": "array"
+          },
+          "evidence": {
+            "items": {
+              "$ref": "#/components/schemas/Evidence"
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
+          "exceptions": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Exceptions",
+            "type": "array"
+          },
+          "explanation": {
+            "title": "Explanation",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "lawyer_question": {
+            "title": "Lawyer Question",
+            "type": "string"
+          },
+          "missing_facts": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Missing Facts",
+            "type": "array"
+          },
+          "mode": {
+            "default": "live",
+            "enum": [
+              "live",
+              "sample"
+            ],
+            "title": "Mode",
+            "type": "string"
+          },
+          "provenance": {
+            "enum": [
+              "inferred",
+              "unresolved"
+            ],
+            "title": "Provenance",
+            "type": "string"
+          },
+          "scope_comparison": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Scope Comparison",
+            "type": "object"
+          },
+          "status": {
+            "enum": [
+              "potential_conflict",
+              "no_conflict_identified_for_this_rule",
+              "insufficient_evidence"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "documents",
+          "scope_comparison",
+          "evidence",
+          "exceptions",
+          "missing_facts",
+          "explanation",
+          "lawyer_question",
+          "confidence",
+          "confidence_reason",
+          "provenance",
+          "mode"
+        ],
+        "title": "ConflictAssessment",
+        "type": "object"
+      },
+      "DatabaseStatus": {
+        "additionalProperties": false,
+        "properties": {
+          "status": {
+            "enum": [
+              "ready",
+              "unavailable"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "title": "DatabaseStatus",
+        "type": "object"
+      },
+      "DeadlineRule": {
+        "additionalProperties": false,
+        "properties": {
+          "action": {
+            "enum": [
+              "notice_received",
+              "notice_sent",
+              "payment_due",
+              "review",
+              "expiry"
+            ],
+            "title": "Action",
+            "type": "string"
+          },
+          "citations": {
+            "items": {
+              "$ref": "#/components/schemas/Citation"
+            },
+            "title": "Citations",
+            "type": "array"
+          },
+          "conditions": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Conditions",
+            "type": "array"
+          },
+          "direction": {
+            "default": "before",
+            "enum": [
+              "before",
+              "after"
+            ],
+            "title": "Direction",
+            "type": "string"
+          },
+          "earliest_offset": {
+            "anyOf": [
+              {
+                "maximum": 36500.0,
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Earliest Offset"
+          },
+          "event_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Event Date"
+          },
+          "event_type": {
+            "enum": [
+              "expiry",
+              "renewal",
+              "payment",
+              "termination",
+              "other"
+            ],
+            "title": "Event Type",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "missing_inputs": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Missing Inputs",
+            "type": "array"
+          },
+          "month_end_rule": {
+            "default": "unspecified",
+            "enum": [
+              "last_day",
+              "unspecified"
+            ],
+            "title": "Month End Rule",
+            "type": "string"
+          },
+          "offset": {
+            "anyOf": [
+              {
+                "maximum": 36500.0,
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Offset"
+          },
+          "recurrence_months": {
+            "anyOf": [
+              {
+                "maximum": 1200.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recurrence Months"
+          },
+          "trigger": {
+            "title": "Trigger",
+            "type": "string"
+          },
+          "unit": {
+            "default": "calendar_days",
+            "enum": [
+              "calendar_days",
+              "calendar_months",
+              "business_days",
+              "unknown"
+            ],
+            "title": "Unit",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "citations",
+          "label",
+          "event_type",
+          "event_date",
+          "trigger",
+          "action",
+          "offset",
+          "earliest_offset",
+          "unit",
+          "direction",
+          "recurrence_months",
+          "month_end_rule",
+          "conditions",
+          "missing_inputs"
+        ],
+        "title": "DeadlineRule",
+        "type": "object"
+      },
+      "Document": {
+        "additionalProperties": false,
+        "properties": {
+          "created_at": {
+            "title": "Created At",
+            "type": "string"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "filename": {
+            "title": "Filename",
+            "type": "string"
+          },
+          "findings": {
+            "items": {
+              "$ref": "#/components/schemas/Finding"
+            },
+            "title": "Findings",
+            "type": "array"
+          },
+          "has_ocr": {
+            "default": false,
+            "title": "Has Ocr",
+            "type": "boolean"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "issues": {
+            "items": {
+              "$ref": "#/components/schemas/ReviewIssue"
+            },
+            "title": "Issues",
+            "type": "array"
+          },
+          "mode": {
+            "enum": [
+              "live",
+              "sample"
+            ],
+            "title": "Mode",
+            "type": "string"
+          },
+          "model": {
+            "title": "Model",
+            "type": "string"
+          },
+          "page_count": {
+            "default": 0,
+            "title": "Page Count",
+            "type": "integer"
+          },
+          "pages_analyzed": {
+            "default": 0,
+            "title": "Pages Analyzed",
+            "type": "integer"
+          },
+          "pages_read": {
+            "default": 0,
+            "title": "Pages Read",
+            "type": "integer"
+          },
+          "pagination": {
+            "default": "original",
+            "title": "Pagination",
+            "type": "string"
+          },
+          "parties": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Parties",
+            "type": "array"
+          },
+          "provisions": {
+            "items": {
+              "$ref": "#/components/schemas/CommercialProvision"
+            },
+            "title": "Provisions",
+            "type": "array"
+          },
+          "reviews": {
+            "items": {
+              "$ref": "#/components/schemas/Verdict"
+            },
+            "title": "Reviews",
+            "type": "array"
+          },
+          "rules": {
+            "items": {
+              "$ref": "#/components/schemas/DeadlineRule"
+            },
+            "title": "Rules",
+            "type": "array"
+          },
+          "sha256": {
+            "title": "Sha256",
+            "type": "string"
+          },
+          "stage": {
+            "default": "Waiting to process",
+            "title": "Stage",
+            "type": "string"
+          },
+          "status": {
+            "default": "queued",
+            "title": "Status",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "string"
+          },
+          "warnings": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "filename",
+          "title",
+          "sha256",
+          "mode",
+          "status",
+          "stage",
+          "error",
+          "page_count",
+          "pages_read",
+          "pages_analyzed",
+          "has_ocr",
+          "pagination",
+          "parties",
+          "findings",
+          "rules",
+          "provisions",
+          "reviews",
+          "issues",
+          "warnings",
+          "created_at",
+          "model",
+          "version"
+        ],
+        "title": "Document",
+        "type": "object"
+      },
+      "ErrorDetail": {
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "details": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Details",
+            "type": "array"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "message",
+          "details"
+        ],
+        "title": "ErrorDetail",
+        "type": "object"
+      },
+      "ErrorResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "error": {
+            "$ref": "#/components/schemas/ErrorDetail"
+          }
+        },
+        "required": [
+          "error"
+        ],
+        "title": "ErrorResponse",
+        "type": "object"
+      },
+      "Event": {
+        "additionalProperties": false,
+        "properties": {
+          "action": {
+            "title": "Action",
+            "type": "string"
+          },
+          "action_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Action Date"
+          },
+          "assumptions": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Assumptions",
+            "type": "array"
+          },
+          "confidence": {
+            "enum": [
+              "high",
+              "medium",
+              "low"
+            ],
+            "title": "Confidence",
+            "type": "string"
+          },
+          "document_id": {
+            "title": "Document Id",
+            "type": "string"
+          },
+          "event_date": {
+            "title": "Event Date",
+            "type": "string"
+          },
+          "event_type": {
+            "title": "Event Type",
+            "type": "string"
+          },
+          "evidence": {
+            "items": {
+              "$ref": "#/components/schemas/Evidence"
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
+          "formula": {
+            "title": "Formula",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "provenance": {
+            "const": "calculated",
+            "default": "calculated",
+            "title": "Provenance",
+            "type": "string"
+          },
+          "window_start": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Window Start"
+          }
+        },
+        "required": [
+          "id",
+          "document_id",
+          "label",
+          "event_type",
+          "event_date",
+          "action_date",
+          "window_start",
+          "action",
+          "formula",
+          "assumptions",
+          "confidence",
+          "evidence",
+          "provenance"
+        ],
+        "title": "Event",
+        "type": "object"
+      },
+      "Evidence": {
+        "additionalProperties": false,
+        "properties": {
+          "boxes": {
+            "items": {
+              "items": {
+                "type": "number"
+              },
+              "type": "array"
+            },
+            "title": "Boxes",
+            "type": "array"
+          },
+          "clause": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Clause"
+          },
+          "document_id": {
+            "title": "Document Id",
+            "type": "string"
+          },
+          "ocr_confidence": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ocr Confidence"
+          },
+          "page": {
+            "title": "Page",
+            "type": "integer"
+          },
+          "quote": {
+            "title": "Quote",
+            "type": "string"
+          },
+          "source": {
+            "enum": [
+              "native",
+              "ocr"
+            ],
+            "title": "Source",
+            "type": "string"
+          },
+          "span_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Span Ids",
+            "type": "array"
+          }
+        },
+        "required": [
+          "document_id",
+          "span_ids",
+          "quote",
+          "page",
+          "clause",
+          "boxes",
+          "source",
+          "ocr_confidence"
+        ],
+        "title": "Evidence",
+        "type": "object"
+      },
+      "FieldName": {
+        "enum": [
+          "parties",
+          "term",
+          "renewal",
+          "notice",
+          "termination",
+          "payments",
+          "liability",
+          "restrictions"
+        ],
+        "title": "FieldName",
+        "type": "string"
+      },
+      "Finding": {
+        "additionalProperties": false,
+        "properties": {
+          "conditions": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Conditions",
+            "type": "array"
+          },
+          "confidence": {
+            "enum": [
+              "high",
+              "medium",
+              "low"
+            ],
+            "title": "Confidence",
+            "type": "string"
+          },
+          "confidence_reason": {
+            "title": "Confidence Reason",
+            "type": "string"
+          },
+          "evidence": {
+            "items": {
+              "$ref": "#/components/schemas/Evidence"
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
+          "field": {
+            "$ref": "#/components/schemas/FieldName"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "party": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Party"
+          },
+          "provenance": {
+            "enum": [
+              "found",
+              "calculated",
+              "inferred",
+              "unresolved"
+            ],
+            "title": "Provenance",
+            "type": "string"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          }
+        },
+        "required": [
+          "id",
+          "field",
+          "value",
+          "party",
+          "conditions",
+          "provenance",
+          "confidence",
+          "confidence_reason",
+          "evidence"
+        ],
+        "title": "Finding",
+        "type": "object"
+      },
+      "HealthResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "api_version": {
+            "const": "1",
+            "default": "1",
+            "title": "Api Version",
+            "type": "string"
+          },
+          "capabilities": {
+            "$ref": "#/components/schemas/Capabilities"
+          },
+          "database": {
+            "$ref": "#/components/schemas/DatabaseStatus"
+          },
+          "docx_available": {
+            "title": "Docx Available",
+            "type": "boolean"
+          },
+          "inference_notice": {
+            "default": "When analysis is enabled, extracted contract text is sent to Gemini. Original files and saved results stay local.",
+            "title": "Inference Notice",
+            "type": "string"
+          },
+          "key_configured": {
+            "title": "Key Configured",
+            "type": "boolean"
+          },
+          "limits": {
+            "$ref": "#/components/schemas/Limits"
+          },
+          "model": {
+            "title": "Model",
+            "type": "string"
+          },
+          "model_status": {
+            "enum": [
+              "not_configured",
+              "configured_unverified"
+            ],
+            "title": "Model Status",
+            "type": "string"
+          },
+          "ocr_available": {
+            "title": "Ocr Available",
+            "type": "boolean"
+          },
+          "status": {
+            "enum": [
+              "ready",
+              "degraded"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "string"
+          },
+          "worker": {
+            "$ref": "#/components/schemas/WorkerStatus"
+          }
+        },
+        "required": [
+          "api_version",
+          "status",
+          "version",
+          "model",
+          "key_configured",
+          "model_status",
+          "ocr_available",
+          "docx_available",
+          "database",
+          "worker",
+          "capabilities",
+          "limits",
+          "inference_notice"
+        ],
+        "title": "HealthResponse",
+        "type": "object"
+      },
+      "Limits": {
+        "additionalProperties": false,
+        "properties": {
+          "files_per_batch": {
+            "default": 80,
+            "title": "Files Per Batch",
+            "type": "integer"
+          },
+          "megabytes_per_file": {
+            "default": 25,
+            "title": "Megabytes Per File",
+            "type": "integer"
+          },
+          "pages_per_file": {
+            "default": 200,
+            "title": "Pages Per File",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "files_per_batch",
+          "megabytes_per_file",
+          "pages_per_file"
+        ],
+        "title": "Limits",
+        "type": "object"
+      },
+      "Page": {
+        "additionalProperties": false,
+        "properties": {
+          "height": {
+            "title": "Height",
+            "type": "number"
+          },
+          "number": {
+            "title": "Number",
+            "type": "integer"
+          },
+          "spans": {
+            "items": {
+              "$ref": "#/components/schemas/Span"
+            },
+            "title": "Spans",
+            "type": "array"
+          },
+          "status": {
+            "default": "read",
+            "enum": [
+              "read",
+              "unreadable",
+              "error"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "warnings": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Warnings",
+            "type": "array"
+          },
+          "width": {
+            "title": "Width",
+            "type": "number"
+          }
+        },
+        "required": [
+          "number",
+          "width",
+          "height",
+          "spans",
+          "status",
+          "warnings"
+        ],
+        "title": "Page",
+        "type": "object"
+      },
+      "Portfolio": {
+        "additionalProperties": false,
+        "properties": {
+          "as_of": {
+            "title": "As Of",
+            "type": "string"
+          },
+          "comparisons": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Comparisons",
+            "type": "object"
+          },
+          "conflicts": {
+            "items": {
+              "$ref": "#/components/schemas/ConflictAssessment"
+            },
+            "title": "Conflicts",
+            "type": "array"
+          },
+          "coverage": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Coverage",
+            "type": "object"
+          },
+          "documents": {
+            "items": {
+              "$ref": "#/components/schemas/Document"
+            },
+            "title": "Documents",
+            "type": "array"
+          },
+          "events": {
+            "items": {
+              "$ref": "#/components/schemas/Event"
+            },
+            "title": "Events",
+            "type": "array"
+          },
+          "horizon_end": {
+            "title": "Horizon End",
+            "type": "string"
+          },
+          "issues": {
+            "items": {
+              "$ref": "#/components/schemas/ReviewIssue"
+            },
+            "title": "Issues",
+            "type": "array"
+          },
+          "mode": {
+            "title": "Mode",
+            "type": "string"
+          },
+          "parties": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Parties",
+            "type": "array"
+          },
+          "sme": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sme"
+          }
+        },
+        "required": [
+          "mode",
+          "as_of",
+          "horizon_end",
+          "sme",
+          "parties",
+          "documents",
+          "events",
+          "issues",
+          "conflicts",
+          "comparisons",
+          "coverage"
+        ],
+        "title": "Portfolio",
+        "type": "object"
+      },
+      "ReviewIssue": {
+        "additionalProperties": false,
+        "properties": {
+          "document_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Document Ids",
+            "type": "array"
+          },
+          "established": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Established",
+            "type": "array"
+          },
+          "evidence": {
+            "items": {
+              "$ref": "#/components/schemas/Evidence"
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "default": "uncertainty",
+            "title": "Kind",
+            "type": "string"
+          },
+          "lawyer_question": {
+            "title": "Lawyer Question",
+            "type": "string"
+          },
+          "missing_facts": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Missing Facts",
+            "type": "array"
+          },
+          "mode": {
+            "default": "live",
+            "enum": [
+              "live",
+              "sample"
+            ],
+            "title": "Mode",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "urgency": {
+            "default": "Review before relying on this provision.",
+            "title": "Urgency",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "document_ids",
+          "title",
+          "established",
+          "missing_facts",
+          "lawyer_question",
+          "urgency",
+          "evidence",
+          "kind",
+          "mode"
+        ],
+        "title": "ReviewIssue",
+        "type": "object"
+      },
+      "Span": {
+        "additionalProperties": false,
+        "properties": {
+          "bbox": {
+            "items": {
+              "type": "number"
+            },
+            "title": "Bbox",
+            "type": "array"
+          },
+          "clause": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Clause"
+          },
+          "document_id": {
+            "title": "Document Id",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "ocr_confidence": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ocr Confidence"
+          },
+          "page": {
+            "title": "Page",
+            "type": "integer"
+          },
+          "source": {
+            "enum": [
+              "native",
+              "ocr"
+            ],
+            "title": "Source",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "document_id",
+          "page",
+          "text",
+          "bbox",
+          "source",
+          "ocr_confidence",
+          "clause"
+        ],
+        "title": "Span",
+        "type": "object"
+      },
+      "Verdict": {
+        "additionalProperties": false,
+        "properties": {
+          "item_id": {
+            "title": "Item Id",
+            "type": "string"
+          },
+          "missing_context": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Missing Context",
+            "type": "array"
+          },
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "supported",
+              "uncertain",
+              "rejected"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "item_id",
+          "status",
+          "reason",
+          "missing_context"
+        ],
+        "title": "Verdict",
+        "type": "object"
+      },
+      "WorkerStatus": {
+        "additionalProperties": false,
+        "properties": {
+          "enabled": {
+            "default": false,
+            "title": "Enabled",
+            "type": "boolean"
+          },
+          "running": {
+            "default": false,
+            "title": "Running",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "enabled",
+          "running"
+        ],
+        "title": "WorkerStatus",
+        "type": "object"
+      }
+    }
+  },
+  "info": {
+    "title": "AITHENA evidence API",
+    "version": "2026-09-05.1"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/api/batches": {
+      "post": {
+        "operationId": "disabled_api_batches_post",
+        "responses": {
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Disabled"
+      }
+    },
+    "/api/batches/{batch_id}": {
+      "get": {
+        "operationId": "batch_api_batches__batch_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "batch_id",
+            "required": true,
+            "schema": {
+              "title": "Batch Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Implemented"
+          }
+        },
+        "summary": "Batch"
+      }
+    },
+    "/api/demo": {
+      "post": {
+        "operationId": "disabled_api_demo_post",
+        "responses": {
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Disabled"
+      }
+    },
+    "/api/documents/{document_id}": {
+      "get": {
+        "operationId": "document_api_documents__document_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "document_id",
+            "required": true,
+            "schema": {
+              "title": "Document Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Document"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Implemented"
+          }
+        },
+        "summary": "Document"
+      }
+    },
+    "/api/documents/{document_id}/original": {
+      "get": {
+        "operationId": "disabled_api_documents__document_id__original_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Implemented"
+          }
+        },
+        "summary": "Disabled"
+      }
+    },
+    "/api/documents/{document_id}/pages": {
+      "get": {
+        "operationId": "disabled_api_documents__document_id__pages_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/Page"
+                  },
+                  "title": "Response Disabled Api Documents  Document Id  Pages Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Implemented"
+          }
+        },
+        "summary": "Disabled"
+      }
+    },
+    "/api/documents/{document_id}/pages/{number}/image": {
+      "get": {
+        "operationId": "disabled_api_documents__document_id__pages__number__image_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Implemented"
+          }
+        },
+        "summary": "Disabled"
+      }
+    },
+    "/api/health": {
+      "get": {
+        "operationId": "health_api_health_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Implemented"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Health"
+      }
+    },
+    "/api/jobs": {
+      "get": {
+        "operationId": "jobs_api_jobs_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "mode",
+            "required": false,
+            "schema": {
+              "default": "live",
+              "enum": [
+                "live",
+                "sample"
+              ],
+              "title": "Mode",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Implemented"
+          }
+        },
+        "summary": "Jobs"
+      }
+    },
+    "/api/portfolio": {
+      "get": {
+        "operationId": "portfolio_api_portfolio_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "mode",
+            "required": false,
+            "schema": {
+              "default": "live",
+              "enum": [
+                "live",
+                "sample"
+              ],
+              "title": "Mode",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "as_of",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "As Of"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Portfolio"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Implemented"
+          }
+        },
+        "summary": "Portfolio"
+      }
+    },
+    "/api/retry": {
+      "post": {
+        "operationId": "disabled_api_retry_post",
+        "responses": {
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Disabled"
+      }
+    },
+    "/api/review/{issue_id}/brief": {
+      "get": {
+        "operationId": "disabled_api_review__issue_id__brief_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Implemented"
+          }
+        },
+        "summary": "Disabled"
+      }
+    },
+    "/api/settings/sme": {
+      "post": {
+        "operationId": "disabled_api_settings_sme_post",
+        "responses": {
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "501": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Disabled"
+      }
+    }
+  }
+}

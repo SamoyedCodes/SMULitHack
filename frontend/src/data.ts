@@ -56,7 +56,8 @@ export function parsePortfolio(input: unknown): Portfolio {
 }
 
 export const demoPortfolio = parsePortfolio(sample)
-export const apiBase = (import.meta.env.VITE_API_BASE_URL ?? '').replace(/\/$/, '')
+// Historical fixture adapter only. Live API types and requests live in api.ts.
+export const apiBase = ''
 export function daysBetween(from: string, to: string) {
   return Math.round((Date.parse(`${to}T00:00:00Z`) - Date.parse(`${from}T00:00:00Z`)) / 86400000)
 }
@@ -74,14 +75,6 @@ export function validateFiles(files: File[]) {
     if (file.size === 0 || file.size > 20 * 1024 * 1024) throw new Error(`${file.name}: files must be nonempty and at most 20 MB.`)
   }
 }
-async function request(path: string, options?: RequestInit) {
-  const response = await fetch(`${apiBase}${path}`, { ...options, signal: AbortSignal.timeout(60000) })
-  if (!response.ok) throw new Error(`Server returned ${response.status}. Please try again.`)
-  return response.json()
-}
-export async function fetchPortfolio() { return parsePortfolio(await request('/portfolio')) }
-export async function uploadDocument(file: File): Promise<OcrDocument> {
-  const body = new FormData()
-  body.append('file', file)
-  return documentSchema.parse(await request('/documents', { method: 'POST', body }))
-}
+// Network behavior is deliberately disabled in the legacy prototype.
+export async function fetchPortfolio(): Promise<Portfolio> { throw new Error('Prototype only. Use the canonical live API client.') }
+export async function uploadDocument(_file: File): Promise<OcrDocument> { throw new Error('Ingestion is not enabled in Phase 1.') }

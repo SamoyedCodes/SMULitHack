@@ -1,6 +1,6 @@
 import { describe, expect, it, vi, afterEach } from 'vitest'
 import { renderToStaticMarkup } from 'react-dom/server'
-import App from './App'
+import PrototypeDashboard from './PrototypeDashboard'
 import { demoPortfolio, parsePortfolio, daysBetween, upcomingActions, validateFiles, fetchPortfolio, uploadDocument } from './data'
 
 afterEach(() => vi.unstubAllGlobals())
@@ -78,31 +78,8 @@ describe('upload validation', () => {
   })
 })
 
-describe('HTTP adapter', () => {
-  it('validates a successful portfolio response', async () => {
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(JSON.stringify(demoPortfolio))))
-    expect(await fetchPortfolio()).toEqual(demoPortfolio)
-  })
-  it('reports backend failures without substituting demo records', async () => {
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response('failed', { status: 500 })))
-    await expect(fetchPortfolio()).rejects.toThrow('500')
-  })
-  it('sends multipart file uploads and validates the returned document', async () => {
-    const fetchMock = vi.fn().mockResolvedValue(new Response(JSON.stringify(demoPortfolio.documents[0]), { status: 202 }))
-    vi.stubGlobal('fetch', fetchMock)
-    const file = new File(['sample'], 'contract.pdf')
-    expect((await uploadDocument(file)).id).toBe('doc-cloud')
-    const [url, options] = fetchMock.mock.calls[0]
-    expect(url).toBe('/documents')
-    expect(options.method).toBe('POST')
-    expect((options.body as FormData).get('file')).toBe(file)
-  })
-})
-
-it('renders a useful sample dashboard with its uncertainty visible', () => {
-  const markup = renderToStaticMarkup(<App />)
-  expect(markup).toContain('Portfolio overview')
+it('retains the isolated synthetic prototype for future component reuse', () => {
+  const markup = renderToStaticMarkup(<PrototypeDashboard />)
   expect(markup).toContain('Sample workspace')
   expect(markup).toContain('Needs review')
-  expect(markup).toContain('Overlapping distribution commitments')
 })

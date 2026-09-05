@@ -1,0 +1,23 @@
+{
+  "mode": "live",
+  "as_of": "2026-09-05",
+  "horizon_end": "2026-12-04",
+  "sme": null,
+  "parties": [],
+  "documents": [],
+  "events": [],
+  "issues": [],
+  "conflicts": [],
+  "comparisons": {
+    "pending": 0,
+    "assessed": 0,
+    "failed": 0
+  },
+  "coverage": {
+    "total": 0,
+    "analyzed": 0,
+    "pages": 0,
+    "pages_read": 0,
+    "pages_analyzed": 0
+  }
+}

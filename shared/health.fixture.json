@@ -1,0 +1,31 @@
+{
+  "api_version": "1",
+  "status": "ready",
+  "version": "2026-09-05.1",
+  "model": "gemini-3.8-flash",
+  "key_configured": false,
+  "model_status": "not_configured",
+  "ocr_available": false,
+  "docx_available": false,
+  "database": {
+    "status": "ready"
+  },
+  "worker": {
+    "enabled": false,
+    "running": false
+  },
+  "capabilities": {
+    "ingestion": false,
+    "extraction": false,
+    "deadlines": false,
+    "conflicts": false,
+    "handoff": false,
+    "sample_workspace": false
+  },
+  "limits": {
+    "files_per_batch": 80,
+    "megabytes_per_file": 25,
+    "pages_per_file": 200
+  },
+  "inference_notice": "When analysis is enabled, extracted contract text is sent to Gemini. Original files and saved results stay local."
+}
