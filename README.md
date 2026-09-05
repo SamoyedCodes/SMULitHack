@@ -3,7 +3,7 @@
 > Current checkpoint: Phases 1–6 are integrated. Local ingestion, explicit OpenRouter/Gemini extraction, grounded deadline calculations, automatic distribution comparisons, and review/printable lawyer briefs are enabled. Phase 7 evaluation and sample loading remain outside this checkpoint. See [combined integration verification](docs/PHASE_4_6_INTEGRATION.md).
 
 
-Phase 2 adds batch ingestion and real source viewing to Builder 2's React interface and the local FastAPI/SQLite foundation. Upload PDFs, DOCX, PNGs or JPEGs (including scans), inspect every physical page, and select text blocks to highlight their source locations. Local reading needs no model key. Requested extraction and automatically allowed conflict comparisons send extracted text to a configured provider.
+AITHENA is a local contract workspace built on a React interface over a local FastAPI/SQLite foundation. Phases 1–6 are integrated into a single pipeline: batch ingestion, physical-page source viewing, explicit provider extraction, grounded deadline calendars, automatic distribution comparisons, and review/printable lawyer briefs. Upload PDFs, DOCX, PNGs or JPEGs (including scans), inspect every physical page, and select text blocks to highlight their source locations. Local reading needs no model key. Requested extraction and automatically allowed conflict comparisons send extracted text to a configured provider.
 
 The navy/blue dashboard styling and navigation are retained. The earlier synthetic dashboard is preserved in `frontend/src/PrototypeDashboard.tsx` for component reuse and fixture tests; it is not loaded by the application. Its legacy sample schema is **not** the backend integration contract. Live types are generated from Python into `shared/api.generated.ts`.
 
@@ -90,7 +90,7 @@ Neither schema export nor app import initializes storage or starts a worker. Tes
 
 The original coupled worker in `backend/analysis_worker.py` remains inactive. Calendar projection and lawyer brief assembly are read-only and do not call a model or enqueue work.
 
-See [integration contract](docs/INTEGRATION.md), [phased implementation plan](IMPLEMENTATION_PLAN.md), [Phase 2 verification](PHASE_2_COMPLETION.md) and [Phase 3 handoff](docs/PHASE_3_HANDOFF.md).
+See [integration contract](docs/INTEGRATION.md), [phased implementation plan](IMPLEMENTATION_PLAN.md), the [combined Phase 4–6 integration verification](docs/PHASE_4_6_INTEGRATION.md), and the per-phase completion notes: [Phase 1](PHASE_1_COMPLETION.md), [Phase 2](PHASE_2_COMPLETION.md), [Phase 3](docs/PHASE_3_COMPLETION.md), [Phase 4](docs/PHASE_4_COMPLETION.md), [Phase 5](docs/PHASE_5_COMPLETION.md) and [Phase 6](docs/PHASE_6_COMPLETION.md).
 
 ## Ingest and inspect
 
