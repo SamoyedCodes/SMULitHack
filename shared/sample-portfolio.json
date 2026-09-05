@@ -1,0 +1,613 @@
+{
+  "schema_version": "1.0",
+  "as_of": "2026-09-05",
+  "documents": [
+    {
+      "id": "doc-cloud",
+      "filename": "cloud.pdf",
+      "status": "ready",
+      "pages": [
+        {
+          "number": 1,
+          "text": "Meridian Pte Ltd and Cloudline Pte Ltd\n\nThe term runs from 1 December 2025 to 30 November 2026.\n\nThe subscription renews for one year unless either party gives written notice at least 60 calendar days before 30 November 2026.\n\nEither party may terminate for a material breach not remedied within 30 days of written notice.",
+          "method": "native",
+          "quality": "good"
+        },
+        {
+          "number": 2,
+          "text": "S$40,000 annually, payable within 30 days of invoice.\n\nAggregate liability is capped at fees paid in the preceding 12 months.\n\nNeither party shall disclose the other party’s confidential information.",
+          "method": "native",
+          "quality": "good"
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "doc-northstar",
+      "filename": "northstar.pdf",
+      "status": "ready",
+      "pages": [
+        {
+          "number": 1,
+          "text": "Meridian Pte Ltd and Northstar Trading Pte Ltd\n\nThe term runs from 1 January 2026 to 31 December 2026.\n\nThe agreement expires on 31 December 2026 unless renewed in writing.\n\nEither party may terminate for a material breach not remedied within 30 days of written notice.",
+          "method": "native",
+          "quality": "good"
+        },
+        {
+          "number": 2,
+          "text": "S$8,000 monthly, payable within 30 days of invoice.\n\nAggregate liability shall not exceed S$50,000.\n\nMeridian appoints Northstar as its exclusive distributor for the Atlas product in Singapore during the term.",
+          "method": "native",
+          "quality": "good"
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "doc-harbour",
+      "filename": "harbour.pdf",
+      "status": "ready",
+      "pages": [
+        {
+          "number": 1,
+          "text": "Meridian Pte Ltd and Harbour Retail Pte Ltd\n\nThe term runs from 1 September 2026 to 31 October 2026.\n\nThis agreement does not renew automatically.\n\nEither party may terminate if the other party becomes insolvent.",
+          "method": "native",
+          "quality": "good"
+        },
+        {
+          "number": 2,
+          "text": "S$12,000 for the Atlas product, payable on delivery.\n\nAggregate liability shall not exceed S$12,000.\n\nMeridian shall sell the Atlas product directly to Harbour for resale in Singapore on 15 October 2026.",
+          "method": "native",
+          "quality": "good"
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "doc-studio",
+      "filename": "studio.pdf",
+      "status": "ready",
+      "pages": [
+        {
+          "number": 1,
+          "text": "Meridian Pte Ltd and Studio Eight Pte Ltd\n\nThe term runs from 1 January 2026 to 31 October 2026.\n\nAny extension requires a new written agreement.\n\nThe tenant may terminate by giving two months’ written notice.",
+          "method": "ocr",
+          "quality": "good"
+        },
+        {
+          "number": 2,
+          "text": "S$4,500 monthly, payable on the first day of each month.\n\n[Illegible text in supplied scan]\n\nThe premises may be used only as an office.",
+          "method": "ocr",
+          "quality": "poor"
+        }
+      ],
+      "error": null
+    }
+  ],
+  "contracts": [
+    {
+      "id": "cloud",
+      "document_id": "doc-cloud",
+      "name": "Cloudline software subscription",
+      "category": "Software",
+      "fields": {
+        "parties": {
+          "value": "Meridian Pte Ltd and Cloudline Pte Ltd",
+          "basis": "found",
+          "confidence": "high",
+          "reason": "Explicit wording located in the supplied sample.",
+          "evidence": [
+            {
+              "document_id": "doc-cloud",
+              "page": 1,
+              "clause": "1",
+              "quote": "Meridian Pte Ltd and Cloudline Pte Ltd"
+            }
+          ]
+        },
+        "term": {
+          "value": "The term runs from 1 December 2025 to 30 November 2026.",
+          "basis": "found",
+          "confidence": "high",
+          "reason": "Explicit wording located in the supplied sample.",
+          "evidence": [
+            {
+              "document_id": "doc-cloud",
+              "page": 1,
+              "clause": "2",
+              "quote": "The term runs from 1 December 2025 to 30 November 2026."
+            }
+          ]
+        },
+        "renewal": {
+          "value": "The subscription renews for one year unless either party gives written notice at least 60 calendar days before 30 November 2026.",
+          "basis": "found",
+          "confidence": "high",
+          "reason": "Explicit wording located in the supplied sample.",
+          "evidence": [
+            {
+              "document_id": "doc-cloud",
+              "page": 1,
+              "clause": "3",
+              "quote": "The subscription renews for one year unless either party gives written notice at least 60 calendar days before 30 November 2026."
+            }
+          ]
+        },
+        "termination": {
+          "value": "Either party may terminate for a material breach not remedied within 30 days of written notice.",
+          "basis": "found",
+          "confidence": "high",
+          "reason": "Explicit wording located in the supplied sample.",
+          "evidence": [
+            {
+              "document_id": "doc-cloud",
+              "page": 1,
+              "clause": "4",
+              "quote": "Either party may terminate for a material breach not remedied within 30 days of written notice."
+            }
+          ]
+        },
+        "payment": {
+          "value": "S$40,000 annually, payable within 30 days of invoice.",
+          "basis": "found",
+          "confidence": "high",
+          "reason": "Explicit wording located in the supplied sample.",
+          "evidence": [
+            {
+              "document_id": "doc-cloud",
+              "page": 2,
+              "clause": "5",
+              "quote": "S$40,000 annually, payable within 30 days of invoice."
+            }
+          ]
+        },
+        "liability": {
+          "value": "Aggregate liability is capped at fees paid in the preceding 12 months.",
+          "basis": "found",
+          "confidence": "high",
+          "reason": "Explicit wording located in the supplied sample.",
+          "evidence": [
+            {
+              "document_id": "doc-cloud",
+              "page": 2,
+              "clause": "6",
+              "quote": "Aggregate liability is capped at fees paid in the preceding 12 months."
+            }
+          ]
+        },
+        "restrictions": {
+          "value": "Neither party shall disclose the other party’s confidential information.",
+          "basis": "found",
+          "confidence": "high",
+          "reason": "Explicit wording located in the supplied sample.",
+          "evidence": [
+            {
+              "document_id": "doc-cloud",
+              "page": 2,
+              "clause": "7",
+              "quote": "Neither party shall disclose the other party’s confidential information."
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "northstar",
+      "document_id": "doc-northstar",
+      "name": "Northstar distribution agreement",
+      "category": "Distribution",
+      "fields": {
+        "parties": {
+          "value": "Meridian Pte Ltd and Northstar Trading Pte Ltd",
+          "basis": "found",
+          "confidence": "high",
+          "reason": "Explicit wording located in the supplied sample.",
+          "evidence": [
+            {
+              "document_id": "doc-northstar",
+              "page": 1,
+              "clause": "1",
+              "quote": "Meridian Pte Ltd and Northstar Trading Pte Ltd"
+            }
+          ]
+        },
+        "term": {
+          "value": "The term runs from 1 January 2026 to 31 December 2026.",
+          "basis": "found",
+          "confidence": "high",
+          "reason": "Explicit wording located in the supplied sample.",
+          "evidence": [
+            {
+              "document_id": "doc-northstar",
+              "page": 1,
+              "clause": "2",
+              "quote": "The term runs from 1 January 2026 to 31 December 2026."
+            }
+          ]
+        },
+        "renewal": {
+          "value": "The agreement expires on 31 December 2026 unless renewed in writing.",
+          "basis": "found",
+          "confidence": "high",
+          "reason": "Explicit wording located in the supplied sample.",
+          "evidence": [
+            {
+              "document_id": "doc-northstar",
+              "page": 1,
+              "clause": "3",
+              "quote": "The agreement expires on 31 December 2026 unless renewed in writing."
+            }
+          ]
+        },
+        "termination": {
+          "value": "Either party may terminate for a material breach not remedied within 30 days of written notice.",
+          "basis": "found",
+          "confidence": "high",
+          "reason": "Explicit wording located in the supplied sample.",
+          "evidence": [
+            {
+              "document_id": "doc-northstar",
+              "page": 1,
+              "clause": "4",
+              "quote": "Either party may terminate for a material breach not remedied within 30 days of written notice."
+            }
+          ]
+        },
+        "payment": {
+          "value": "S$8,000 monthly, payable within 30 days of invoice.",
+          "basis": "found",
+          "confidence": "high",
+          "reason": "Explicit wording located in the supplied sample.",
+          "evidence": [
+            {
+              "document_id": "doc-northstar",
+              "page": 2,
+              "clause": "5",
+              "quote": "S$8,000 monthly, payable within 30 days of invoice."
+            }
+          ]
+        },
+        "liability": {
+          "value": "Aggregate liability shall not exceed S$50,000.",
+          "basis": "found",
+          "confidence": "high",
+          "reason": "Explicit wording located in the supplied sample.",
+          "evidence": [
+            {
+              "document_id": "doc-northstar",
+              "page": 2,
+              "clause": "6",
+              "quote": "Aggregate liability shall not exceed S$50,000."
+            }
+          ]
+        },
+        "restrictions": {
+          "value": "Meridian appoints Northstar as its exclusive distributor for the Atlas product in Singapore during the term.",
+          "basis": "found",
+          "confidence": "high",
+          "reason": "Explicit wording located in the supplied sample.",
+          "evidence": [
+            {
+              "document_id": "doc-northstar",
+              "page": 2,
+              "clause": "7",
+              "quote": "Meridian appoints Northstar as its exclusive distributor for the Atlas product in Singapore during the term."
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "harbour",
+      "document_id": "doc-harbour",
+      "name": "Harbour sales agreement",
+      "category": "Customer",
+      "fields": {
+        "parties": {
+          "value": "Meridian Pte Ltd and Harbour Retail Pte Ltd",
+          "basis": "found",
+          "confidence": "high",
+          "reason": "Explicit wording located in the supplied sample.",
+          "evidence": [
+            {
+              "document_id": "doc-harbour",
+              "page": 1,
+              "clause": "1",
+              "quote": "Meridian Pte Ltd and Harbour Retail Pte Ltd"
+            }
+          ]
+        },
+        "term": {
+          "value": "The term runs from 1 September 2026 to 31 October 2026.",
+          "basis": "found",
+          "confidence": "high",
+          "reason": "Explicit wording located in the supplied sample.",
+          "evidence": [
+            {
+              "document_id": "doc-harbour",
+              "page": 1,
+              "clause": "2",
+              "quote": "The term runs from 1 September 2026 to 31 October 2026."
+            }
+          ]
+        },
+        "renewal": {
+          "value": "This agreement does not renew automatically.",
+          "basis": "found",
+          "confidence": "high",
+          "reason": "Explicit wording located in the supplied sample.",
+          "evidence": [
+            {
+              "document_id": "doc-harbour",
+              "page": 1,
+              "clause": "3",
+              "quote": "This agreement does not renew automatically."
+            }
+          ]
+        },
+        "termination": {
+          "value": "Either party may terminate if the other party becomes insolvent.",
+          "basis": "found",
+          "confidence": "high",
+          "reason": "Explicit wording located in the supplied sample.",
+          "evidence": [
+            {
+              "document_id": "doc-harbour",
+              "page": 1,
+              "clause": "4",
+              "quote": "Either party may terminate if the other party becomes insolvent."
+            }
+          ]
+        },
+        "payment": {
+          "value": "S$12,000 for the Atlas product, payable on delivery.",
+          "basis": "found",
+          "confidence": "high",
+          "reason": "Explicit wording located in the supplied sample.",
+          "evidence": [
+            {
+              "document_id": "doc-harbour",
+              "page": 2,
+              "clause": "5",
+              "quote": "S$12,000 for the Atlas product, payable on delivery."
+            }
+          ]
+        },
+        "liability": {
+          "value": "Aggregate liability shall not exceed S$12,000.",
+          "basis": "found",
+          "confidence": "high",
+          "reason": "Explicit wording located in the supplied sample.",
+          "evidence": [
+            {
+              "document_id": "doc-harbour",
+              "page": 2,
+              "clause": "6",
+              "quote": "Aggregate liability shall not exceed S$12,000."
+            }
+          ]
+        },
+        "restrictions": {
+          "value": "Meridian shall sell the Atlas product directly to Harbour for resale in Singapore on 15 October 2026.",
+          "basis": "found",
+          "confidence": "high",
+          "reason": "Explicit wording located in the supplied sample.",
+          "evidence": [
+            {
+              "document_id": "doc-harbour",
+              "page": 2,
+              "clause": "7",
+              "quote": "Meridian shall sell the Atlas product directly to Harbour for resale in Singapore on 15 October 2026."
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "studio",
+      "document_id": "doc-studio",
+      "name": "Studio Eight office lease",
+      "category": "Property",
+      "fields": {
+        "parties": {
+          "value": "Meridian Pte Ltd and Studio Eight Pte Ltd",
+          "basis": "found",
+          "confidence": "high",
+          "reason": "Explicit wording located in the supplied sample.",
+          "evidence": [
+            {
+              "document_id": "doc-studio",
+              "page": 1,
+              "clause": "1",
+              "quote": "Meridian Pte Ltd and Studio Eight Pte Ltd"
+            }
+          ]
+        },
+        "term": {
+          "value": "The term runs from 1 January 2026 to 31 October 2026.",
+          "basis": "found",
+          "confidence": "high",
+          "reason": "Explicit wording located in the supplied sample.",
+          "evidence": [
+            {
+              "document_id": "doc-studio",
+              "page": 1,
+              "clause": "2",
+              "quote": "The term runs from 1 January 2026 to 31 October 2026."
+            }
+          ]
+        },
+        "renewal": {
+          "value": "Any extension requires a new written agreement.",
+          "basis": "found",
+          "confidence": "high",
+          "reason": "Explicit wording located in the supplied sample.",
+          "evidence": [
+            {
+              "document_id": "doc-studio",
+              "page": 1,
+              "clause": "3",
+              "quote": "Any extension requires a new written agreement."
+            }
+          ]
+        },
+        "termination": {
+          "value": "The tenant may terminate by giving two months’ written notice.",
+          "basis": "found",
+          "confidence": "high",
+          "reason": "Explicit wording located in the supplied sample.",
+          "evidence": [
+            {
+              "document_id": "doc-studio",
+              "page": 1,
+              "clause": "4",
+              "quote": "The tenant may terminate by giving two months’ written notice."
+            }
+          ]
+        },
+        "payment": {
+          "value": "S$4,500 monthly, payable on the first day of each month.",
+          "basis": "found",
+          "confidence": "high",
+          "reason": "Explicit wording located in the supplied sample.",
+          "evidence": [
+            {
+              "document_id": "doc-studio",
+              "page": 2,
+              "clause": "5",
+              "quote": "S$4,500 monthly, payable on the first day of each month."
+            }
+          ]
+        },
+        "liability": {
+          "value": null,
+          "basis": "unresolved",
+          "confidence": "low",
+          "reason": "The liability clause is unreadable. Obtain a clearer copy before relying on a cap.",
+          "evidence": [
+            {
+              "document_id": "doc-studio",
+              "page": 2,
+              "clause": "6",
+              "quote": "[Illegible text in supplied scan]"
+            }
+          ]
+        },
+        "restrictions": {
+          "value": "The premises may be used only as an office.",
+          "basis": "found",
+          "confidence": "high",
+          "reason": "Explicit wording located in the supplied sample.",
+          "evidence": [
+            {
+              "document_id": "doc-studio",
+              "page": 2,
+              "clause": "7",
+              "quote": "The premises may be used only as an office."
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "actions": [
+    {
+      "id": "notice-cloud",
+      "contract_id": "cloud",
+      "title": "Send non-renewal notice",
+      "due_date": "2026-10-01",
+      "event_date": "2026-11-30",
+      "basis": "inferred",
+      "confidence": "high",
+      "reason": "30 November 2026 minus 60 calendar days. Date arithmetic is derived from the stated clause; delivery requirements still need checking.",
+      "evidence": [
+        {
+          "document_id": "doc-cloud",
+          "page": 1,
+          "clause": "3",
+          "quote": "The subscription renews for one year unless either party gives written notice at least 60 calendar days before 30 November 2026."
+        }
+      ]
+    },
+    {
+      "id": "delivery-harbour",
+      "contract_id": "harbour",
+      "title": "Deliver Atlas products",
+      "due_date": "2026-10-15",
+      "event_date": "2026-10-15",
+      "basis": "found",
+      "confidence": "high",
+      "reason": "Delivery date is stated in clause 7.",
+      "evidence": [
+        {
+          "document_id": "doc-harbour",
+          "page": 2,
+          "clause": "7",
+          "quote": "Meridian shall sell the Atlas product directly to Harbour for resale in Singapore on 15 October 2026."
+        }
+      ]
+    },
+    {
+      "id": "end-studio",
+      "contract_id": "studio",
+      "title": "Office lease expires",
+      "due_date": "2026-10-31",
+      "event_date": "2026-10-31",
+      "basis": "found",
+      "confidence": "high",
+      "reason": "Expiry is stated in the term. Renewal requires a separate written agreement.",
+      "evidence": [
+        {
+          "document_id": "doc-studio",
+          "page": 1,
+          "clause": "2",
+          "quote": "The term runs from 1 January 2026 to 31 October 2026."
+        }
+      ]
+    },
+    {
+      "id": "end-harbour",
+      "contract_id": "harbour",
+      "title": "Sales agreement expires",
+      "due_date": "2026-10-31",
+      "event_date": "2026-10-31",
+      "basis": "found",
+      "confidence": "high",
+      "reason": "Expiry is stated in the term.",
+      "evidence": [
+        {
+          "document_id": "doc-harbour",
+          "page": 1,
+          "clause": "2",
+          "quote": "The term runs from 1 September 2026 to 31 October 2026."
+        }
+      ]
+    }
+  ],
+  "conflicts": [
+    {
+      "id": "conflict-atlas",
+      "title": "Overlapping distribution commitments",
+      "contract_ids": [
+        "northstar",
+        "harbour"
+      ],
+      "summary": "Northstar is granted exclusive distribution of Atlas in Singapore. The Harbour agreement commits to direct sales for resale in the same territory during the same period.",
+      "question": "Does the Northstar exclusivity prohibit this direct sale, and are there waivers or amendments permitting the Harbour transaction?",
+      "confidence": "medium",
+      "evidence": [
+        {
+          "document_id": "doc-northstar",
+          "page": 2,
+          "clause": "7",
+          "quote": "Meridian appoints Northstar as its exclusive distributor for the Atlas product in Singapore during the term."
+        },
+        {
+          "document_id": "doc-harbour",
+          "page": 2,
+          "clause": "7",
+          "quote": "Meridian shall sell the Atlas product directly to Harbour for resale in Singapore on 15 October 2026."
+        }
+      ]
+    }
+  ]
+}

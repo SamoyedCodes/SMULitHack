@@ -1,1 +1,10 @@
+node_modules/
+.pnpm-store/
+dist/
+.env
+.env.local
+.env.*.local
+*.tsbuildinfo
 .DS_Store
+__pycache__/
+.venv/
