@@ -34,6 +34,57 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/conflicts/continue": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Continue Conflicts */
+        post: operations["continue_conflicts_api_conflicts_continue_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/conflicts/screening": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Conflict Screening */
+        get: operations["conflict_screening_api_conflicts_screening_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/conflicts/{comparison_id}/retry": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Retry Conflict */
+        post: operations["retry_conflict_api_conflicts__comparison_id__retry_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/demo": {
         parameters: {
             query?: never;
@@ -359,16 +410,37 @@ export interface components {
             confidence: "medium" | "low";
             /** Confidence Reason */
             confidence_reason: string;
+            /**
+             * Created At
+             * @default
+             */
+            created_at: string;
+            /**
+             * Current
+             * @default false
+             */
+            current: boolean;
+            /** Dimension Evidence */
+            dimension_evidence: {
+                [key: string]: components["schemas"]["Evidence"][];
+            };
             /** Documents */
             documents: string[];
             /** Evidence */
             evidence: components["schemas"]["Evidence"][];
+            /** Exception Evidence */
+            exception_evidence: components["schemas"]["Evidence"][][];
             /** Exceptions */
             exceptions: string[];
             /** Explanation */
             explanation: string;
             /** Id */
             id: string;
+            /**
+             * Input Revision
+             * @default
+             */
+            input_revision: string;
             /** Lawyer Question */
             lawyer_question: string;
             /** Missing Facts */
@@ -379,6 +451,8 @@ export interface components {
              * @enum {string}
              */
             mode: "live" | "sample";
+            /** Model Usage */
+            model_usage: components["schemas"]["ModelUse"][];
             /**
              * Provenance
              * @enum {string}
@@ -393,6 +467,132 @@ export interface components {
              * @enum {string}
              */
             status: "potential_conflict" | "no_conflict_identified_for_this_rule" | "insufficient_evidence";
+        };
+        /** ConflictScan */
+        ConflictScan: {
+            /**
+             * Allowance
+             * @default 10
+             */
+            allowance: number;
+            /**
+             * Assigned
+             * @default 0
+             */
+            assigned: number;
+            /**
+             * Blocked
+             * @default 0
+             */
+            blocked: number;
+            /**
+             * Can Continue
+             * @default false
+             */
+            can_continue: boolean;
+            /**
+             * Candidates
+             * @default 0
+             */
+            candidates: number;
+            /**
+             * Completed
+             * @default 0
+             */
+            completed: number;
+            /**
+             * Excluded
+             * @default 0
+             */
+            excluded: number;
+            /**
+             * Failed
+             * @default 0
+             */
+            failed: number;
+            /**
+             * Needs Evidence
+             * @default 0
+             */
+            needs_evidence: number;
+            /**
+             * Queued
+             * @default 0
+             */
+            queued: number;
+            /**
+             * Running
+             * @default 0
+             */
+            running: number;
+            /**
+             * State
+             * @default disabled
+             * @enum {string}
+             */
+            state: "disabled" | "awaiting_sme" | "ready" | "running" | "paused" | "needs_review";
+            /**
+             * Total Pairs
+             * @default 0
+             */
+            total_pairs: number;
+            /**
+             * Unchecked
+             * @default 0
+             */
+            unchecked: number;
+            /**
+             * Unprocessed Documents
+             * @default 0
+             */
+            unprocessed_documents: number;
+            /**
+             * Unscreened
+             * @default 0
+             */
+            unscreened: number;
+            /**
+             * Waiting
+             * @default 0
+             */
+            waiting: number;
+        };
+        /** ConflictScreen */
+        ConflictScreen: {
+            /**
+             * Current
+             * @default true
+             */
+            current: boolean;
+            /** Documents */
+            documents: string[];
+            /** Error */
+            error: string | null;
+            /** Evidence */
+            evidence: components["schemas"]["Evidence"][];
+            /** Id */
+            id: string;
+            /** Job State */
+            job_state: string | null;
+            /** Missing Facts */
+            missing_facts: string[];
+            /**
+             * Mode
+             * @enum {string}
+             */
+            mode: "live" | "sample";
+            /**
+             * Outcome
+             * @enum {string}
+             */
+            outcome: "candidate" | "excluded" | "needs_evidence";
+            /**
+             * Priority
+             * @default 1
+             */
+            priority: number;
+            /** Reason */
+            reason: string;
         };
         /** DatabaseStatus */
         DatabaseStatus: {
@@ -759,6 +959,7 @@ export interface components {
             comparisons: {
                 [key: string]: number;
             };
+            conflict_scan: components["schemas"]["ConflictScan"];
             /** Conflicts */
             conflicts: components["schemas"]["ConflictAssessment"][];
             /** Coverage */
@@ -1113,6 +1314,265 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["BatchResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request Entity Too Large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Implemented */
+            501: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    continue_conflicts_api_conflicts_continue_post: {
+        parameters: {
+            query?: {
+                mode?: "live" | "sample";
+            };
+            header: {
+                "idempotency-key": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConflictScan"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request Entity Too Large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Implemented */
+            501: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    conflict_screening_api_conflicts_screening_get: {
+        parameters: {
+            query?: {
+                mode?: "live" | "sample";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConflictScreen"][];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request Entity Too Large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Implemented */
+            501: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    retry_conflict_api_conflicts__comparison_id__retry_post: {
+        parameters: {
+            query?: {
+                mode?: "live" | "sample";
+            };
+            header?: never;
+            path: {
+                comparison_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RetryResponse"];
                 };
             };
             /** @description Forbidden */

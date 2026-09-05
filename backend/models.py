@@ -176,6 +176,9 @@ class ConflictDraft(Record):
     status: Literal["potential_conflict", "no_conflict_identified_for_this_rule", "insufficient_evidence"]
     documents: list[str]
     scope_comparison: dict[str, str]
+    dimension_citations: dict[str, list[Citation]] = Field(default_factory=dict)
+    exception_citations: list[list[Citation]] = Field(default_factory=list)
+    time_overlap: Literal["yes", "no", "unknown"] = "unknown"
     citations: list[Citation]
     exceptions: list[str]
     missing_facts: list[str]
@@ -197,6 +200,12 @@ class ConflictAssessment(Record):
     confidence_reason: str
     provenance: Literal["inferred", "unresolved"]
     mode: Literal["live", "sample"] = "live"
+    input_revision: str = ""
+    created_at: str = ""
+    current: bool = False
+    dimension_evidence: dict[str, list[Evidence]] = Field(default_factory=dict)
+    exception_evidence: list[list[Evidence]] = Field(default_factory=list)
+    model_usage: list[ModelUse] = Field(default_factory=list)
 
 
 class ModelUse(Record):
@@ -235,6 +244,40 @@ class Document(Record):
     version: str
 
 
+class ConflictScreen(Record):
+    id: str
+    documents: list[str]
+    mode: Literal["live", "sample"]
+    outcome: Literal["candidate", "excluded", "needs_evidence"]
+    reason: str
+    evidence: list[Evidence] = Field(default_factory=list)
+    missing_facts: list[str] = Field(default_factory=list)
+    priority: int = 1
+    current: bool = True
+    job_state: str | None = None
+    error: str | None = None
+
+
+class ConflictScan(Record):
+    state: Literal["disabled", "awaiting_sme", "ready", "running", "paused", "needs_review"] = "disabled"
+    allowance: int = 10
+    assigned: int = 0
+    total_pairs: int = 0
+    unscreened: int = 0
+    candidates: int = 0
+    excluded: int = 0
+    needs_evidence: int = 0
+    unprocessed_documents: int = 0
+    completed: int = 0
+    unchecked: int = 0
+    queued: int = 0
+    running: int = 0
+    waiting: int = 0
+    blocked: int = 0
+    failed: int = 0
+    can_continue: bool = False
+
+
 class Portfolio(Record):
     mode: str
     as_of: str
@@ -246,6 +289,7 @@ class Portfolio(Record):
     issues: list[ReviewIssue]
     conflicts: list[ConflictAssessment]
     comparisons: dict[str, int]
+    conflict_scan: ConflictScan = Field(default_factory=ConflictScan)
     coverage: dict[str, int]
 
 

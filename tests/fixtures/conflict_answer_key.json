@@ -1,0 +1,10 @@
+{
+  "overlap": {"screen": "candidate", "status": "potential_conflict"},
+  "wording": {"screen": "candidate", "status": "potential_conflict"},
+  "online_exception": {"screen": "candidate", "status": "no_conflict_identified_for_this_rule"},
+  "missing_schedule": {"screen": "needs_evidence", "status": "insufficient_evidence"},
+  "unknown_consent": {"screen": "candidate", "status": "insufficient_evidence"},
+  "disjoint": {"screen": "excluded", "status": null},
+  "renewal_uncertain": {"screen": "candidate", "status": "insufficient_evidence"},
+  "missing_provisions": {"screen": "needs_evidence", "status": "insufficient_evidence"}
+}

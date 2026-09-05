@@ -1,6 +1,6 @@
 # AITHENA implementation phases
 
-Each phase has a separate acceptance boundary. The current integration implements Phases 1–3: foundation, local ingestion/source viewing, and explicitly requested grounded extraction. See `docs/PHASE_3_INTEGRATION.md` for merge verification and unverified model/accuracy limits. Ingestion and extraction are enabled; phases 4–7 remain planned. Builder 2 continues from `docs/PHASE_4_HANDOFF.md`; Builder 1 owns Phase 5 concurrently.
+Each phase has a separate acceptance boundary. This branch contains Phases 1–3 and Phase 5, with ingestion, extraction and distribution conflicts enabled. Phase 4 remains Builder 2’s independent work; Phase 6 and 7 remain outside this checkpoint. See `docs/PHASE_5_COMPLETION.md` for evidence and limits and `docs/PHASE_4_5_MERGE.md` before manually combining branches.
 
 ```mermaid
 flowchart LR
@@ -9,7 +9,7 @@ flowchart LR
     API --> HEALTH[Configuration / readiness / capabilities]
     API -. Phase 2 .-> WORKER[Durable single worker]
     WORKER -.-> PARSE[PyMuPDF / Tesseract / LibreOffice]
-    PARSE -. Phase 3 .-> LLM[Gemini extraction + support review]
+    PARSE -. Phase 3 .-> LLM[OpenRouter primary / Gemini secondary]
     LLM -.-> VERIFY[Python evidence validation]
     VERIFY -. Phase 4 .-> DATES[Python deadline engine]
     VERIFY -. Phase 5 .-> PAIRS[Python pair selection]
@@ -24,7 +24,7 @@ flowchart LR
 | 2. Ingestion and sources — implemented | Batch files/folders, originals/hashes, durable reading jobs, PDF/OCR/DOCX, every page with coordinates | Real clean/degraded scans and DOCX; duplicate/interrupted/error handling; local reading works without API key |
 | 3. Grounded extraction — integrated | LLM typed extraction/support review, eight required fields, citation validation, provenance/confidence, SME selection | Every assertion supported; unknowns explicit; quota/key failures visible; no silent truncation |
 | 4. Deadline calendar | Python offsets/windows/recurrence and 90-day event-or-action selection | Exact deadline fixtures pass; unknown triggers, business days and month-end ambiguity escalate |
-| 5. Distribution conflicts | Python candidates plus LLM scope/exception comparison, validated assessments | Exclusive/non-exclusive overlaps, exclusions, non-overlapping dates and missing schedules evaluated; no breach claims |
+| 5. Distribution conflicts — implemented on separate branch | Python candidates plus LLM scope/exception comparison, validated assessments | Exclusive/non-exclusive overlaps, exclusions, non-overlapping dates and missing schedules evaluated; no breach claims |
 | 6. Review and lawyer briefs | Review queue, cited issue summaries, missing facts and specific questions, printable/downloadable handoff | Lawyer can locate clauses and act on the issue; no automatic sending |
 | 7. Evaluation and demo | Real synthetic mixed-format corpus, reviewed answer key/holdout, measured accuracy/calibration, 80-file load test | Report actual field/citation/date/conflict metrics; planted unanswerable cases escalate; no hidden failures |
 

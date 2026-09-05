@@ -89,3 +89,23 @@ export async function extractDocument(id: string): Promise<void> {
   const body = await apiRequest(`/extract?document_id=${encodeURIComponent(id)}`, { method: 'POST' })
   if (!validateRetry(body)) throw new ApiError('validation', 'The extraction response does not match this build.')
 }
+
+export type ConflictAssessment = components['schemas']['ConflictAssessment']
+export type ConflictScreen = components['schemas']['ConflictScreen']
+const validateScreens = ajv.compile<ConflictScreen[]>({type:'array',items:{$ref:'aithena#/components/schemas/ConflictScreen'}})
+const validateScan = ajv.compile<components['schemas']['ConflictScan']>({$ref:'aithena#/components/schemas/ConflictScan'})
+export async function fetchConflictScreens(signal?:AbortSignal):Promise<ConflictScreen[]> {
+  const data=await apiRequest('/conflicts/screening',{signal})
+  if(!validateScreens(data))throw new ApiError('validation','Conflict screening does not match this build.')
+  return data
+}
+export async function continueConflicts(key:string) {
+  const data=await apiRequest('/conflicts/continue',{method:'POST',headers:{'Idempotency-Key':key}},false,120000)
+  if(!validateScan(data))throw new ApiError('validation','The conflict allowance response does not match this build.')
+  return data
+}
+export async function retryConflict(id:string) {
+  const data=await apiRequest(`/conflicts/${encodeURIComponent(id)}/retry`,{method:'POST'})
+  if(!validateRetry(data))throw new ApiError('validation','The comparison retry response does not match this build.')
+  return data
+}

@@ -14,7 +14,7 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from .config import VERSION, Config, libreoffice_path, tesseract_path
 from .foundation import CAPABILITIES, DatabaseStatus, ErrorResponse, HealthResponse, WorkerStatus, ProviderStatus
-from .models import Document, Page, Portfolio, BatchResponse, Job, RetryResponse, SmeSelection
+from .models import Document, Page, Portfolio, BatchResponse, Job, RetryResponse, SmeSelection, ConflictScan, ConflictScreen
 from .store import Store
 
 
@@ -65,6 +65,8 @@ def create_app(config: Config | None = None, start_worker: bool = True):
                 capability = "ingestion"
             elif re.fullmatch(r"/api/review/[^/]+/brief/?", path):
                 capability = "handoff"
+        if path.startswith('/api/conflicts/'):
+            capability = 'conflicts'
         if capability and not getattr(CAPABILITIES, capability):
             return error(501, "feature_not_enabled", f"{capability.replace('_', ' ').capitalize()} is not enabled in this build.")
         return await call_next(request)
@@ -107,13 +109,14 @@ def create_app(config: Config | None = None, start_worker: bool = True):
         store = request.app.state.store
         as_of = as_of or datetime.now(ZoneInfo("Asia/Singapore")).date()
         docs = store.documents(mode)
-        comparisons = store.comparisons(mode)
-        pairs = [j for j in store.jobs(mode) if j["kind"] == "conflict"]
+        from .conflict_service import snapshot
+        scan, _, comparisons, conflict_issues = snapshot(request.app.state.config, store, mode)
         return Portfolio(mode=mode, as_of=as_of.isoformat(), horizon_end=(as_of + timedelta(days=90)).isoformat(),
                          sme=store.setting("sme:" + mode), parties=sorted({p for doc in docs for p in doc.parties}),
-                         documents=docs, events=[], issues=[i for doc in docs for i in doc.issues], conflicts=comparisons,
-                         comparisons={"pending": sum(j["state"] != "complete" for j in pairs), "assessed": len(comparisons),
-                                      "failed": sum(j["state"] in {"failed", "blocked"} for j in pairs)},
+                         documents=docs, events=[], issues=[i for doc in docs for i in doc.issues] + conflict_issues, conflicts=comparisons,
+                         conflict_scan=scan,
+                         comparisons={"pending": scan.unchecked + scan.queued + scan.running + scan.waiting, "assessed": scan.completed,
+                                      "failed": scan.failed + scan.blocked},
                          coverage={"total": len(docs), "analyzed": sum(d.status in {"complete", "needs_review"} for d in docs),
                                    "pages": sum(d.page_count for d in docs), "pages_read": sum(d.pages_read for d in docs),
                                    "pages_analyzed": sum(d.pages_analyzed for d in docs)})
@@ -214,7 +217,33 @@ def create_app(config: Config | None = None, start_worker: bool = True):
         if selection.name is not None and selection.name not in parties:
             raise HTTPException(422, 'Choose a party established in this workspace.')
         store.set_setting('sme:' + selection.mode, selection.name)
+        from .conflict_service import reconcile
+        reconcile(request.app.state.config, store, selection.mode)
         return selection
+
+    @app.get('/api/conflicts/screening', response_model=list[ConflictScreen])
+    def conflict_screening(request: Request, mode: Literal['live','sample'] = 'live'):
+        from .conflict_service import snapshot
+        _, records, _, _ = snapshot(request.app.state.config, request.app.state.store, mode)
+        return [r for r in records if r.current]
+
+    @app.post('/api/conflicts/continue', response_model=ConflictScan)
+    def continue_conflicts(request: Request, idempotency_key: uuid.UUID = Header(...), mode: Literal['live','sample'] = 'live'):
+        from .conflict_service import reconcile, snapshot
+        try:
+            reconcile(request.app.state.config, request.app.state.store, mode, str(idempotency_key))
+        except ValueError as exc:
+            raise HTTPException(409, str(exc)) from None
+        return snapshot(request.app.state.config, request.app.state.store, mode)[0]
+
+    @app.post('/api/conflicts/{comparison_id}/retry', response_model=RetryResponse)
+    def retry_conflict(comparison_id: str, request: Request, mode: Literal['live','sample'] = 'live'):
+        from .conflict_service import retry_comparison
+        try:
+            count = retry_comparison(request.app.state.config, request.app.state.store, mode, comparison_id)
+        except ValueError as exc:
+            raise HTTPException(409, str(exc)) from None
+        return RetryResponse(resumed_jobs=count)
 
     def disabled():
         raise HTTPException(501, "This feature is not implemented in Phase 3.")

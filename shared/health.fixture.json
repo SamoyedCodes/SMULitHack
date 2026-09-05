@@ -1,7 +1,7 @@
 {
   "api_version": "1",
   "status": "ready",
-  "version": "2026-09-05.3-or1",
+  "version": "2026-09-05.5",
   "model": "openrouter/free",
   "providers": [
     {
@@ -34,7 +34,7 @@
     "ingestion": true,
     "extraction": true,
     "deadlines": false,
-    "conflicts": false,
+    "conflicts": true,
     "handoff": false,
     "sample_workspace": false
   },

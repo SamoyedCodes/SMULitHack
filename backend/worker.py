@@ -37,6 +37,12 @@ class Worker:
         from .foundation import CAPABILITIES
         if CAPABILITIES.extraction:
             self.store.recover('extract')
+        if CAPABILITIES.conflicts:
+            from .conflicts import JOB_KIND, CONFLICT_VERSION
+            from .conflict_service import reconcile
+            self.store.recover(JOB_KIND, CONFLICT_VERSION)
+            for mode in ('live','sample'):
+                reconcile(self.config, self.store, mode)
         self.thread = threading.Thread(target=self.run, name='aithena-ingestion', daemon=True)
         self.thread.start()
 
@@ -65,9 +71,14 @@ class Worker:
         from .foundation import CAPABILITIES
         if not job and CAPABILITIES.extraction:
             job = self.store.claim('extract')
+        if not job and CAPABILITIES.conflicts:
+            from .conflicts import JOB_KIND, CONFLICT_VERSION
+            job = self.store.claim(JOB_KIND, CONFLICT_VERSION)
         if not job:
             return False
         try:
+            if job['kind'] == 'conflict-v1':
+                return self.run_conflict_job(job)
             if job['kind'] == 'extract':
                 return self.run_extraction_job(job)
             self.process_document(job['payload']['document_id'])
@@ -140,6 +151,11 @@ class Worker:
         try:
             self.extract_document(job['payload']['document_id'])
             self.store.job_state(job['id'], 'complete')
+            from .conflict_service import reconcile
+            try:
+                reconcile(self.config, self.store, job['payload']['mode'])
+            except Exception:
+                logger.exception('Conflict screening failed after extraction; extraction remains complete.')
         except ProviderUnavailable as exc:
             self.store.job_state(job['id'], 'blocked', str(exc))
             self.mark_doc(job, 'awaiting_key', str(exc))
@@ -231,3 +247,20 @@ class Worker:
         doc.stage = "Analysis complete; review unresolved items" if doc.status == "needs_review" else "Analysis complete"
         doc.error = None
         self.store.put_document(doc)
+
+    def run_conflict_job(self, job):
+        from .llm import ModelClient, ProviderUnavailable, ProviderFailure, QuotaWait
+        from .conflict_service import process_comparison
+        try:
+            if self.llm is None:
+                self.llm = ModelClient(self.config, self.store)
+            process_comparison(self.config, self.store, job, self.llm)
+        except ProviderUnavailable as exc:
+            self.store.job_state(job['id'], 'blocked', str(exc))
+        except QuotaWait as exc:
+            self.store.job_state(job['id'], 'waiting', str(exc), exc.delay)
+        except Exception as exc:
+            logger.exception('Conflict comparison %s failed', job['id'])
+            message = str(exc) if isinstance(exc, ProviderFailure) else 'Conflict comparison failed; retry or inspect the local service logs.'
+            self.store.job_state(job['id'], 'failed', message)
+        return True

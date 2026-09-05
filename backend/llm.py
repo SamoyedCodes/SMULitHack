@@ -43,6 +43,11 @@ class ProviderFailure(Exception):
     pass
 
 
+class InvalidModelOutput(ProviderFailure):
+    """A returned answer cannot satisfy the evidence response contract."""
+    pass
+
+
 def text_context(pages: list[Page]) -> str:
     return "\n".join(
         f"[document_id={s.document_id} page={s.page} span_id={s.id} source={s.source}]\n{s.text}"
@@ -108,7 +113,12 @@ Read both documents, definitions, exceptions, consent, schedules, and evidence.
 One exclusive grant may conflict with a NON-exclusive grant to someone else.
 Different terminology is not proof of different scope. Dates are supplied by Python.
 Return a dimension-by-dimension scope_comparison with product, territory, activity,
-channel, parties, and time. Explain using citations to BOTH agreements.
+channel, customers, parties, and time. Supply dimension_citations for EVERY dimension,
+with passages from BOTH documents supporting that comparison. Supply one entry in
+exception_citations for each exception, in the same order. time_overlap must match the
+supported python_time_comparison: yes if any pair overlaps, no if ALL pairs are known
+disjoint, otherwise unknown. Unknown dates cannot establish a potential conflict.
+Do not hide missing facts needed to establish scope, identity, consent or exceptions. Explain using citations to BOTH agreements.
 Use potential_conflict for a grounded potential incompatibility (never actual breach).
 Use insufficient_evidence if overlap/exception/consent/missing context cannot be established.
 Use no_conflict_identified_for_this_rule only for a grounded exclusion for this pair/rule.
@@ -148,7 +158,7 @@ class Provider(Tasks):
                 if not isinstance(actual_model, str) or not actual_model:
                     raise ValueError()
             except (ValueError, KeyError, TypeError):
-                raise ProviderFailure('Saved model output could not be validated; no result was published.') from None
+                raise InvalidModelOutput('Saved model output could not be validated; no result was published.') from None
             self.last_use = ModelUse(provider=self.name, requested_model=self.model, model=actual_model, purpose=schema.__name__, cached=True)
             return result
         if not self.api_key:
@@ -165,7 +175,7 @@ class Provider(Tasks):
         try:
             text, actual_model = self.request(purpose, serialized, schema)
             if not isinstance(text, str) or not text.strip():
-                raise ProviderFailure('The model returned no structured answer. The item remains unresolved.')
+                raise InvalidModelOutput('The model returned no structured answer. The item remains unresolved.')
             result = schema.model_validate_json(text)
         except QuotaWait as exc:
             self.store.set_setting(cooldown_key, time.time() + exc.delay)
@@ -173,7 +183,7 @@ class Provider(Tasks):
         except (ProviderFailure, ProviderUnavailable):
             raise
         except Exception:
-            raise ProviderFailure('The model response could not be validated. No unvalidated output was published.') from None
+            raise InvalidModelOutput('The model response could not be validated. No unvalidated output was published.') from None
         self.store.cache_put(key, {'result': result.model_dump(mode='json'), 'model': actual_model})
         self.last_use = ModelUse(provider=self.name, requested_model=self.model, model=actual_model, purpose=schema.__name__, cached=False)
         return result

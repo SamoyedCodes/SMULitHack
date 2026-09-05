@@ -31,7 +31,7 @@ General legal chat, Singapore-law retrieval, authentication, drive integrations,
 
 ## What is actually in this repository
 
-The repository now contains the **Phase 3 ingestion, grounded extraction and source viewer**, preserving Builder B's design. Extraction is explicitly requested per document. Calendar, conflict and handoff modules remain disabled drafts. Live model accuracy is unverified.
+This branch contains **Phases 1–3 and Phase 5 distribution-conflict detection**, preserving Builder B's design. Extraction is explicitly requested; selected-SME conflict comparisons start automatically with ten persistent pair slots. Calendar remains Builder 2's separate Phase 4 work; handoff export is disabled. Read `docs/PHASE_5_COMPLETION.md` and `docs/PHASE_4_5_MERGE.md`. Live model accuracy is unverified.
 
 | Area | Current implementation | Important limit |
 | --- | --- | --- |
@@ -259,7 +259,7 @@ Still unverified: exact default `3000 → 8000` proxy path (3000 was occupied), 
 
 Phase 2 verification: **37 backend tests and 25 frontend tests passed**, including real clean/degraded scans, mixed/blank pages, DOCX, images, duplicate/idempotent/concurrent uploads, errors/retries, process-lock/restart behavior, path confinement and an 80-file ingestion run. Source coordinates and rotated page geometry are checked. Browser verification exercised native PDF/scan/DOCX upload and visible source highlights. See `PHASE_2_COMPLETION.md` for final checks and limits; Phase 1's old out-of-scope list above is historical.
 
-Phase 3 integration: read `docs/PHASE_3_INTEGRATION.md`. The active `worker.py` retains local ingestion and claims explicit `extract` jobs with a lazy provider; old `document` and `conflict` jobs remain idle. `analysis_worker.py` is an inactive reference. Keep source checkpoints, warnings, lock/recovery, generated contracts and three-second polling intact. Only ingestion/extraction capabilities are enabled. Builder 2's Phase 4 ownership and Phase 5 compatibility are specified in `docs/PHASE_4_HANDOFF.md`.
+Phase 3 integration: read `docs/PHASE_3_INTEGRATION.md`. The active `worker.py` retains local ingestion and claims explicit `extract` jobs with a lazy provider; old `document` and `conflict` jobs remain idle. `analysis_worker.py` is an inactive reference. Keep source checkpoints, warnings, lock/recovery, generated contracts and three-second polling intact. On this Phase 5 branch ingestion/extraction/conflicts capabilities are enabled; the following Phase 3 record is historical. Builder 2's Phase 4 ownership and Phase 5 compatibility are specified in `docs/PHASE_4_HANDOFF.md`.
 
 ## Skills and local tooling
 
@@ -306,3 +306,7 @@ Keep this file current as implementation replaces the prototype: update the insp
 ## Provider routing update
 
 Use `backend.llm.ModelClient` for extraction/review and future Phase 5 comparison work: OpenRouter primary, Gemini secondary. Read `docs/MODEL_PROVIDERS.md`; primary/secondary caches and cooldowns are separate, failed/refused answers do not trigger fallback, and per-document model usage stays separate from evidence/confidence. Health reports both providers without exposing keys; original data and inference capability boundaries are unchanged. Phase 4 makes no model calls. Preserve the additive schema fields when merging other builders’ branches. Live provider access/accuracy remain unverified.
+
+## Phase 5 branch checkpoint
+
+`codex/phase-5-conflicts` is intentionally unmerged. `backend/conflicts.py` and `conflict_service.py` now implement conservative screening, evidence validation and persistent comparison scheduling; `worker.py` claims only `conflict-v1` with the current conflict version after ingestion/extraction. `frontend/src/Conflicts.tsx` contains the live view and notification flow. Older table/file-map entries above describing conflict drafts are historical and superseded by this checkpoint. Calendar/deadlines and Phase 6 remain excluded from this branch. Follow the manual integration notes rather than replacing shared files wholesale. API models/types/fixtures are additive and regenerated. Full verification and conservative semantic limits are recorded in `docs/PHASE_5_COMPLETION.md`.

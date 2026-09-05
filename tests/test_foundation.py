@@ -44,7 +44,7 @@ def test_health_no_key_tools_optional_and_empty_portfolio(tmp_path):
         assert health.status == 'ready' and health.database.status == 'ready'
         assert not health.ocr_available and not health.docx_available and not health.key_configured
         assert health.capabilities.ingestion and health.capabilities.extraction
-        assert not any(v for k, v in health.capabilities.model_dump().items() if k not in {"ingestion", "extraction"})
+        assert not any(v for k, v in health.capabilities.model_dump().items() if k not in {"ingestion", "extraction", "conflicts"})
         assert not health.worker.enabled and app.state.worker is None
         portfolio = client.get('/api/portfolio?as_of=2026-09-05').json()
         assert portfolio['as_of'] == '2026-09-05' and portfolio['horizon_end'] == '2026-12-04'
