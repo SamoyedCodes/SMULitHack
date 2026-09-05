@@ -254,11 +254,32 @@ def snapshot_portfolios(cfg, store, root):
     write_json(root / 'portfolios.json', result)
 
 
+def finalize_stop(root, cfg, store):
+    """Repair interrupted display state locally; never retry a request to get a report."""
+    reason = store.setting('evaluation:stopped')
+    if not reason:
+        return
+    for doc in store.documents('live'):
+        if doc.status == 'extracting':
+            doc.status, doc.error, doc.stage = 'failed', reason, 'Evaluation stopped; extraction is incomplete'
+            store.put_document(doc)
+    path = root / 'run.json'
+    if path.exists():
+        saved = json.loads(path.read_text())
+        saved['documents'] = [d.model_dump() for d in store.documents('live')]
+        write_json(path, saved)
+        snapshot_portfolios(cfg, store, root)
+
+
 def run(root):
     import httpx
     from backend.conflict_service import reconcile, snapshot, process_comparison
     from backend.conflicts import JOB_KIND, CONFLICT_VERSION
     manifest, cfg, store = verify(root)
+    if store.setting('evaluation:stopped'):
+        finalize_stop(root, cfg, store)
+        print('Campaign stopped with an unresolved provider/billing outcome. No network request was made.')
+        return
     if cfg.openrouter_model != MODEL or not cfg.openrouter_api_key:
         raise ValueError('Configure the agreed OPENROUTER_MODEL and OPENROUTER_API_KEY first.')
     if store.setting('evaluation:closed'):
@@ -328,6 +349,7 @@ def run(root):
     except (BudgetStop, ProviderUnavailable, QuotaWait) as exc:
         fatal = str(exc)
         store.set_setting('evaluation:stopped', fatal)
+        finalize_stop(root, cfg, store)
         print('CAMPAIGN STOPPED: ' + fatal, flush=True)
     finally:
         snapshot_portfolios(cfg, store, root)
@@ -340,7 +362,8 @@ def run(root):
 
 def replay_app(root):
     from backend.api import create_app, error
-    _, cfg, _ = verify(root)
+    _, cfg, store = verify(root)
+    finalize_stop(root, cfg, store)
     app = create_app(cfg, start_worker=False)
     @app.middleware('http')
     async def read_only(request, call_next):
@@ -370,6 +393,8 @@ def main():
             run(root)
         elif args.command == 'score':
             from evaluation.scoring import score
+            _, cfg, store = verify(root)
+            finalize_stop(root, cfg, store)
             score(root, args.judgments)
         else:
             import uvicorn

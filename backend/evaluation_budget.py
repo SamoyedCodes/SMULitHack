@@ -119,6 +119,11 @@ class EvaluationBudget:
                                    headers={'Authorization': 'Bearer ' + api_key}, json=body)
         except httpx.TransportError:
             raise BudgetStop('Transport outcome is uncertain; reservation retained and campaign stopped.') from None
+        # Persist a receipt even for errors without usage, so a generation ID can be audited
+        # later without repeating inference. This is local data, never printed or sent elsewhere.
+        with self.store.connection() as db:
+            db.execute('UPDATE evaluation_requests SET body=? WHERE fingerprint=?',
+                       (json.dumps({'status': response.status_code, 'raw_response': response.text}), fingerprint))
         try:
             result = response.json()
             cost = money(result.get('usage', {}).get('cost'))
@@ -130,4 +135,8 @@ class EvaluationBudget:
                        (str(cost), 'settled' if cost <= reserve else 'over_reservation', saved, fingerprint))
         if cost > reserve:
             raise BudgetStop('Reported cost exceeded its reservation; campaign stopped.')
+        if response.status_code == 200 and result.get('model') != MODEL:
+            with self.store.connection() as db:
+                db.execute("UPDATE evaluation_requests SET state='model_mismatch' WHERE fingerprint=?", (fingerprint,))
+            raise BudgetStop('Response model differs from the authorized model; campaign stopped.')
         return response

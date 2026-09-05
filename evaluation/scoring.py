@@ -1,6 +1,5 @@
 """Transparent provisional scoring. Semantic decisions are explicit local judgments, never an LLM judge."""
 import json
-from collections import Counter
 
 from backend.documents import load_pages
 from backend.evidence import resolve_citations
@@ -136,7 +135,7 @@ def score(root, judgment_path=None):
     write_json(root / 'judgments-template.json', template)
     write_json(root / 'metrics.json', report)
     lines = ['# Phase 7 provisional evaluation', '', '**Pending independent answer-key review; ten documents are not a calibration study.**', '',
-             f"Model: `{run['model']}`. Charged: US${run['budget']['charged_usd']}; unresolved reservations: US${run['budget']['unreconciled_reserved_usd']}; requests: {run['budget']['requests']}.", '',
+             f"Model: `{run['model']}`. Confirmed charges: US${run['budget']['charged_usd']}; unresolved reservations: US${run['budget']['unreconciled_reserved_usd']}; requests: {run['budget']['requests']}. Actual total spend is UNKNOWN while any reservation is unreconciled.", '',
              'Semantic judgments are local, explicit assessments against the frozen key; no paid model grades the answers. Unreviewed decisions never count as passes. Answerable coverage counts answered key facts, including incorrect answers; accuracy is reported separately.', '',
              '| Metric | Development | Holdout | All |', '| --- | --- | --- | --- |']
     for metric in ['field_accuracy', 'fact_accuracy', 'answerable_coverage', 'prediction_correctness', 'citation_validity', 'deadline_accuracy', 'deadline_recall', 'candidate_recall', 'retained_for_review_recall', 'conflict_precision', 'conflict_recall']:
