@@ -42,17 +42,18 @@ def create_app(config: Config | None = None, start_worker: bool = True):
     app = FastAPI(title="AITHENA evidence API", version=VERSION, lifespan=lifespan,
                   responses={status: {"model": ErrorResponse} for status in (403, 404, 409, 413, 422, 500, 501)})
     app.state.worker = None
-    app.add_middleware(CORSMiddleware, allow_origin_regex=r"http://(?:127\.0\.0\.1|localhost):\d+",
+    app.add_middleware(CORSMiddleware, allow_origin_regex=r"https?://(?:(?:127\.0\.0\.1|localhost):\d+|.*\.vercel\.app)",
                        allow_methods=["GET", "POST"], allow_headers=["Content-Type", "Idempotency-Key"])
 
     @app.middleware("http")
     async def local_origin(request: Request, call_next):
         import re
+        import os
         origin = request.headers.get("origin")
         if request.method not in {"GET", "HEAD", "OPTIONS"} and origin:
             cfg = request.app.state.config
             allowed = {f"http://{host}:{port}" for host in ("127.0.0.1", "localhost") for port in (cfg.web_port, cfg.api_port)}
-            if origin not in allowed:
+            if not os.environ.get("VERCEL") and origin not in allowed:
                 return error(403, "forbidden", "Only the configured local interface can modify this workspace.")
         # Gate before parsing bodies: disabled uploads must not spool files or validate input.
         path = request.url.path

@@ -37,7 +37,10 @@ def libreoffice_path() -> str | None:
 
 class Config:
     def __init__(self, data_dir: Path | str | None = None):
-        path = Path(data_dir if data_dir is not None else setting("AITHENA_DATA_DIR", "data")).expanduser()
+        path_str = data_dir if data_dir is not None else setting("AITHENA_DATA_DIR", "data")
+        if os.environ.get("VERCEL"):
+            path_str = "/tmp/data"
+        path = Path(path_str).expanduser()
         self.data_dir = (path if path.is_absolute() else ROOT / path).resolve()
         self.api_port = self._port("AITHENA_API_PORT", "8000")
         self.web_port = self._port("AITHENA_WEB_PORT", "3000")

@@ -129,3 +129,65 @@ def test_eleventh_manifest_document_rejected_before_workspace_read(tmp_path):
     (tmp_path / 'manifest.json').write_text(json.dumps({'model': MODEL, 'documents': entries}))
     with pytest.raises(ValueError, match='exactly'):
         verify(tmp_path)
+
+
+def test_stopped_campaign_cannot_make_preflight_or_inference_requests(tmp_path, monkeypatch):
+    from scripts import evaluate
+    store = Store(tmp_path)
+    store.set_setting('evaluation:stopped', 'Unaccounted charge')
+    monkeypatch.setattr(evaluate, 'verify', lambda root: ({}, Config(tmp_path), store))
+    monkeypatch.setattr(httpx.Client, 'get', lambda *a, **k: pytest.fail('Stopped campaign must be offline'))
+    evaluate.run(tmp_path)
+
+
+def test_replay_blocks_mutation_and_leaves_worker_off(tmp_path, monkeypatch):
+    from fastapi.testclient import TestClient
+    from scripts import evaluate
+    cfg, store = Config(tmp_path), Store(tmp_path)
+    monkeypatch.setattr(evaluate, 'verify', lambda root: ({}, cfg, store))
+    with TestClient(evaluate.replay_app(tmp_path)) as client:
+        assert client.get('/api/health').json()['worker'] == {'enabled': False, 'running': False}
+        for route in ('/api/batches', '/api/extract', '/api/settings/sme', '/api/conflicts/continue', '/api/demo'):
+            response = client.post(route, json={})
+            assert response.status_code == 403
+        assert not store.jobs('live')
+
+
+def test_scoring_distinguishes_unreviewed_incorrect_and_unsupported_citations(tmp_path, monkeypatch):
+    from scripts import evaluate
+    from evaluation.scoring import score
+    from backend.models import Document, Finding, Page, Span
+    from backend.documents import save_pages
+    from backend.store import now
+    from backend.evidence import resolve_citations
+    from backend.models import Citation
+    cfg, store = Config(tmp_path), Store(tmp_path)
+    page = Page(number=1, width=600, height=800, spans=[Span(id='d0:p1:s0', document_id='d0', page=1,
+                text='Rent is S$100 per month.', bbox=[0, 0, 100, 20], source='native')])
+    evidence, errors = resolve_citations([Citation(document_id='d0', span_ids=['d0:p1:s0'], quote=page.spans[0].text)], [page], {'d0'})
+    assert not errors
+    finding = Finding(id='f', field='payments', value='Rent is S$200 per month.', provenance='found',
+                      confidence='high', confidence_reason='Incorrect test assertion', evidence=evidence)
+    doc = Document(id='d0', mode='live', filename='test.pdf', title='Test', sha256='hash', created_at=now(), model='fake',
+                   version='test', status='complete', findings=[finding], page_count=1, pages_read=1, pages_analyzed=1)
+    save_pages(cfg.directory('d0') / 'pages.json', [page])
+    key = {'review_status': 'provisional_pending_independent_review', 'documents': {'s01': {'facts': [
+        {'id': 'rent', 'field': 'payments', 'answerable': True, 'expected': 'S$100 monthly'}]}}}
+    evaluate.write_json(tmp_path / 'answer-key.json', key)
+    manifest = {'answer_key_sha256': evaluate.digest(tmp_path / 'answer-key.json'),
+                'documents': [{'sample_id': 's01', 'document_id': 'd0', 'split': 'development'}]}
+    monkeypatch.setattr(evaluate, 'verify', lambda root: (manifest, cfg, store))
+    evaluate.write_json(tmp_path / 'run.json', {'model': 'fake', 'budget': {'charged_usd': '0', 'unreconciled_reserved_usd': '0', 'requests': 0},
+                                             'stopped': None, 'documents': [doc.model_dump()], 'contexts': {}})
+    evaluate.write_json(tmp_path / 'portfolios.json', {})
+    unreviewed = score(tmp_path)['groups']['all']
+    assert unreviewed['field_accuracy']['rate'] is None and unreviewed['fields_unreviewed'] == 1
+    judgments = json.loads((tmp_path / 'judgments-template.json').read_text())
+    judgments['facts']['s01']['rent'] = {'correct': False, 'matched_findings': ['f'], 'reason': 'Wrong rent amount.'}
+    judgments['findings']['s01']['f'] = {'correct': False, 'reason': 'S$200 contradicts S$100 source.'}
+    evaluate.write_json(tmp_path / 'judgments.json', judgments)
+    reviewed = score(tmp_path, tmp_path / 'judgments.json')['groups']['all']
+    assert reviewed['citation_validity']['rate'] == 1  # Presence is not entailment.
+    assert reviewed['field_accuracy']['rate'] == 0 and reviewed['answerable_coverage']['rate'] == 1
+    assert reviewed['correctness_by_confidence']['high']['rate'] == 0
+    assert reviewed['conflict_precision']['rate'] is None
