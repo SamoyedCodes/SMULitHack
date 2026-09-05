@@ -97,6 +97,197 @@
         "title": "Body_upload_api_batches_post",
         "type": "object"
       },
+      "Brief": {
+        "additionalProperties": false,
+        "properties": {
+          "as_of": {
+            "title": "As Of",
+            "type": "string"
+          },
+          "confidence": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Confidence"
+          },
+          "confidence_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Confidence Reason"
+          },
+          "coverage_warnings": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Coverage Warnings",
+            "type": "array"
+          },
+          "disclaimer": {
+            "default": "This brief summarizes grounded source evidence for human legal review. It is not legal advice, does not assert breach or enforceability, and was not sent anywhere automatically.",
+            "title": "Disclaimer",
+            "type": "string"
+          },
+          "documents": {
+            "items": {
+              "$ref": "#/components/schemas/BriefDocument"
+            },
+            "title": "Documents",
+            "type": "array"
+          },
+          "established": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Established",
+            "type": "array"
+          },
+          "evidence": {
+            "items": {
+              "$ref": "#/components/schemas/Evidence"
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
+          "exceptions": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Exceptions",
+            "type": "array"
+          },
+          "explanation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Explanation"
+          },
+          "generated_at": {
+            "title": "Generated At",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "lawyer_question": {
+            "title": "Lawyer Question",
+            "type": "string"
+          },
+          "missing_facts": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Missing Facts",
+            "type": "array"
+          },
+          "mode": {
+            "default": "live",
+            "enum": [
+              "live",
+              "sample"
+            ],
+            "title": "Mode",
+            "type": "string"
+          },
+          "provenance": {
+            "title": "Provenance",
+            "type": "string"
+          },
+          "scope_comparison": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Scope Comparison",
+            "type": "object"
+          },
+          "source": {
+            "enum": [
+              "issue",
+              "conflict"
+            ],
+            "title": "Source",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "urgency": {
+            "default": "Review before relying on this provision.",
+            "title": "Urgency",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "source",
+          "kind",
+          "mode",
+          "generated_at",
+          "as_of",
+          "title",
+          "documents",
+          "established",
+          "missing_facts",
+          "lawyer_question",
+          "urgency",
+          "explanation",
+          "scope_comparison",
+          "exceptions",
+          "provenance",
+          "confidence",
+          "confidence_reason",
+          "evidence",
+          "coverage_warnings",
+          "disclaimer"
+        ],
+        "title": "Brief",
+        "type": "object"
+      },
+      "BriefDocument": {
+        "additionalProperties": false,
+        "properties": {
+          "filename": {
+            "title": "Filename",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "filename"
+        ],
+        "title": "BriefDocument",
+        "type": "object"
+      },
       "Capabilities": {
         "additionalProperties": false,
         "properties": {
@@ -3152,12 +3343,56 @@
     },
     "/api/review/{issue_id}/brief": {
       "get": {
-        "operationId": "disabled_api_review__issue_id__brief_get",
+        "operationId": "review_brief_api_review__issue_id__brief_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "issue_id",
+            "required": true,
+            "schema": {
+              "title": "Issue Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "mode",
+            "required": false,
+            "schema": {
+              "default": "live",
+              "enum": [
+                "live",
+                "sample"
+              ],
+              "title": "Mode",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "as_of",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "As Of"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/Brief"
+                }
               }
             },
             "description": "Successful Response"
@@ -3233,7 +3468,7 @@
             "description": "Not Implemented"
           }
         },
-        "summary": "Disabled"
+        "summary": "Review Brief"
       }
     },
     "/api/settings/sme": {

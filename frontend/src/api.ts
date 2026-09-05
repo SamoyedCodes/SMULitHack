@@ -7,6 +7,9 @@ export type Portfolio = components['schemas']['Portfolio']
 export type Finding = components['schemas']['Finding']
 export type Evidence = components['schemas']['Evidence']
 export type ApiDocument = components['schemas']['Document']
+export type Brief = components['schemas']['Brief']
+export type ReviewIssue = components['schemas']['ReviewIssue']
+export type ConflictAssessment = components['schemas']['ConflictAssessment']
 
 // Use the exact backend schemas for runtime validation as well as generated types.
 const ajv = new Ajv2020({ strict: false, validateFormats: false })
@@ -88,4 +91,11 @@ export async function setSme(name: string | null): Promise<void> {
 export async function extractDocument(id: string): Promise<void> {
   const body = await apiRequest(`/extract?document_id=${encodeURIComponent(id)}`, { method: 'POST' })
   if (!validateRetry(body)) throw new ApiError('validation', 'The extraction response does not match this build.')
+}
+
+const validateBrief = ajv.compile<Brief>({ $ref: 'aithena#/components/schemas/Brief' })
+export async function fetchBrief(id: string, signal?: AbortSignal): Promise<Brief> {
+  const body = await apiRequest(`/review/${encodeURIComponent(id)}/brief`, { signal })
+  if (!validateBrief(body)) throw new ApiError('validation', 'The lawyer brief response does not match this build.')
+  return body
 }

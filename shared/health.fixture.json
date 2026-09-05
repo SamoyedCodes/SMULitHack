@@ -35,7 +35,7 @@
     "extraction": true,
     "deadlines": false,
     "conflicts": false,
-    "handoff": false,
+    "handoff": true,
     "sample_workspace": false
   },
   "limits": {

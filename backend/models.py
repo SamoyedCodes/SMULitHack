@@ -199,6 +199,37 @@ class ConflictAssessment(Record):
     mode: Literal["live", "sample"] = "live"
 
 
+class BriefDocument(Record):
+    id: str
+    title: str
+    filename: str
+
+
+class Brief(Record):
+    id: str
+    source: Literal["issue", "conflict"]
+    kind: str
+    mode: Literal["live", "sample"] = "live"
+    generated_at: str
+    as_of: str
+    title: str
+    documents: list[BriefDocument] = Field(default_factory=list)
+    established: list[str] = Field(default_factory=list)
+    missing_facts: list[str] = Field(default_factory=list)
+    lawyer_question: str
+    urgency: str = "Review before relying on this provision."
+    explanation: str | None = None
+    scope_comparison: dict[str, str] = Field(default_factory=dict)
+    exceptions: list[str] = Field(default_factory=list)
+    provenance: str
+    confidence: str | None = None
+    confidence_reason: str | None = None
+    evidence: list[Evidence] = Field(default_factory=list)
+    coverage_warnings: list[str] = Field(default_factory=list)
+    disclaimer: str = ("This brief summarizes grounded source evidence for human legal review. "
+                       "It is not legal advice, does not assert breach or enforceability, and was not sent anywhere automatically.")
+
+
 class ModelUse(Record):
     provider: Literal["openrouter", "gemini"]
     requested_model: str

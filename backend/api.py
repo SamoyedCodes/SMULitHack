@@ -14,7 +14,7 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from .config import VERSION, Config, libreoffice_path, tesseract_path
 from .foundation import CAPABILITIES, DatabaseStatus, ErrorResponse, HealthResponse, WorkerStatus, ProviderStatus
-from .models import Document, Page, Portfolio, BatchResponse, Job, RetryResponse, SmeSelection
+from .models import Brief, Document, Page, Portfolio, BatchResponse, Job, RetryResponse, SmeSelection
 from .store import Store
 
 
@@ -216,12 +216,18 @@ def create_app(config: Config | None = None, start_worker: bool = True):
         store.set_setting('sme:' + selection.mode, selection.name)
         return selection
 
+    @app.get("/api/review/{issue_id}/brief", response_model=Brief)
+    def review_brief(issue_id: str, request: Request, mode: Literal["live", "sample"] = "live", as_of: date | None = None):
+        from .review import brief_for
+        cfg, store = request.app.state.config, request.app.state.store
+        as_of = as_of or datetime.now(ZoneInfo("Asia/Singapore")).date()
+        return brief_for(store, cfg, issue_id, mode, as_of)
+
     def disabled():
         raise HTTPException(501, "This feature is not implemented in Phase 3.")
 
     for path in ("/api/demo",):
         app.add_api_route(path, disabled, methods=["POST"], status_code=501)
-    app.add_api_route("/api/review/{issue_id}/brief", disabled, methods=["GET"])
     return app
 
 
