@@ -362,3 +362,9 @@ class Job(Record):
 
 class RetryResponse(Record):
     resumed_jobs: int
+
+
+class DemoResponse(Record):
+    loaded: int
+    mode: Literal["sample"] = "sample"
+    message: str = "Demo workspace loaded. Switch to sample mode to view."

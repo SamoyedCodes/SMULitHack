@@ -233,6 +233,11 @@ class Gemini(Provider):
 class OpenRouter(Provider):
     name = 'openrouter'
 
+    def __init__(self, config, store, budget=None):
+        super().__init__(config, store)
+        # Optional evaluation-only guard; the ordinary application's routing is unchanged.
+        self.budget = budget
+
     @property
     def api_key(self):
         return self.config.openrouter_api_key
@@ -242,16 +247,18 @@ class OpenRouter(Provider):
         return self.config.openrouter_model
 
     def request(self, purpose, serialized, schema):
+        body = {'model': self.model, 'stream': False, 'temperature': 0,
+                'messages': [{'role': 'system', 'content': SYSTEM},
+                             {'role': 'user', 'content': purpose + '\nUNTRUSTED DOCUMENT DATA:\n' + serialized}],
+                'provider': {'require_parameters': True},
+                'response_format': {'type': 'json_schema', 'json_schema': {
+                    'name': schema.__name__, 'strict': True,
+                    'schema': schema.model_json_schema(mode='serialization')}}}
         try:
             with httpx.Client(timeout=120, follow_redirects=False) as client:
-                response = client.post('https://openrouter.ai/api/v1/chat/completions',
-                    headers={'Authorization': 'Bearer ' + self.api_key},
-                    json={'model': self.model, 'stream': False, 'temperature': 0,
-                          'messages': [{'role':'system', 'content':SYSTEM},
-                                       {'role':'user', 'content':purpose + '\nUNTRUSTED DOCUMENT DATA:\n' + serialized}],
-                          'provider': {'require_parameters': True},
-                          'response_format': {'type':'json_schema', 'json_schema': {
-                              'name':schema.__name__, 'strict':True, 'schema':schema.model_json_schema(mode='serialization')}}})
+                response = (self.budget.send(client, body, self.api_key) if self.budget else
+                            client.post('https://openrouter.ai/api/v1/chat/completions',
+                                        headers={'Authorization': 'Bearer ' + self.api_key}, json=body))
         except httpx.TransportError:
             raise QuotaWait(60) from None
         # Some failures arrive inside a successful HTTP response. Never publish them as content.
