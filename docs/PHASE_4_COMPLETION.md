@@ -157,6 +157,13 @@ of the deliverable.
   any obligation shown is enforceable. Python cannot establish enforceability, breach, delivery
   success, continued operation, or that a payment remains unpaid.
 
+## Merging with Phase 5
+
+Coordination items, expected conflict points and the regeneration order are in
+[PHASE_4_MERGE_NOTES.md](PHASE_4_MERGE_NOTES.md). Read it before merging — in particular the
+Python 3.12 requirement for regenerating `shared/*`, and the fact that a stale `openapi.json`
+makes the browser reject the entire portfolio response rather than reporting a schema error.
+
 ## Not done (deliberately out of scope)
 
 Conflict assessment, lawyer-brief export, sample loading, legal chat and deployment are untouched.

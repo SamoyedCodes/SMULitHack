@@ -63,7 +63,7 @@ The repository now contains the **Phase 3 ingestion, grounded extraction and sou
 - `backend/ingestion.py`, `documents.py`, `worker.py`: active local upload/reading pipeline and explicitly queued extraction. Provider imports are lazy; local reading needs no key.
 - `backend/llm.py`, `evidence.py`: active extraction/support review and evidence checks; no live model accuracy claim.
 - `frontend/src/Findings.tsx`: extraction request, full findings/evidence and SME selector.
-- `backend/analysis_worker.py`, `deadlines.py`, `conflicts.py`: inactive drafts; never start the old coupled worker.
+- `backend/analysis_worker.py`, `conflicts.py`: inactive drafts; never start the old coupled worker. `deadlines.py` is active as of Phase 4.
 - `shared/openapi.json`, `shared/api.generated.ts`: canonical API snapshot and generated types.
 - `shared/health.fixture.json`, `shared/portfolio.fixture.json`: backend-derived non-legal API fixtures.
 - `shared/types.ts`, `shared/sample-portfolio.json`: **legacy prototype v1.0**, not the live API payload.
@@ -71,6 +71,8 @@ The repository now contains the **Phase 3 ingestion, grounded extraction and sou
 - `scripts/dev.py`, `doctor.py`, `export_openapi.py`, `export_fixtures.py`: launch, diagnostics and contract generation.
 - `tests/test_foundation.py`, `test_ingestion.py`: isolated foundation, local ingestion, 80-file load, restart, source, OCR/DOCX and boundary checks.
 - `scripts/make_ingestion_fixtures.py`: seven synthetic mixed-format ingestion files; no extraction answer key implied.
+- `backend/deadlines.py`, `frontend/src/Calendar.tsx`: Phase 4 deterministic date projection and its calendar view; no model call is made to build the calendar.
+- `docs/PHASE_4_COMPLETION.md`, `docs/PHASE_4_MERGE_NOTES.md`: Phase 4 verification/limits and the Phase 5 merge contract.
 - `README.md`, `docs/INTEGRATION.md`: current startup and integration guidance.
 - `IMPLEMENTATION_PLAN.md`, `PHASE_1_COMPLETION.md`, `docs/PHASE_2_HANDOFF.md`: phase boundaries, recorded verification and next-builder extension points.
 
@@ -87,7 +89,7 @@ The original dashboard's automatic sample selection, URL-based “Connected” b
 
 ## Phase status and checkpoints
 
-**Current checkpoint: Phase 4 on `codex/phase-4-deadlines`, built over integrated Phases 2–3.** Read `docs/PHASE_3_INTEGRATION.md` and `docs/PHASE_4_COMPLETION.md` for verification and limits. Phase 4 is not merged to `main`; Phases 5–7 are not complete. The sample dashboard previews later UI only. Do not import temporary work or overwrite another active builder's changes without checking the repository.
+**Current checkpoint: Phase 4 on `codex/phase-4-deadlines`, built over integrated Phases 2–3.** Read `docs/PHASE_3_INTEGRATION.md` and `docs/PHASE_4_COMPLETION.md` for verification and limits, and `docs/PHASE_4_MERGE_NOTES.md` before merging Phase 4 with Phase 5. Phase 4 is not merged to `main`; Phases 5–7 are not complete. The sample dashboard previews later UI only. Do not import temporary work or overwrite another active builder's changes without checking the repository.
 
 | Phase | Scope and completion gate | Status at this snapshot |
 | --- | --- | --- |
