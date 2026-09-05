@@ -87,14 +87,14 @@ The original dashboard's automatic sample selection, URL-based “Connected” b
 
 ## Phase status and checkpoints
 
-**Current checkpoint: Phase 3 integrated with Phase 2.** Read `docs/PHASE_3_INTEGRATION.md` for verification and limits, and `docs/PHASE_4_HANDOFF.md` for Builder 2. Phases 4–7 are not complete. The sample dashboard previews later UI only. Do not import temporary work or overwrite another active builder's changes without checking the repository.
+**Current checkpoint: Phase 4 on `codex/phase-4-deadlines`, built over integrated Phases 2–3.** Read `docs/PHASE_3_INTEGRATION.md` and `docs/PHASE_4_COMPLETION.md` for verification and limits. Phase 4 is not merged to `main`; Phases 5–7 are not complete. The sample dashboard previews later UI only. Do not import temporary work or overwrite another active builder's changes without checking the repository.
 
 | Phase | Scope and completion gate | Status at this snapshot |
 | --- | --- | --- |
 | 1 — Runnable foundation | Preserve the frontend shell; add FastAPI/SQLite, validated configuration, real health/capability reporting, stable generated interfaces, portable startup and smoke tests. Runs without a Gemini key. | Implemented; remaining checks listed below. |
 | 2 — Ingestion and pages | Up to 80 mixed-format files, originals/hashes, durable local queue, conversion/OCR, page coverage/errors, deduplication, restart recovery, source viewer. Local reading must work without a key. | Implemented and tested, including real OCR/DOCX and 80-file ingestion; no model calls. |
 | 3 — Grounded extraction | Gemini structured extraction and support review, Python citation checks, all required fields, explained provenance/confidence, completeness and SME selection. | Integrated and tested with fake-provider fixtures; live model access and extraction accuracy remain unverified. |
-| 4 — Deadlines | Tested Python rules, notice windows, ambiguity stops, adjustable as-of date, 90-day/overdue events with cited calculations. | Planned; sample date display and disabled drafts only. |
+| 4 — Deadlines | Tested Python rules, notice windows, ambiguity stops, adjustable as-of date, 90-day/overdue events with cited calculations. | Implemented on `codex/phase-4-deadlines` and tested with synthetic fixtures; see `docs/PHASE_4_COMPLETION.md`. Per-input grounding of offset/unit/direction remains unverified, so calculated dates are capped at medium confidence. |
 | 5 — Conflicts | Conservative Python candidate selection, LLM comparison of both agreements, evidence validation, cached/pending assessments and uncertainty. | Planned; sample conflict display and disabled drafts only. |
 | 6 — Review and handoff | Dedicated review queue, missing facts, urgency, source excerpts and a specific lawyer question; printable/downloadable briefs. | Planned; sample conflict JSON export only exists. |
 | 7 — Evaluation and demo | Mixed-quality corpus and reviewed answer key, grouped holdout, quality/calibration metrics, 80-file ingestion test and reproducible demonstration. | Planned; four synthetic examples are not an evaluation corpus. |

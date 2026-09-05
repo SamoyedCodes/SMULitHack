@@ -40,3 +40,23 @@
 .confidence.low, .provenance.unresolved { background: #fff1d8; color: #805b17; }
 @media (max-width: 1250px) { .contract-detail { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 700px) { .extraction-action { flex-direction: column; align-items: stretch; } }
+
+/* Grounded deadline calendar: dates, their arithmetic and their sources must stay readable together. */
+.calendar-controls { padding: 24px; }
+.calendar-asof { display: inline-flex; flex-direction: column; gap: 6px; font-size: 13px; color: var(--muted); margin: 4px 0 14px; }
+.calendar-asof input { font: inherit; color: var(--ink); padding: 9px 12px; border: 1px solid var(--border); border-radius: 7px; background: #fff; }
+.calendar-asof input:disabled { background: #f2f5f9; color: var(--muted); }
+.calendar-day { padding: 0 0 8px; }
+.calendar-day .section-heading { padding: 20px 24px 4px; }
+.calendar-row > .date-tile { min-width: 0; }
+.calendar-row .row-copy { flex: 1 1 260px; }
+.calendar-row h3 { font-size: 15px; margin: 0; }
+.calendar-formula { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px; color: var(--ink); background: #f4f7fb; border-radius: 6px; padding: 7px 10px; display: inline-block; margin-top: 8px; }
+.calendar-badges { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; flex: 1 1 240px; }
+.calendar-badges .finding-reason, .calendar-badges .evidence { flex-basis: 100%; }
+.calendar-review .finding h3 { display: flex; align-items: center; gap: 7px; font-size: 15px; }
+.calendar-review .finding h4 { font-size: 12px; text-transform: uppercase; letter-spacing: .4px; color: var(--muted); margin-top: 14px; }
+.calendar-facts { margin: 8px 0 0 18px; font-size: 13.5px; color: #4d5b6c; }
+.calendar-facts li { margin-top: 5px; }
+.subtle { color: var(--muted); font-size: 13px; line-height: 1.6; }
+@media (max-width: 760px) { .calendar-badges, .calendar-row .row-copy { flex-basis: 100%; } .calendar-asof { width: 100%; } }

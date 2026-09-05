@@ -552,6 +552,11 @@ export interface components {
              * @enum {string}
              */
             confidence: "high" | "medium" | "low";
+            /**
+             * Confidence Reason
+             * @default
+             */
+            confidence_reason: string;
             /** Document Id */
             document_id: string;
             /** Event Date */
@@ -567,11 +572,21 @@ export interface components {
             /** Label */
             label: string;
             /**
+             * Occurrence
+             * @default 0
+             */
+            occurrence: number;
+            /**
+             * Overdue
+             * @default false
+             */
+            overdue: boolean;
+            /**
              * Provenance
              * @default calculated
-             * @constant
+             * @enum {string}
              */
-            provenance: "calculated";
+            provenance: "calculated" | "found";
             /** Window Start */
             window_start: string | null;
         };

@@ -13,7 +13,8 @@ fixtures = {
                              model_status='not_configured', ocr_available=False, docx_available=False,
                              database=DatabaseStatus(status='ready')),
     'portfolio': Portfolio(mode='live', as_of='2026-09-05', horizon_end='2026-12-04', sme=None, parties=[], documents=[], events=[], issues=[], conflicts=[],
-                           coverage={'total':0, 'analyzed':0, 'pages':0, 'pages_read':0, 'pages_analyzed':0},
+                           coverage={'total':0, 'analyzed':0, 'pages':0, 'pages_read':0, 'pages_analyzed':0,
+                                     'dated':0, 'dates_unavailable':0, 'undated':0},
                            comparisons={'pending':0, 'assessed':0, 'failed':0}),
 }
 for name, record in fixtures.items():

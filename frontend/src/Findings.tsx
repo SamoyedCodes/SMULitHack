@@ -8,7 +8,7 @@ const FIELD_LABELS: Record<Finding['field'], string> = {
 }
 const FIELD_ORDER = Object.keys(FIELD_LABELS) as Finding['field'][]
 
-function Evidence({ items, onEvidence }: { items: Finding['evidence']; onEvidence: (e: SourceEvidence) => void }) {
+export function Evidence({ items, onEvidence }: { items: Finding['evidence']; onEvidence: (e: SourceEvidence) => void }) {
   if (!items.length) return null
   return <ul className="evidence">{items.map((e, i) => <li key={i}><Quote size={13} /><blockquote>{e.quote}</blockquote><button className="contract-link" onClick={() => onEvidence(e)}>Page {e.page}{e.clause ? ` · ${e.clause}` : ''}{e.source === 'ocr' ? ' · OCR' : ''}</button></li>)}</ul>
 }

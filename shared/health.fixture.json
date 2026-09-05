@@ -17,7 +17,7 @@
   "capabilities": {
     "ingestion": true,
     "extraction": true,
-    "deadlines": false,
+    "deadlines": true,
     "conflicts": false,
     "handoff": false,
     "sample_workspace": false

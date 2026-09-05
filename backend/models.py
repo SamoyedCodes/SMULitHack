@@ -168,8 +168,13 @@ class Event(Record):
     formula: str
     assumptions: list[str]
     confidence: Literal["high", "medium", "low"]
+    confidence_reason: str = ""
     evidence: list[Evidence]
-    provenance: Literal["calculated"] = "calculated"
+    # Overdue is a calendar comparison against the selected date, never a finding of non-performance.
+    overdue: bool = False
+    occurrence: int = 0
+    # "found" is an explicit source date; "calculated" means arithmetic ran on cited inputs.
+    provenance: Literal["calculated", "found"] = "calculated"
 
 
 class ConflictDraft(Record):

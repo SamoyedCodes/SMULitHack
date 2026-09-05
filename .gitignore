@@ -14,3 +14,6 @@ data/
 .coverage
 .env.*
 !.env.example
+
+# Local pnpm shim (machine-specific scaffolding, not part of the deliverable)
+.bin/

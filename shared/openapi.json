@@ -850,6 +850,11 @@
             "title": "Confidence",
             "type": "string"
           },
+          "confidence_reason": {
+            "default": "",
+            "title": "Confidence Reason",
+            "type": "string"
+          },
           "document_id": {
             "title": "Document Id",
             "type": "string"
@@ -881,9 +886,22 @@
             "title": "Label",
             "type": "string"
           },
+          "occurrence": {
+            "default": 0,
+            "title": "Occurrence",
+            "type": "integer"
+          },
+          "overdue": {
+            "default": false,
+            "title": "Overdue",
+            "type": "boolean"
+          },
           "provenance": {
-            "const": "calculated",
             "default": "calculated",
+            "enum": [
+              "calculated",
+              "found"
+            ],
             "title": "Provenance",
             "type": "string"
           },
@@ -911,7 +929,10 @@
           "formula",
           "assumptions",
           "confidence",
+          "confidence_reason",
           "evidence",
+          "overdue",
+          "occurrence",
           "provenance"
         ],
         "title": "Event",

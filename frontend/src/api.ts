@@ -7,6 +7,8 @@ export type Portfolio = components['schemas']['Portfolio']
 export type Finding = components['schemas']['Finding']
 export type Evidence = components['schemas']['Evidence']
 export type ApiDocument = components['schemas']['Document']
+export type CalendarEvent = components['schemas']['Event']
+export type ReviewIssue = components['schemas']['ReviewIssue']
 
 // Use the exact backend schemas for runtime validation as well as generated types.
 const ajv = new Ajv2020({ strict: false, validateFormats: false })
@@ -40,8 +42,8 @@ export async function fetchHealth(signal?: AbortSignal): Promise<Health> {
   if (!validateHealth(body)) throw new ApiError('validation', 'The backend health response does not match this build. Restart matching frontend and backend versions.')
   return body
 }
-export async function fetchLivePortfolio(signal?: AbortSignal): Promise<Portfolio> {
-  const body = await apiRequest('/portfolio', { signal })
+export async function fetchLivePortfolio(signal?: AbortSignal, asOf?: string): Promise<Portfolio> {
+  const body = await apiRequest(`/portfolio${asOf ? `?as_of=${encodeURIComponent(asOf)}` : ''}`, { signal })
   if (!validatePortfolio(body) || body.mode !== 'live') throw new ApiError('validation', 'The portfolio response does not match the live workspace contract.')
   return body
 }

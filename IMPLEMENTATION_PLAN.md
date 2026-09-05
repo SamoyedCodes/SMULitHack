@@ -1,6 +1,6 @@
 # AITHENA implementation phases
 
-Each phase has a separate acceptance boundary. The current integration implements Phases 1–3: foundation, local ingestion/source viewing, and explicitly requested grounded extraction. See `docs/PHASE_3_INTEGRATION.md` for merge verification and unverified model/accuracy limits. Ingestion and extraction are enabled; phases 4–7 remain planned. Builder 2 continues from `docs/PHASE_4_HANDOFF.md`; Builder 1 owns Phase 5 concurrently.
+Each phase has a separate acceptance boundary. `main` implements Phases 1–3: foundation, local ingestion/source viewing, and explicitly requested grounded extraction. See `docs/PHASE_3_INTEGRATION.md` for merge verification and unverified model/accuracy limits. Phase 4's deadline calendar is implemented on `codex/phase-4-deadlines` and records its own limits in `docs/PHASE_4_COMPLETION.md`; ingestion, extraction and deadlines are enabled there. Phases 5–7 remain planned, and Builder 1 owns Phase 5 concurrently.
 
 ```mermaid
 flowchart LR
@@ -23,7 +23,7 @@ flowchart LR
 | 1. Runnable foundation | Builder 2's UI shell, local FastAPI, persistent SQLite, truthful health, generated contracts, launcher, tests | No key needed; no processing; disabled routes cannot mutate; schema/build/tests and local proxy work |
 | 2. Ingestion and sources — implemented | Batch files/folders, originals/hashes, durable reading jobs, PDF/OCR/DOCX, every page with coordinates | Real clean/degraded scans and DOCX; duplicate/interrupted/error handling; local reading works without API key |
 | 3. Grounded extraction — integrated | LLM typed extraction/support review, eight required fields, citation validation, provenance/confidence, SME selection | Every assertion supported; unknowns explicit; quota/key failures visible; no silent truncation |
-| 4. Deadline calendar | Python offsets/windows/recurrence and 90-day event-or-action selection | Exact deadline fixtures pass; unknown triggers, business days and month-end ambiguity escalate |
+| 4. Deadline calendar — implemented | Python offsets/windows/recurrence and 90-day event-or-action selection | Exact deadline fixtures pass; unknown triggers, business days and month-end ambiguity escalate. Delivered on `codex/phase-4-deadlines`; see `docs/PHASE_4_COMPLETION.md` |
 | 5. Distribution conflicts | Python candidates plus LLM scope/exception comparison, validated assessments | Exclusive/non-exclusive overlaps, exclusions, non-overlapping dates and missing schedules evaluated; no breach claims |
 | 6. Review and lawyer briefs | Review queue, cited issue summaries, missing facts and specific questions, printable/downloadable handoff | Lawyer can locate clauses and act on the issue; no automatic sending |
 | 7. Evaluation and demo | Real synthetic mixed-format corpus, reviewed answer key/holdout, measured accuracy/calibration, 80-file load test | Report actual field/citation/date/conflict metrics; planted unanswerable cases escalate; no hidden failures |

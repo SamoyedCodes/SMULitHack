@@ -100,21 +100,56 @@ def create_app(config: Config | None = None, start_worker: bool = True):
                               database=DatabaseStatus(status="ready" if ready else "unavailable"),
                               worker=WorkerStatus(enabled=bool(request.app.state.worker), running=bool(request.app.state.worker and request.app.state.worker.running)))
 
+    def document_pages(config, document_id: str):
+        """None means the saved checkpoint could not be read; [] would mean it was read and empty."""
+        from .documents import load_pages
+        from .ingestion import source_path
+        try:
+            return load_pages(source_path(config, document_id, 'pages.json'))
+        except (HTTPException, OSError, ValueError):
+            # JSONDecodeError and pydantic ValidationError are both ValueError subclasses.
+            return None
+
     @app.get("/api/portfolio", response_model=Portfolio)
     def portfolio(request: Request, mode: Literal["live", "sample"] = "live", as_of: date | None = None):
+        from .deadlines import ANALYZED, HORIZON_DAYS, calendar_for, event_order, stale_analysis_issue, unreadable_pages_issue
         store = request.app.state.store
         as_of = as_of or datetime.now(ZoneInfo("Asia/Singapore")).date()
         docs = store.documents(mode)
         comparisons = store.comparisons(mode)
         pairs = [j for j in store.jobs(mode) if j["kind"] == "conflict"]
-        return Portfolio(mode=mode, as_of=as_of.isoformat(), horizon_end=(as_of + timedelta(days=90)).isoformat(),
+        events, projected, evaluated, unavailable = [], [], 0, 0
+        # A read-only projection: no model call, no queued work and no stored record is changed.
+        for doc in docs if CAPABILITIES.deadlines else []:
+            if doc.status not in ANALYZED:
+                # Rules retained from an earlier run cannot supply dates while this run is incomplete.
+                projected += [stale_analysis_issue(doc)] if doc.rules else []
+                continue
+            if not doc.rules:
+                continue
+            pages = document_pages(request.app.state.config, doc.id)
+            if pages is None:
+                unavailable += 1
+                projected.append(unreadable_pages_issue(doc))
+                continue
+            found, raised = calendar_for(doc, pages, as_of, days=HORIZON_DAYS)
+            events += found
+            projected += raised
+            evaluated += 1
+        events.sort(key=event_order)
+        merged = {}
+        for issue in [*(i for doc in docs for i in doc.issues), *projected]:
+            merged.setdefault(issue.id, issue)
+        return Portfolio(mode=mode, as_of=as_of.isoformat(), horizon_end=(as_of + timedelta(days=HORIZON_DAYS)).isoformat(),
                          sme=store.setting("sme:" + mode), parties=sorted({p for doc in docs for p in doc.parties}),
-                         documents=docs, events=[], issues=[i for doc in docs for i in doc.issues], conflicts=comparisons,
+                         documents=docs, events=events, issues=list(merged.values()), conflicts=comparisons,
                          comparisons={"pending": sum(j["state"] != "complete" for j in pairs), "assessed": len(comparisons),
                                       "failed": sum(j["state"] in {"failed", "blocked"} for j in pairs)},
-                         coverage={"total": len(docs), "analyzed": sum(d.status in {"complete", "needs_review"} for d in docs),
+                         coverage={"total": len(docs), "analyzed": sum(d.status in ANALYZED for d in docs),
                                    "pages": sum(d.page_count for d in docs), "pages_read": sum(d.pages_read for d in docs),
-                                   "pages_analyzed": sum(d.pages_analyzed for d in docs)})
+                                   "pages_analyzed": sum(d.pages_analyzed for d in docs),
+                                   "dated": evaluated, "dates_unavailable": unavailable,
+                                   "undated": sum(1 for d in docs if d.status not in ANALYZED)})
 
     @app.get("/api/documents/{document_id}", response_model=Document)
     def document(document_id: str, request: Request):
