@@ -17,3 +17,5 @@ data/
 
 # Local pnpm shim (machine-specific scaffolding, not part of the deliverable)
 .bin/
+
+sample-contracts/CUAD_v1/
