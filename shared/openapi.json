@@ -1324,6 +1324,67 @@
         "title": "ReviewIssue",
         "type": "object"
       },
+      "SmeSelection-Input": {
+        "additionalProperties": false,
+        "properties": {
+          "mode": {
+            "default": "live",
+            "enum": [
+              "live",
+              "sample"
+            ],
+            "title": "Mode",
+            "type": "string"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "SmeSelection",
+        "type": "object"
+      },
+      "SmeSelection-Output": {
+        "additionalProperties": false,
+        "properties": {
+          "mode": {
+            "default": "live",
+            "enum": [
+              "live",
+              "sample"
+            ],
+            "title": "Mode",
+            "type": "string"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          }
+        },
+        "required": [
+          "name",
+          "mode"
+        ],
+        "title": "SmeSelection",
+        "type": "object"
+      },
       "Span": {
         "additionalProperties": false,
         "properties": {
@@ -2323,8 +2384,28 @@
     },
     "/api/settings/sme": {
       "post": {
-        "operationId": "disabled_api_settings_sme_post",
+        "operationId": "set_sme_api_settings_sme_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SmeSelection-Input"
+              }
+            }
+          },
+          "required": true
+        },
         "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SmeSelection-Output"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
           "403": {
             "content": {
               "application/json": {
@@ -2373,10 +2454,10 @@
                 }
               }
             },
-            "description": "Successful Response"
+            "description": "Not Implemented"
           }
         },
-        "summary": "Disabled"
+        "summary": "Set Sme"
       }
     }
   }

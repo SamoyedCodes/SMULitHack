@@ -5,6 +5,9 @@ import type { components } from '../../shared/api.generated'
 export type Health = components['schemas']['HealthResponse']
 export type Portfolio = components['schemas']['Portfolio']
 export type ApiDocument = components['schemas']['Document']
+export type Finding = components['schemas']['Finding']
+export type Evidence = components['schemas']['Evidence']
+export type ContractMode = 'live' | 'sample'
 
 // Use the exact backend schemas for runtime validation as well as generated types.
 const ajv = new Ajv2020({ strict: false, validateFormats: false })
@@ -42,4 +45,14 @@ export async function fetchLivePortfolio(signal?: AbortSignal): Promise<Portfoli
   const body = await apiRequest('/portfolio', { signal })
   if (!validatePortfolio(body) || body.mode !== 'live') throw new ApiError('validation', 'The portfolio response does not match the live workspace contract.')
   return body
+}
+
+// Established-party (SME) selection. Sends null to clear the current selection.
+export async function setSme(name: string | null, mode: ContractMode = 'live', signal?: AbortSignal): Promise<void> {
+  await apiRequest('/settings/sme', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, mode }),
+    signal,
+  })
 }

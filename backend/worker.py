@@ -6,6 +6,7 @@ from pathlib import Path
 from .conflicts import candidates, pair_id, time_comparison, validate_assessment
 from .documents import load_pages, normalize_pdf, parse_pdf, save_pages
 from .evidence import apply_extraction, stable_id
+from .foundation import CAPABILITIES
 from .llm import Gemini, ProviderFailure, ProviderUnavailable, QuotaWait, text_chunks, text_context
 from .models import Extraction, ReviewIssue, SupportReview, Verdict
 
@@ -40,7 +41,9 @@ class Worker:
             return False
         try:
             if job["kind"] == "document":
-                self.process_document(job["payload"]["document_id"])
+                self.read_document(job["payload"]["document_id"])
+            elif job["kind"] == "extract":
+                self.extract_document(job["payload"]["document_id"])
             else:
                 self.process_pair(job["payload"])
             self.store.job_state(job["id"], "complete")
@@ -59,13 +62,15 @@ class Worker:
         return True
 
     def mark_doc(self, job, state, message):
-        if job["kind"] == "document":
+        # Reading (Phase 2) and extraction (Phase 3) both report failure/blocking on the document.
+        if job["kind"] in ("document", "extract"):
             doc = self.store.document(job["payload"]["document_id"])
             if doc:
                 doc.status, doc.stage, doc.error = state, message, message
                 self.store.put_document(doc)
 
-    def process_document(self, document_id):
+    def read_document(self, document_id):
+        """Phase 2 stage: render pages and persist them. Constructs no model client and needs no key."""
         doc = self.store.document(document_id)
         if not doc:
             raise ValueError("Document no longer exists.")
@@ -99,6 +104,24 @@ class Worker:
         self.store.put_document(doc)
         if not any(p.spans for p in pages):
             raise ValueError("No legible text could be extracted. The document has not been analyzed.")
+        doc.status, doc.stage = "read", "Read; queued for extraction"
+        self.store.put_document(doc)
+        # Extraction is a separate, model-dependent stage so reading never requires a key.
+        self.store.enqueue("extract:" + doc.id, "extract", {"document_id": doc.id, "mode": doc.mode})
+
+    def extract_document(self, document_id):
+        """Phase 3 stage: grounded extraction and support review over already-read pages."""
+        doc = self.store.document(document_id)
+        if not doc:
+            raise ValueError("Document no longer exists.")
+        pages_path = self.config.directory(doc.id) / "pages.json"
+        if not pages_path.exists():
+            raise ValueError("Document pages are not available; read the document before extraction.")
+        pages = load_pages(pages_path)
+        if not any(p.spans for p in pages):
+            raise ValueError("No legible text could be extracted. The document has not been analyzed.")
+        doc.status, doc.error = "extracting", None
+        self.store.put_document(doc)
         chunks = text_chunks(pages)
         extraction = Extraction(title=doc.filename)
         fingerprints = set()
@@ -139,7 +162,9 @@ class Worker:
         doc.stage = "Analysis complete; review unresolved items" if doc.status == "needs_review" else "Analysis complete"
         doc.error = None
         self.store.put_document(doc)
-        self.schedule_pairs(doc.mode)
+        # Cross-contract comparison is Phase 5; only screen/enqueue pairs when that capability is on.
+        if CAPABILITIES.conflicts:
+            self.schedule_pairs(doc.mode)
 
     def schedule_pairs(self, mode):
         documents = [d for d in self.store.documents(mode) if d.status in ("complete", "needs_review")]

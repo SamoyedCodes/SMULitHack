@@ -13,7 +13,7 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from .config import VERSION, Config, libreoffice_path, tesseract_path
 from .foundation import CAPABILITIES, DatabaseStatus, ErrorResponse, HealthResponse
-from .models import Document, Page, Portfolio
+from .models import Document, Page, Portfolio, SmeSelection
 from .store import Store
 
 
@@ -126,10 +126,17 @@ def create_app(config: Config | None = None, start_worker: bool = False):
     def jobs(request: Request, mode: Literal["live", "sample"] = "live"):
         return request.app.state.store.jobs(mode)
 
+    @app.post("/api/settings/sme", response_model=SmeSelection)
+    def set_sme(selection: SmeSelection, request: Request):
+        # Established-party selection (Phase 3). The middleware already gates this on the
+        # extraction capability; persistence reuses the existing settings store.
+        request.app.state.store.set_setting("sme:" + selection.mode, selection.name)
+        return selection
+
     def disabled():
         raise HTTPException(501, "This feature is not implemented in Phase 1.")
 
-    for path in ("/api/batches", "/api/retry", "/api/settings/sme", "/api/demo"):
+    for path in ("/api/batches", "/api/retry", "/api/demo"):
         app.add_api_route(path, disabled, methods=["POST"], status_code=501)
     app.add_api_route("/api/documents/{document_id}/pages", disabled, methods=["GET"], response_model=list[Page])
     for path in ("/api/documents/{document_id}/pages/{number}/image", "/api/documents/{document_id}/original", "/api/review/{issue_id}/brief"):

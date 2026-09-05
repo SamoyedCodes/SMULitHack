@@ -13,7 +13,8 @@ class Capabilities(Record):
 
 
 # Enable a capability only when its route implementation and phase acceptance tests land.
-CAPABILITIES = Capabilities()
+# Phase 3 (grounded extraction + SME selection) is implemented; ingestion/later phases stay owned by their phases.
+CAPABILITIES = Capabilities(extraction=True)
 
 
 class DatabaseStatus(Record):
