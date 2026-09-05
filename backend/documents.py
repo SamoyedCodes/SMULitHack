@@ -142,18 +142,6 @@ def parse_pdf(path: Path, document_id: str, progress=None, existing: list[Page] 
                     scanned = ocr_spans(page, document_id, i + 1, len(result.spans))
                     if scanned:
                         result.spans = scanned
-                else:
-                    seen = set()
-                    for info in page.get_image_info():
-                        box = tuple(round(x, 1) for x in (pymupdf.Rect(info["bbox"]) * page.rotation_matrix))
-                        if box in seen or pymupdf.Rect(box).get_area() < 1500:
-                            continue
-                        seen.add(box)
-                        try:
-                            result.spans.extend(ocr_spans(page, document_id, i+1, len(result.spans), clip=box))
-                        except (ValueError, RuntimeError) as error:
-                            result.warnings.append(str(error) if isinstance(error, ValueError) else "Local OCR failed or timed out; this page has not been fully read.")
-                            result.status = "error"
                 if not result.spans:
                     result.status = "unreadable"
                     result.warnings.append("No legible text on this page. It may be blank or contain unreadable content.")
