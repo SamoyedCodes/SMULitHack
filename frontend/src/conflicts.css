@@ -9,15 +9,17 @@
 .conflict-counts strong { font-family:var(--display); font-size:1.7rem; font-weight:600; letter-spacing:-.03em; color:var(--accent-ink); }
 .conflict-counts div { font-size:.78rem; color:var(--muted); }
 .conflict-evidence { list-style:none; padding:0; margin-top:12px; }
-.conflict-evidence li { margin:10px 0; padding:12px 14px; background:var(--wash); border:1px solid var(--line); border-left:3px solid var(--found); border-radius:0 var(--r-ctrl) var(--r-ctrl) 0; }
-.conflict-evidence blockquote { margin:0 0 10px; line-height:1.6; color:var(--ink-soft); }
+.conflict-evidence li { margin:10px 0; padding:12px 14px; background:var(--wash); border:1px solid var(--line); border-radius:var(--r-ctrl); }
+.conflict-evidence blockquote { margin:0 0 10px 15px; position:relative; line-height:1.6; color:var(--ink-soft); }
+.conflict-evidence blockquote::before { content:""; position:absolute; left:-15px; top:3px; bottom:3px; width:2px; border-radius:2px; background:var(--line-strong); }
 .conflict-evidence .contract-link { font-family:var(--mono); font-size:.74rem; font-weight:500; color:var(--muted); border-bottom:1px dotted var(--line-strong); padding-bottom:1px; }
 .conflict-evidence .contract-link:hover { color:var(--ink); border-bottom-color:var(--ink); border-bottom-style:solid; }
 .conflict-filters { display:flex; flex-wrap:wrap; gap:16px; margin:24px 0; align-items:center; }
 .conflict-filters label { display:inline-flex; align-items:center; gap:8px; font-size:.85rem; color:var(--muted); }
 .conflict-filters select { padding:9px 11px; border:1px solid var(--line-strong); border-radius:var(--r-ctrl); background:var(--card); max-width:100%; color:var(--ink-soft); }
-.conflict-toast { position:fixed; bottom:24px; right:24px; z-index:30; max-width:420px; padding:20px; background:var(--card); border:1px solid var(--line); border-top:3px solid var(--unresolved); border-radius:var(--r-card); box-shadow:var(--shadow-float); }
-.conflict-toast strong { font-family:var(--display); font-size:1rem; color:var(--ink); }
+.conflict-toast { position:fixed; bottom:24px; right:24px; z-index:30; max-width:420px; padding:18px 20px; background:var(--card); border:1px solid var(--line); border-radius:var(--r-card); box-shadow:var(--shadow-float); }
+.conflict-toast strong { display:flex; align-items:center; gap:8px; font-family:var(--display); font-size:1rem; color:var(--ink); }
+.conflict-toast strong::before { content:""; width:8px; height:8px; border-radius:50%; background:var(--unresolved); flex-shrink:0; }
 .conflict-toast p { margin:10px 0; color:var(--muted); font-size:.875rem; }
 .conflict-toast button { margin-right:8px; margin-top:8px; }
 .conflict-focused { outline:2px solid var(--accent); outline-offset:2px; scroll-margin-top:76px; }
