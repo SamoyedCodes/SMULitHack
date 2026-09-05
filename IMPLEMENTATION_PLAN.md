@@ -1,6 +1,6 @@
 # AITHENA implementation phases
 
-Each phase has a separate acceptance boundary. The current integration implements the Phase 1 foundation; consult `PHASE_1_COMPLETION.md` for actual checks and any outstanding verification. Later modules remain drafts and capabilities remain disabled.
+Each phase has a separate acceptance boundary. The current integration implements the Phase 1 foundation and Phase 2 ingestion/source viewing. Consult `PHASE_1_COMPLETION.md` and `PHASE_2_COMPLETION.md` for actual checks. Only ingestion is enabled; phases 3–7 remain drafts or planned work.
 
 ```mermaid
 flowchart LR
@@ -21,7 +21,7 @@ flowchart LR
 | Phase | Deliverable | Acceptance boundary |
 |---|---|---|
 | 1. Runnable foundation | Builder 2's UI shell, local FastAPI, persistent SQLite, truthful health, generated contracts, launcher, tests | No key needed; no processing; disabled routes cannot mutate; schema/build/tests and local proxy work |
-| 2. Ingestion and sources | Batch files/folders, originals/hashes, durable reading jobs, PDF/OCR/DOCX, every page with coordinates | Real clean/degraded scans and DOCX; duplicate/interrupted/error handling; local reading works without API key |
+| 2. Ingestion and sources — implemented | Batch files/folders, originals/hashes, durable reading jobs, PDF/OCR/DOCX, every page with coordinates | Real clean/degraded scans and DOCX; duplicate/interrupted/error handling; local reading works without API key |
 | 3. Grounded extraction | LLM typed extraction/support review, eight required fields, citation validation, provenance/confidence, SME selection | Every assertion supported; unknowns explicit; quota/key failures visible; no silent truncation |
 | 4. Deadline calendar | Python offsets/windows/recurrence and 90-day event-or-action selection | Exact deadline fixtures pass; unknown triggers, business days and month-end ambiguity escalate |
 | 5. Distribution conflicts | Python candidates plus LLM scope/exception comparison, validated assessments | Exclusive/non-exclusive overlaps, exclusions, non-overlapping dates and missing schedules evaluated; no breach claims |

@@ -1,19 +1,20 @@
-"""Phase 1 API. Draft processing modules are deliberately not imported here."""
+"""Local ingestion API. Inference modules remain disconnected."""
 import sqlite3
+import uuid
 from contextlib import asynccontextmanager
 from datetime import date, datetime, timedelta
 from typing import Literal
 from zoneinfo import ZoneInfo
 
-from fastapi import FastAPI, HTTPException, Request, Response
+from fastapi import FastAPI, HTTPException, Request, Response, File, UploadFile, Header, Query
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from .config import VERSION, Config, libreoffice_path, tesseract_path
-from .foundation import CAPABILITIES, DatabaseStatus, ErrorResponse, HealthResponse
-from .models import Document, Page, Portfolio
+from .foundation import CAPABILITIES, DatabaseStatus, ErrorResponse, HealthResponse, WorkerStatus
+from .models import Document, Page, Portfolio, BatchResponse, Job, RetryResponse
 from .store import Store
 
 
@@ -21,21 +22,28 @@ def error(status: int, code: str, message: str):
     return JSONResponse(status_code=status, content={"error": {"code": code, "message": message, "details": []}})
 
 
-def create_app(config: Config | None = None, start_worker: bool = False):
-    # Kept for caller compatibility. Phase 1 never constructs or starts a worker.
+def create_app(config: Config | None = None, start_worker: bool = True):
     @asynccontextmanager
     async def lifespan(app):
         resolved = config or Config()
         app.state.config = resolved
         resolved.data_dir.mkdir(parents=True, exist_ok=True)
         app.state.store = Store(resolved.data_dir)
-        yield
+        if start_worker and CAPABILITIES.ingestion:
+            from .worker import Worker
+            app.state.worker = Worker(resolved, app.state.store)
+            app.state.worker.start()
+        try:
+            yield
+        finally:
+            if app.state.worker:
+                app.state.worker.stop()
 
     app = FastAPI(title="AITHENA evidence API", version=VERSION, lifespan=lifespan,
-                  responses={status: {"model": ErrorResponse} for status in (403, 404, 422, 500, 501)})
+                  responses={status: {"model": ErrorResponse} for status in (403, 404, 409, 413, 422, 500, 501)})
     app.state.worker = None
     app.add_middleware(CORSMiddleware, allow_origin_regex=r"http://(?:127\.0\.0\.1|localhost):\d+",
-                       allow_methods=["GET", "POST"], allow_headers=["Content-Type"])
+                       allow_methods=["GET", "POST"], allow_headers=["Content-Type", "Idempotency-Key"])
 
     @app.middleware("http")
     async def local_origin(request: Request, call_next):
@@ -63,7 +71,7 @@ def create_app(config: Config | None = None, start_worker: bool = False):
 
     @app.exception_handler(StarletteHTTPException)
     async def http_error(request, exc):
-        codes = {404: "not_found", 422: "validation_error", 403: "forbidden", 501: "feature_not_enabled"}
+        codes = {409: "conflict", 413: "payload_too_large", 404: "not_found", 422: "validation_error", 403: "forbidden", 501: "feature_not_enabled"}
         return error(exc.status_code, codes.get(exc.status_code, "http_error"), str(exc.detail))
 
     @app.exception_handler(RequestValidationError)
@@ -89,7 +97,8 @@ def create_app(config: Config | None = None, start_worker: bool = False):
         return HealthResponse(status="ready" if ready else "degraded", version=VERSION, model=cfg.model,
                               key_configured=configured, model_status="configured_unverified" if configured else "not_configured",
                               ocr_available=bool(tesseract_path()), docx_available=bool(libreoffice_path()),
-                              database=DatabaseStatus(status="ready" if ready else "unavailable"))
+                              database=DatabaseStatus(status="ready" if ready else "unavailable"),
+                              worker=WorkerStatus(enabled=bool(request.app.state.worker), running=bool(request.app.state.worker and request.app.state.worker.running)))
 
     @app.get("/api/portfolio", response_model=Portfolio)
     def portfolio(request: Request, mode: Literal["live", "sample"] = "live", as_of: date | None = None):
@@ -114,26 +123,80 @@ def create_app(config: Config | None = None, start_worker: bool = False):
             raise HTTPException(404, "Document not found.")
         return doc
 
-    @app.get("/api/batches/{batch_id}")
+    @app.get("/api/batches", response_model=list[BatchResponse])
+    def recent_batches(request: Request, limit: int = Query(1, ge=1, le=20)):
+        import json
+        from .ingestion import batch_response
+        store = request.app.state.store
+        with store.connection() as db:
+            rows = db.execute("SELECT body FROM batches ORDER BY json_extract(body, '$.created_at') DESC LIMIT ?", (limit,)).fetchall()
+        return [batch_response(store, json.loads(row['body'])) for row in rows]
+
+    @app.get("/api/batches/{batch_id}", response_model=BatchResponse)
     def batch(batch_id: str, request: Request):
         store = request.app.state.store
         batch = store.batch(batch_id)
         if batch is None:
             raise HTTPException(404, "Batch not found.")
-        return {**batch, "progress": [store.document(doc["id"]) for doc in batch["documents"]]}
+        from .ingestion import batch_response
+        return batch_response(store, batch)
 
-    @app.get("/api/jobs")
+    @app.get("/api/jobs", response_model=list[Job])
     def jobs(request: Request, mode: Literal["live", "sample"] = "live"):
         return request.app.state.store.jobs(mode)
 
-    def disabled():
-        raise HTTPException(501, "This feature is not implemented in Phase 1.")
+    @app.post("/api/batches", response_model=BatchResponse, status_code=202)
+    async def upload(request: Request, files: list[UploadFile] = File(...), idempotency_key: uuid.UUID | None = Header(None)):
+        from .ingestion import ingest
+        return await ingest(files, request.app.state.config, request.app.state.store, str(idempotency_key or uuid.uuid4()))
 
-    for path in ("/api/batches", "/api/retry", "/api/settings/sme", "/api/demo"):
+    @app.post("/api/retry", response_model=RetryResponse)
+    def retry(request: Request, document_id: str, mode: Literal['live', 'sample'] = 'live'):
+        doc = document(document_id, request)
+        if doc.mode != mode:
+            raise HTTPException(404, 'Document not found in this workspace.')
+        return RetryResponse(resumed_jobs=request.app.state.store.retry_ingestion(document_id, mode))
+
+    @app.get("/api/documents/{document_id}/pages", response_model=list[Page])
+    def pages(document_id: str, request: Request):
+        from .documents import load_pages
+        from .ingestion import source_path
+        document(document_id, request)
+        try:
+            path = source_path(request.app.state.config, document_id, 'pages.json')
+        except HTTPException:
+            return []
+        return load_pages(path)
+
+    @app.get("/api/documents/{document_id}/pages/{number}/image", responses={200: {'content': {'image/png': {}}}})
+    def page_image(document_id: str, number: int, request: Request):
+        from .documents import render_page
+        from .ingestion import source_path
+        document(document_id, request)
+        path = source_path(request.app.state.config, document_id, 'canonical.pdf')
+        try:
+            content = render_page(path, number)
+        except ValueError:
+            raise HTTPException(404, 'Page does not exist.') from None
+        return Response(content, media_type='image/png', headers={'Cache-Control': 'no-store'})
+
+    @app.get("/api/documents/{document_id}/original")
+    def original(document_id: str, request: Request):
+        from .ingestion import source_path
+        doc = document(document_id, request)
+        directory = request.app.state.config.directory(document_id, create=False)
+        original = next(directory.glob('original.*'), None)
+        if not original:
+            raise HTTPException(404, 'Original file unavailable.')
+        path = source_path(request.app.state.config, document_id, original.name)
+        return FileResponse(path, filename=doc.filename, media_type='application/octet-stream', headers={'X-Content-Type-Options':'nosniff'})
+
+    def disabled():
+        raise HTTPException(501, "This feature is not implemented in Phase 2.")
+
+    for path in ("/api/settings/sme", "/api/demo"):
         app.add_api_route(path, disabled, methods=["POST"], status_code=501)
-    app.add_api_route("/api/documents/{document_id}/pages", disabled, methods=["GET"], response_model=list[Page])
-    for path in ("/api/documents/{document_id}/pages/{number}/image", "/api/documents/{document_id}/original", "/api/review/{issue_id}/brief"):
-        app.add_api_route(path, disabled, methods=["GET"])
+    app.add_api_route("/api/review/{issue_id}/brief", disabled, methods=["GET"])
     return app
 
 

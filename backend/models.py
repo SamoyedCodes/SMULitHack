@@ -242,3 +242,33 @@ class Portfolio(Record):
 class SmeSelection(Record):
     name: str | None
     mode: Literal["live", "sample"] = "live"
+
+
+class BatchItem(Record):
+    id: str | None
+    filename: str
+    cached: bool = False
+    error: str | None = None
+
+
+class BatchResponse(Record):
+    id: str
+    created_at: str
+    documents: list[BatchItem]
+    progress: list[Document] = Field(default_factory=list)
+
+
+class Job(Record):
+    id: str
+    cache_key: str
+    kind: str
+    payload: dict
+    state: str
+    attempts: int
+    next_run: float
+    error: str | None
+    created_at: str
+
+
+class RetryResponse(Record):
+    resumed_jobs: int

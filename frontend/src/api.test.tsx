@@ -51,7 +51,7 @@ it('starts with a live checking state, disabled ingestion and no invented SME or
   const markup = renderToStaticMarkup(<App />)
   expect(markup).toContain('Checking connection')
   expect(markup).toContain('SME not selected')
-  expect(markup).toContain('ingestion is not enabled')
+  expect(markup).toContain('Connect to the backend')
   expect(markup).not.toContain('Meridian')
   expect(markup).not.toContain('Sample workspace')
   expect(markup).toContain('disabled="" aria-describedby="ingestion-note"')

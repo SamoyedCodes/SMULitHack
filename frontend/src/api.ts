@@ -15,10 +15,10 @@ export class ApiError extends Error {
   constructor(public kind: 'transport' | 'api' | 'validation', message: string, public status?: number) { super(message) }
 }
 
-export async function apiRequest(path: string, options: RequestInit = {}, allowDegraded = false): Promise<unknown> {
+export async function apiRequest(path: string, options: RequestInit = {}, allowDegraded = false, timeout = 5000): Promise<unknown> {
   let response: Response
   try {
-    response = await fetch(`/api${path}`, { ...options, signal: AbortSignal.any([AbortSignal.timeout(5000), ...(options.signal ? [options.signal] : [])]) })
+    response = await fetch(`/api${path}`, { ...options, signal: AbortSignal.any([AbortSignal.timeout(timeout), ...(options.signal ? [options.signal] : [])]) })
   } catch {
     throw new ApiError('transport', 'Cannot reach the local backend. Start it and check the configured ports.')
   }
@@ -42,4 +42,38 @@ export async function fetchLivePortfolio(signal?: AbortSignal): Promise<Portfoli
   const body = await apiRequest('/portfolio', { signal })
   if (!validatePortfolio(body) || body.mode !== 'live') throw new ApiError('validation', 'The portfolio response does not match the live workspace contract.')
   return body
+}
+
+export type Batch = components['schemas']['BatchResponse']
+export type SourcePage = components['schemas']['Page']
+const validateBatch = ajv.compile<Batch>({ $ref: 'aithena#/components/schemas/BatchResponse' })
+const validatePages = ajv.compile<SourcePage[]>({ type: 'array', items: { $ref: 'aithena#/components/schemas/Page' } })
+const validateRetry = ajv.compile<components['schemas']['RetryResponse']>({ $ref: 'aithena#/components/schemas/RetryResponse' })
+export async function uploadBatch(files: File[], key: string): Promise<Batch> {
+  const body = new FormData()
+  files.forEach(file => body.append('files', file, file.webkitRelativePath || file.name))
+  const result = await apiRequest('/batches', { method: 'POST', headers: { 'Idempotency-Key': key }, body }, false, 120000)
+  if (!validateBatch(result)) throw new ApiError('validation', 'The upload acknowledgement does not match this build. Retry the same selection to recover its batch receipt.')
+  return result
+}
+export async function fetchBatch(id: string): Promise<Batch> {
+  const body = await apiRequest(`/batches/${encodeURIComponent(id)}`)
+  if (!validateBatch(body)) throw new ApiError('validation', 'Invalid batch response.')
+  return body
+}
+export async function fetchPages(id: string, signal?: AbortSignal): Promise<SourcePage[]> {
+  const body = await apiRequest(`/documents/${encodeURIComponent(id)}/pages`, { signal })
+  if (!validatePages(body)) throw new ApiError('validation', 'The source page response does not match this build.')
+  return body
+}
+export async function retryReading(id: string) {
+  const body = await apiRequest(`/retry?document_id=${encodeURIComponent(id)}`, { method: 'POST' })
+  if (!validateRetry(body)) throw new ApiError('validation', 'Invalid retry response.')
+  return body
+}
+
+export async function fetchLatestBatch(): Promise<Batch | null> {
+  const body = await apiRequest('/batches?limit=1')
+  if (!Array.isArray(body) || body.some(item => !validateBatch(item))) throw new ApiError('validation', 'Invalid batch history response.')
+  return (body[0] as Batch | undefined) ?? null
 }

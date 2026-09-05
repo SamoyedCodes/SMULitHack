@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { CalendarDays, ChevronRight, CircleAlert, FolderOpen, LayoutDashboard, Plus, RefreshCw, Scale, ShieldCheck } from 'lucide-react'
+import { DocumentLibrary, RecentBatch, SourceViewer, UploadPanel } from './Ingestion'
 import { fetchHealth, fetchLivePortfolio, type Health, type Portfolio } from './api'
 
 const navigation = [
@@ -15,15 +16,17 @@ export function Readiness({ health, stale }: { health: Health | null; stale: boo
   const rows = [
     ['Local API', health ? (health.status === 'ready' ? 'Ready' : 'Degraded') : 'Checking', 'Local service readiness does not mean contracts have been analyzed.'],
     ['SQLite database', health?.database.status ?? 'Checking', 'Saved metadata and queued work persist locally.'],
-    ['Gemini', health ? (health.key_configured ? 'Configured, not verified' : 'Not configured') : 'Checking', 'Optional in Phase 1. Configure GEMINI_API_KEY in the repository .env for the extraction phase.'],
-    ['Tesseract OCR', health ? (health.ocr_available ? 'Executable detected' : 'Not detected') : 'Checking', 'Optional now. Install Tesseract or set TESSERACT_CMD before processing scans.'],
-    ['DOCX conversion', health ? (health.docx_available ? 'Executable detected' : 'Not detected') : 'Checking', 'Optional now. Install LibreOffice or set LIBREOFFICE_CMD before converting DOCX files.'],
-    ['Processing worker', health ? (health.worker.running ? 'Running' : health.worker.enabled ? 'Enabled, stopped' : 'Disabled') : 'Checking', 'Phase 1 does not start processing, OCR or model requests.'],
+    ['Gemini', health ? (health.key_configured ? 'Configured, not verified' : 'Not configured') : 'Checking', 'Optional for local reading. Configure GEMINI_API_KEY in the repository .env for the extraction phase.'],
+    ['Tesseract OCR', health ? (health.ocr_available ? 'Executable detected' : 'Not detected') : 'Checking', 'Needed for scans. Install Tesseract or set TESSERACT_CMD before processing scans.'],
+    ['DOCX conversion', health ? (health.docx_available ? 'Executable detected' : 'Not detected') : 'Checking', 'Needed for DOCX. Install LibreOffice or set LIBREOFFICE_CMD before converting DOCX files.'],
+    ['Processing worker', health ? (health.worker.running ? 'Running' : health.worker.enabled ? 'Enabled, stopped' : 'Disabled') : 'Checking', 'The worker reads files locally. Model extraction is disabled.'],
   ]
   return <section className="card readiness"><div className="section-heading"><h2>Workspace readiness</h2><span className="badge">{stale ? 'Last response · stale' : 'Local checks'}</span></div><div className="readiness-grid">{rows.map(([title, value, note]) => <article key={title}><h3>{title}</h3><strong>{stale ? `${value} · stale` : value}</strong><p>{note}</p></article>)}</div></section>
 }
 
 export default function App() {
+  const [uploadOpen, setUploadOpen] = useState(false)
+  const [selectedId, setSelectedId] = useState<string | null>(null)
   const [view, setView] = useState<View>('Overview')
   const [health, setHealth] = useState<Health | null>(null)
   const [portfolio, setPortfolio] = useState<Portfolio | null>(null)
@@ -54,11 +57,13 @@ export default function App() {
   }, [])
   useEffect(() => {
     void refresh()
-    const timer = setInterval(() => void refresh(), 10000)
+    const timer = setInterval(() => void refresh(), 3000)
     return () => { clearInterval(timer); active.current?.abort(); active.current = null }
   }, [refresh])
 
   const connected = Boolean(health?.status === 'ready' && !stale && portfolio)
+  const ingestionEnabled = Boolean(connected && health?.capabilities.ingestion)
+  const selectedDocument = portfolio?.documents.find(doc => doc.id === selectedId)
   const status = error ? (health?.status === 'degraded' ? 'Degraded' : 'Disconnected') : connected ? 'Local service ready' : 'Checking connection'
   const explanation: Record<Exclude<View, 'Overview'>, string> = {
     Contracts: 'Document ingestion and source viewing arrive in Phase 2. No new documents can be processed in this build.',
@@ -67,13 +72,16 @@ export default function App() {
     'Needs review': 'Evidence review and lawyer briefs arrive in later phases. An empty queue does not mean there are no unresolved obligations.',
   }
   return <div className="app-shell foundation-shell">
-    <aside className="sidebar"><a className="brand" href="#" onClick={event => { event.preventDefault(); setView('Overview') }}><span className="brand-mark"><Scale size={24} /></span>aithena<span className="brand-dot">.</span></a><div className="workspace-label">LOCAL WORKSPACE</div><nav aria-label="Main navigation">{navigation.map(({ name, icon: Icon }) => <button key={name} className={`nav-item ${view === name ? 'active' : ''}`} aria-current={view === name ? 'page' : undefined} onClick={() => setView(name)}><Icon size={19} />{name}</button>)}</nav><div className="sidebar-bottom"><ShieldCheck /><strong>Evidence comes first.</strong><p>Know what is established.<br />See what needs review.</p><div className="profile">SME not selected<small>Party selection arrives with extraction.</small></div></div></aside>
+    <aside className="sidebar"><a className="brand" href="#" onClick={event => { event.preventDefault(); setView('Overview') }}><span className="brand-mark"><Scale size={24} /></span>aithena<span className="brand-dot">.</span></a><div className="workspace-label">LOCAL WORKSPACE</div><nav aria-label="Main navigation">{navigation.map(({ name, icon: Icon }) => <button key={name} className={`nav-item ${view === name ? 'active' : ''}`} aria-current={view === name ? 'page' : undefined} onClick={() => { setView(name); setSelectedId(null) }}><Icon size={19} />{name}</button>)}</nav><div className="sidebar-bottom"><ShieldCheck /><strong>Evidence comes first.</strong><p>Know what is established.<br />See what needs review.</p><div className="profile">SME not selected<small>Party selection arrives with extraction.</small></div></div></aside>
     <div className="main-shell"><header className="topbar"><div>Workspace <ChevronRight size={14} /><strong>{view}</strong></div><span role="status" className={`badge ${connected ? 'green' : 'amber'}`}>{status}</span></header><main>
-      <div className="page-heading"><div><div className="eyebrow">AITHENA · PHASE 1</div><h1>{view === 'Overview' ? 'Workspace overview' : view}</h1><p>A connected foundation for evidence-backed contract review.</p></div><div className="heading-actions"><button className="secondary" disabled={checking} onClick={() => void refresh()}><RefreshCw size={18} className={checking ? 'spin' : ''} />Check connection</button><button className="primary" disabled aria-describedby="ingestion-note"><Plus size={18} />Add contracts</button></div></div>
-      <p id="ingestion-note" className="phase-notice">Contract ingestion is not enabled. Uploads become available in Phase 2.</p>
+      <div className="page-heading"><div><div className="eyebrow">AITHENA · PHASE 2</div><h1>{view === 'Overview' ? 'Workspace overview' : view}</h1><p>A connected foundation for evidence-backed contract review.</p></div><div className="heading-actions"><button className="secondary" disabled={checking} onClick={() => void refresh()}><RefreshCw size={18} className={checking ? 'spin' : ''} />Check connection</button><button className="primary" disabled={!ingestionEnabled} aria-describedby="ingestion-note" onClick={() => setUploadOpen(true)}><Plus size={18} />Add contracts</button></div></div>
+      <p id="ingestion-note" className="phase-notice">{ingestionEnabled ? "Local reading is available. Obligation extraction and legal assessment remain disabled." : "Connect to the backend to upload and read documents locally."}</p>
       {error && <div className="error" role="alert">{error} {health && 'Previous information below must not be treated as current.'}</div>}
-      {checkedAt && <p className="check-time">Last response: {checkedAt} SGT{stale ? ' · stale' : ''}. Checks repeat every 10 seconds.</p>}
-      {view === 'Overview' ? <><Readiness health={health} stale={stale} /><section className="card foundation-empty"><FolderOpen size={30} /><h2>{portfolio?.documents.length ? `${portfolio.documents.length} saved document records${stale ? ' · stale' : ''}` : 'No contracts have been analyzed in this build'}</h2><p>{portfolio?.documents.length ? 'Existing records are preserved. Processing and analysis remain disabled; saved results are not recomputed.' : 'The workspace is ready for future ingestion. An empty workspace tells us nothing about obligations in documents that have not been processed.'}</p></section>{health && <section className="card capability-card"><h2>Available capabilities{stale ? ' · stale' : ''}</h2><ul>{Object.entries(health.capabilities).map(([name, enabled]) => <li key={name}><span>{name.replaceAll('_', ' ')}</span><span>{enabled ? 'Backend enabled' : 'Not enabled'}</span></li>)}</ul><p>{health.inference_notice}</p></section>}</> : <section className="card foundation-empty"><FolderOpen size={30} /><h2>{view} is awaiting its implementation phase</h2><p>{explanation[view]}</p>{view === 'Contracts' && Boolean(portfolio?.documents.length) && <ul className="saved-documents">{portfolio?.documents.map(doc => <li key={doc.id}><strong>{doc.filename}</strong><span>{doc.status} · {doc.stage}{stale ? ' · stale' : ''}</span></li>)}</ul>}</section>}
+      {checkedAt && <p className="check-time">Last response: {checkedAt} SGT{stale ? ' · stale' : ''}. Checks repeat every 3 seconds.</p>}
+      {uploadOpen && health && <UploadPanel health={health} enabled={ingestionEnabled} onClose={() => setUploadOpen(false)} onUploaded={() => { setUploadOpen(false); setSelectedId(null); setView('Contracts'); void refresh() }} />}
+      {selectedDocument ? <SourceViewer key={selectedDocument.id} document={selectedDocument} enabled={ingestionEnabled} onClose={() => setSelectedId(null)} /> : <>
+      {view === 'Overview' ? <><Readiness health={health} stale={stale} /><section className="card foundation-empty"><FolderOpen size={30} /><h2>{portfolio?.documents.length ? `${portfolio.documents.length} saved document records${stale ? ' · stale' : ''}` : 'No contracts have been analyzed in this build'}</h2><p>{portfolio?.documents.length ? 'Files and page text stay local. Text readiness does not mean obligations have been extracted.' : 'Add contracts to read their pages locally. An empty workspace tells us nothing about obligations in unprocessed documents.'}</p></section>{health && <section className="card capability-card"><h2>Available capabilities{stale ? ' · stale' : ''}</h2><ul>{Object.entries(health.capabilities).map(([name, enabled]) => <li key={name}><span>{name.replaceAll('_', ' ')}</span><span>{enabled ? 'Backend enabled' : 'Not enabled'}</span></li>)}</ul><p>{health.inference_notice}</p></section>}</> : view === 'Contracts' ? <><DocumentLibrary documents={portfolio?.documents ?? []} enabled={ingestionEnabled} stale={stale} onOpen={setSelectedId} onRefresh={() => void refresh()} /><RecentBatch revision={checkedAt ?? ''} /></> : <section className="card foundation-empty"><FolderOpen size={30} /><h2>{view} is awaiting its implementation phase</h2><p>{explanation[view]}</p></section>}
+      </>}
       <footer><ShieldCheck size={16} /><span>Found · Calculated · Inferred · Unresolved — provenance stays separate from confidence.</span></footer>
     </main></div>
   </div>

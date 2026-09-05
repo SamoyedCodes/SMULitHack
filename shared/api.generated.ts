@@ -6,10 +6,11 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        /** Recent Batches */
+        get: operations["recent_batches_api_batches_get"];
         put?: never;
-        /** Disabled */
-        post: operations["disabled_api_batches_post"];
+        /** Upload */
+        post: operations["upload_api_batches_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -74,8 +75,8 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Disabled */
-        get: operations["disabled_api_documents__document_id__original_get"];
+        /** Original */
+        get: operations["original_api_documents__document_id__original_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -91,8 +92,8 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Disabled */
-        get: operations["disabled_api_documents__document_id__pages_get"];
+        /** Pages */
+        get: operations["pages_api_documents__document_id__pages_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -108,8 +109,8 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Disabled */
-        get: operations["disabled_api_documents__document_id__pages__number__image_get"];
+        /** Page Image */
+        get: operations["page_image_api_documents__document_id__pages__number__image_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -178,8 +179,8 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Disabled */
-        post: operations["disabled_api_retry_post"];
+        /** Retry */
+        post: operations["retry_api_retry_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -224,6 +225,36 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** BatchItem */
+        BatchItem: {
+            /**
+             * Cached
+             * @default false
+             */
+            cached: boolean;
+            /** Error */
+            error: string | null;
+            /** Filename */
+            filename: string;
+            /** Id */
+            id: string | null;
+        };
+        /** BatchResponse */
+        BatchResponse: {
+            /** Created At */
+            created_at: string;
+            /** Documents */
+            documents: components["schemas"]["BatchItem"][];
+            /** Id */
+            id: string;
+            /** Progress */
+            progress: components["schemas"]["Document"][];
+        };
+        /** Body_upload_api_batches_post */
+        Body_upload_api_batches_post: {
+            /** Files */
+            files: string[];
+        };
         /** Capabilities */
         Capabilities: {
             /**
@@ -618,6 +649,29 @@ export interface components {
             version: string;
             worker: components["schemas"]["WorkerStatus"];
         };
+        /** Job */
+        Job: {
+            /** Attempts */
+            attempts: number;
+            /** Cache Key */
+            cache_key: string;
+            /** Created At */
+            created_at: string;
+            /** Error */
+            error: string | null;
+            /** Id */
+            id: string;
+            /** Kind */
+            kind: string;
+            /** Next Run */
+            next_run: number;
+            /** Payload */
+            payload: {
+                [key: string]: unknown;
+            };
+            /** State */
+            state: string;
+        };
         /** Limits */
         Limits: {
             /**
@@ -683,6 +737,11 @@ export interface components {
             parties: string[];
             /** Sme */
             sme: string | null;
+        };
+        /** RetryResponse */
+        RetryResponse: {
+            /** Resumed Jobs */
+            resumed_jobs: number;
         };
         /** ReviewIssue */
         ReviewIssue: {
@@ -775,15 +834,26 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    disabled_api_batches_post: {
+    recent_batches_api_batches_get: {
         parameters: {
-            query?: never;
+            query?: {
+                limit?: number;
+            };
             header?: never;
             path?: never;
             cookie?: never;
         };
         requestBody?: never;
         responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BatchResponse"][];
+                };
+            };
             /** @description Forbidden */
             403: {
                 headers: {
@@ -795,6 +865,24 @@ export interface operations {
             };
             /** @description Not Found */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request Entity Too Large */
+            413: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -820,7 +908,96 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
+            /** @description Not Implemented */
+            501: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    upload_api_batches_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "idempotency-key"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_upload_api_batches_post"];
+            };
+        };
+        responses: {
             /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BatchResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request Entity Too Large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Implemented */
             501: {
                 headers: {
                     [name: string]: unknown;
@@ -848,7 +1025,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["BatchResponse"];
                 };
             };
             /** @description Forbidden */
@@ -862,6 +1039,24 @@ export interface operations {
             };
             /** @description Not Found */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request Entity Too Large */
+            413: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -918,6 +1113,24 @@ export interface operations {
             };
             /** @description Not Found */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request Entity Too Large */
+            413: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -992,6 +1205,24 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request Entity Too Large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
             /** @description Unprocessable Entity */
             422: {
                 headers: {
@@ -1021,11 +1252,13 @@ export interface operations {
             };
         };
     };
-    disabled_api_documents__document_id__original_get: {
+    original_api_documents__document_id__original_get: {
         parameters: {
             query?: never;
             header?: never;
-            path?: never;
+            path: {
+                document_id: string;
+            };
             cookie?: never;
         };
         requestBody?: never;
@@ -1057,6 +1290,24 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request Entity Too Large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
             /** @description Unprocessable Entity */
             422: {
                 headers: {
@@ -1086,11 +1337,13 @@ export interface operations {
             };
         };
     };
-    disabled_api_documents__document_id__pages_get: {
+    pages_api_documents__document_id__pages_get: {
         parameters: {
             query?: never;
             header?: never;
-            path?: never;
+            path: {
+                document_id: string;
+            };
             cookie?: never;
         };
         requestBody?: never;
@@ -1122,6 +1375,24 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request Entity Too Large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
             /** @description Unprocessable Entity */
             422: {
                 headers: {
@@ -1151,11 +1422,14 @@ export interface operations {
             };
         };
     };
-    disabled_api_documents__document_id__pages__number__image_get: {
+    page_image_api_documents__document_id__pages__number__image_get: {
         parameters: {
             query?: never;
             header?: never;
-            path?: never;
+            path: {
+                document_id: string;
+                number: number;
+            };
             cookie?: never;
         };
         requestBody?: never;
@@ -1167,6 +1441,7 @@ export interface operations {
                 };
                 content: {
                     "application/json": unknown;
+                    "image/png": unknown;
                 };
             };
             /** @description Forbidden */
@@ -1180,6 +1455,24 @@ export interface operations {
             };
             /** @description Not Found */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request Entity Too Large */
+            413: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -1252,6 +1545,24 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request Entity Too Large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
             /** @description Unprocessable Entity */
             422: {
                 headers: {
@@ -1307,7 +1618,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["Job"][];
                 };
             };
             /** @description Forbidden */
@@ -1321,6 +1632,24 @@ export interface operations {
             };
             /** @description Not Found */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request Entity Too Large */
+            413: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -1396,6 +1725,24 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request Entity Too Large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
             /** @description Unprocessable Entity */
             422: {
                 headers: {
@@ -1425,15 +1772,27 @@ export interface operations {
             };
         };
     };
-    disabled_api_retry_post: {
+    retry_api_retry_post: {
         parameters: {
-            query?: never;
+            query: {
+                document_id: string;
+                mode?: "live" | "sample";
+            };
             header?: never;
             path?: never;
             cookie?: never;
         };
         requestBody?: never;
         responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RetryResponse"];
+                };
+            };
             /** @description Forbidden */
             403: {
                 headers: {
@@ -1445,6 +1804,24 @@ export interface operations {
             };
             /** @description Not Found */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request Entity Too Large */
+            413: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -1470,7 +1847,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description Successful Response */
+            /** @description Not Implemented */
             501: {
                 headers: {
                     [name: string]: unknown;
@@ -1510,6 +1887,24 @@ export interface operations {
             };
             /** @description Not Found */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request Entity Too Large */
+            413: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -1566,6 +1961,24 @@ export interface operations {
             };
             /** @description Not Found */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request Entity Too Large */
+            413: {
                 headers: {
                     [name: string]: unknown;
                 };

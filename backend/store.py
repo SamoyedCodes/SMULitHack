@@ -81,16 +81,16 @@ class Store:
             db.execute("INSERT OR IGNORE INTO jobs(id,cache_key,kind,payload,created_at) VALUES(?,?,?,?,?)",
                        (str(uuid.uuid4()), key, kind, json.dumps(payload), now()))
 
-    def recover(self):
+    def recover(self, kind: str | None = None):
         with self.connection() as db:
-            db.execute("UPDATE jobs SET state='queued', error='Resumed after interruption' WHERE state='running'")
+            db.execute("UPDATE jobs SET state='queued', error='Resumed after interruption' WHERE state='running' AND (? IS NULL OR kind=?)", (kind, kind))
 
-    def claim(self) -> dict | None:
+    def claim(self, kind: str | None = None) -> dict | None:
         with self.connection() as db:
             db.execute("BEGIN IMMEDIATE")
             row = db.execute(
-                "SELECT * FROM jobs WHERE state IN ('queued','waiting') AND next_run<=? ORDER BY created_at LIMIT 1",
-                (time.time(),)).fetchone()
+                "SELECT * FROM jobs WHERE state IN ('queued','waiting') AND next_run<=? AND (? IS NULL OR kind=?) ORDER BY created_at LIMIT 1",
+                (time.time(), kind, kind)).fetchone()
             if row:
                 db.execute("UPDATE jobs SET state='running', attempts=attempts+1 WHERE id=?", (row["id"],))
                 job = dict(row)
@@ -150,3 +150,18 @@ class Store:
         with self.connection() as db:
             row = db.execute("SELECT body FROM batches WHERE id=?", (batch_id,)).fetchone()
         return json.loads(row["body"]) if row else None
+
+    def retry_ingestion(self, document_id: str, mode: str = "live") -> int:
+        with self.connection() as db:
+            db.execute("BEGIN IMMEDIATE")
+            row = db.execute("SELECT body FROM documents WHERE id=? AND mode=?", (document_id, mode)).fetchone()
+            if not row:
+                return 0
+            doc = Document.model_validate_json(row['body'])
+            if doc.status not in {'failed', 'needs_source_review'}:
+                return 0
+            count = db.execute("UPDATE jobs SET state='queued',next_run=0,error=NULL WHERE kind='ingestion' AND state IN ('failed','complete') AND json_extract(payload,'$.document_id')=? AND json_extract(payload,'$.mode')=?", (document_id, mode)).rowcount
+            if count:
+                doc.status, doc.stage, doc.error = 'queued', 'Queued for local reading retry', None
+                db.execute("UPDATE documents SET body=? WHERE id=?", (doc.model_dump_json(), document_id))
+            return count

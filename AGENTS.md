@@ -2,12 +2,12 @@
 
 ## Read this first
 
-This is AITHENA, the SMU legal-tech hackathon contract-obligation project. Work in this repository, preserve Builder B's frontend, and implement the solution one phase at a time. Phase 1 integration is implemented with remaining verification limits documented below. Finish the assigned checkpoint; begin Phase 2 only when the user advances the phase.
+This is AITHENA, the SMU legal-tech hackathon contract-obligation project. Work in this repository, preserve Builder B's frontend, and implement the solution one phase at a time. Phase 1 foundation and Phase 2 local ingestion/source viewing are implemented; verification limits are recorded below. Finish the assigned checkpoint; begin Phase 3 only when the user advances the phase.
 
 This file records both the inspected implementation and the agreed destination. A planned feature, a sample screen, or a draft in another workspace is not a completed feature. Recheck the source and update this file when changes land. User instructions take precedence over this guidance.
 
 **Snapshot date:** 5 September 2026, Asia/Singapore.
-**Inspected baseline:** `b3607a7` — `Add contract dashboard and shared integration formats`, plus the Phase 1 integration now present as working-tree changes. This guide does not imply those changes have been committed.
+**Inspected baseline:** `1f352ea` plus the Phase 2 working-tree implementation. Existing `.env.example` deletion and unrelated `.claude/` work are preserved; no commit or push is implied.
 **Repository:** `SMULitHack` (the saved Codex project may be named “SMU Hack”). An older folder also named “SMU Hack” contains a separate scaffold and planning material; do not confuse it with this Git repository or overwrite this frontend with that scaffold.
 
 ## Product scope
@@ -31,17 +31,17 @@ General legal chat, Singapore-law retrieval, authentication, drive integrations,
 
 ## What is actually in this repository
 
-The repository now contains the **Phase 1 live foundation**, preserving Builder B's design, plus an isolated synthetic prototype and disabled draft processing modules. It is not yet a working contract-analysis system.
+The repository now contains the **Phase 2 live ingestion and source viewer**, preserving Builder B's design, plus an isolated synthetic prototype and disabled draft processing modules. It is not yet a working contract-analysis system.
 
 | Area | Current implementation | Important limit |
 | --- | --- | --- |
 | Frontend | React 19, TypeScript, Vite 6, Tailwind CSS 4, Lucide icons; Zod for prototype data and Ajv for live response validation | Preserve the existing stack and blue/ink visual design. This checkout is not the older Vinext/Sites scaffold. |
-| Live screens | Overview/readiness, Contracts, Calendar, Conflicts, Needs review | Later-phase screens explain their disabled state; Add contracts is disabled. No real SME is assumed. |
-| Backend | FastAPI/Pydantic, root configuration, SQLite persistence, typed health/errors, read-only saved metadata | No processing worker runs. All product capability flags are false. |
+| Live screens | Overview/readiness, Contracts, Calendar, Conflicts, Needs review | Add contracts uploads files/folders; Contracts shows reading progress, source pages and highlights. Inference screens remain disabled. No real SME is assumed. |
+| Backend | FastAPI/Pydantic, root configuration, SQLite persistence, typed health/errors, read-only saved metadata | One local ingestion worker runs. Only `ingestion` is enabled; no model requests occur. |
 | API contract | Relative `/api`, Vite proxy, OpenAPI snapshot and generated TypeScript types | Legacy sample types are isolated and must not become the live contract. |
 | Samples | Four synthetic agreements; original dashboard retained in `PrototypeDashboard.tsx` | Not loaded by the live application. Fixed as-of date `2026-09-05`; sample confidence is illustrative, not calibrated. |
-| Evidence | Prototype text-page dialogs; canonical page/span and coordinate models in Python | Live source viewing and coordinate highlights are disabled. The prototype scan is simulated OCR text, not a scanned PDF test. |
-| Uploads | Prototype picker/drag-drop retained; live ingestion routes guarded | No actual ingestion is enabled. Folder selection and durable reading are Phase 2 work. |
+| Evidence | Prototype text-page dialogs; canonical page/span and coordinate models in Python | Live source pages and coordinate highlights are implemented. New generated fixtures include actual scanned PDFs; prototype OCR remains illustrative. |
+| Uploads | Prototype picker/drag-drop retained; live ingestion routes guarded | Live batch/folder ingestion, duplicate/rejection receipts, checkpoints and explicit retries are implemented. |
 | Dates and conflicts | Sample presentation preserved; Python processing modules carried forward as drafts | No deadline or semantic conflict engine is enabled or certified. |
 | Briefs | Prototype conflict JSON export retained | No live review/handoff export is enabled. |
 | Validation/tests | Backend foundation tests; prototype checks; canonical API/readiness tests; build/schema drift checks | Foundation validation does not prove extraction correctness or confidence calibration. |
@@ -51,7 +51,8 @@ The repository now contains the **Phase 1 live foundation**, preserving Builder 
 
 - `frontend/src/App.tsx`: live readiness shell, navigation and phase-specific empty states.
 - `frontend/src/api.ts`: canonical relative API client, timeouts and OpenAPI-derived runtime validation.
-- `frontend/src/api.test.tsx`: live API/readiness checks.
+- `frontend/src/api.test.tsx`, `ingestion.test.tsx`: API/readiness and ingestion checks.
+- `frontend/src/Ingestion.tsx`: batch upload/receipt, document library and physical-page source viewer.
 - `frontend/src/PrototypeDashboard.tsx`: isolated original dashboard for later visual/component reuse.
 - `frontend/src/data.ts`, `data.test.tsx`: prototype fixtures/validation tests; legacy network functions are disabled.
 - `frontend/src/styles.css`, `main.tsx`: shared appearance and live React entry point.
@@ -59,13 +60,15 @@ The repository now contains the **Phase 1 live foundation**, preserving Builder 
 - `frontend/package.json`, `frontend/pnpm-lock.yaml`, `frontend/pnpm-workspace.yaml`: dependencies, scripts, pinned pnpm and build-script policy.
 - `backend/api.py`, `config.py`, `foundation.py`: application lifespan, configuration, health, capabilities and route guards.
 - `backend/models.py`, `store.py`: canonical Pydantic records and persistent SQLite layout.
-- Other `backend/` processing modules: **drafts** for later phases; do not enable without review/tests.
+- `backend/ingestion.py`, `documents.py`, `worker.py`: active local upload/reading pipeline, with no inference imports.
+- `backend/analysis_worker.py`, `llm.py`, `evidence.py`, `deadlines.py`, `conflicts.py`: inactive drafts for later phases; do not start the old coupled worker.
 - `shared/openapi.json`, `shared/api.generated.ts`: canonical API snapshot and generated types.
 - `shared/health.fixture.json`, `shared/portfolio.fixture.json`: backend-derived non-legal API fixtures.
 - `shared/types.ts`, `shared/sample-portfolio.json`: **legacy prototype v1.0**, not the live API payload.
 - `sample-contracts/*.txt`: synthetic transcriptions, not mixed-format ingestion fixtures.
 - `scripts/dev.py`, `doctor.py`, `export_openapi.py`, `export_fixtures.py`: launch, diagnostics and contract generation.
-- `tests/test_foundation.py`: isolated backend foundation checks.
+- `tests/test_foundation.py`, `test_ingestion.py`: isolated foundation, local ingestion, 80-file load, restart, source, OCR/DOCX and boundary checks.
+- `scripts/make_ingestion_fixtures.py`: seven synthetic mixed-format ingestion files; no extraction answer key implied.
 - `README.md`, `docs/INTEGRATION.md`: current startup and integration guidance.
 - `IMPLEMENTATION_PLAN.md`, `PHASE_1_COMPLETION.md`, `docs/PHASE_2_HANDOFF.md`: phase boundaries, recorded verification and next-builder extension points.
 
@@ -82,12 +85,12 @@ The original dashboard's automatic sample selection, URL-based “Connected” b
 
 ## Phase status and checkpoints
 
-**Current phase: Phase 1 — foundation implemented; acceptance closeout has documented remaining checks.** Read `PHASE_1_COMPLETION.md` before claiming full completion. Phases 2–7 are not complete. The sample dashboard previews later UI only. Do not import temporary work or overwrite another active builder's changes without checking the repository.
+**Current phase: Phase 2 — ingestion and source viewing implemented.** Read `PHASE_2_COMPLETION.md` for verification and limits. Phases 3–7 are not complete. The sample dashboard previews later UI only. Do not import temporary work or overwrite another active builder's changes without checking the repository.
 
 | Phase | Scope and completion gate | Status at this snapshot |
 | --- | --- | --- |
 | 1 — Runnable foundation | Preserve the frontend shell; add FastAPI/SQLite, validated configuration, real health/capability reporting, stable generated interfaces, portable startup and smoke tests. Runs without a Gemini key. | Implemented; remaining checks listed below. |
-| 2 — Ingestion and pages | Up to 80 mixed-format files, originals/hashes, durable local queue, conversion/OCR, page coverage/errors, deduplication, restart recovery, source viewer. Local reading must work without a key. | Planned; live ingestion disabled, prototype picker retained. |
+| 2 — Ingestion and pages | Up to 80 mixed-format files, originals/hashes, durable local queue, conversion/OCR, page coverage/errors, deduplication, restart recovery, source viewer. Local reading must work without a key. | Implemented and tested, including real OCR/DOCX and 80-file ingestion; no model calls. |
 | 3 — Grounded extraction | Gemini structured extraction and support review, Python citation checks, all required fields, explained provenance/confidence, completeness and SME selection. | Planned; sample fields and disabled drafts only. |
 | 4 — Deadlines | Tested Python rules, notice windows, ambiguity stops, adjustable as-of date, 90-day/overdue events with cited calculations. | Planned; sample date display and disabled drafts only. |
 | 5 — Conflicts | Conservative Python candidate selection, LLM comparison of both agreements, evidence validation, cached/pending assessments and uncertainty. | Planned; sample conflict display and disabled drafts only. |
@@ -117,11 +120,11 @@ flowchart TB
     COMPARE <--> GEMINI
 ```
 
-During Phase 1 only the UI, API, configuration and persistence foundation operate. The processing nodes remain disabled. Later stages use the Google Gemini SDK with configurable `GEMINI_MODEL`; the agreed provisional default is `gemini-3.8-flash`. Model availability, key validity and free-tier capacity must be verified in the extraction phase; naming a default does not verify access. Never silently switch to paid inference.
+Phase 2 adds local upload, OCR/conversion and source viewing. Inference, deadline, conflict and handoff nodes remain disabled. Later stages use the Google Gemini SDK with configurable `GEMINI_MODEL`; the agreed provisional default is `gemini-3.8-flash`. Model availability, key validity and free-tier capacity must be verified in the extraction phase; naming a default does not verify access. Never silently switch to paid inference.
 
 Conversion/OCR run locally. When model analysis is enabled, extracted text is sent to Gemini. Keys stay in the backend. The browser communicates only with FastAPI; no credentials belong in `VITE_*` variables.
 
-### Phase 1 contract to preserve
+### Historical Phase 1 contract and continuing invariants
 
 - Backend Pydantic records are the source of truth: `Document`, `Finding`, `Evidence`, `Page`/`Span`, `Event`, `ReviewIssue`, `ConflictAssessment`, `Portfolio`.
 - Preserve IDs, hashes, original files, JSON meanings and existing SQLite records when introducing the backend. Do not reset data to solve interface mismatches.
@@ -137,16 +140,17 @@ Conversion/OCR run locally. When model analysis is enabled, extracted text is se
 - Show readiness, disabled ingestion with a Phase 2 explanation, unknown SME, and accurate empty states. Poll health every 10 seconds without overlapping requests, use bounded timeouts and cleanup, allow manual retry, and label retained results stale after failure.
 - Keep main text readable, controls keyboard-operable, status updates accessible, and layouts usable on mobile and at 200% zoom.
 
-### Current Phase 1 routes and later extension points
+### Current routes and later extension points
 
-| Route | Phase 1 behavior | Later implementation |
+| Route | Current behavior | Later implementation |
 | --- | --- | --- |
 | `GET /api/health` | Typed readiness/capabilities | Shared foundation |
 | `GET /api/portfolio` | Canonical live shape; empty on fresh storage; read stored results without recomputation | Portfolio aggregation |
 | `GET /api/jobs`, `GET /api/batches/{id}`, `GET /api/documents/{id}` | Read existing metadata only | Progress and inspection |
-| `POST /api/batches` | Disabled/501 | Batch multipart `files`, max 80; backend enforces limits |
-| `POST /api/retry` | Disabled/501 | Resume eligible local jobs |
-| `GET /api/documents/{id}/pages`, `GET /api/documents/{id}/pages/{number}/image`, `GET /api/documents/{id}/original` | Disabled/501 | Source inspection |
+| `POST /api/batches` | Enabled; typed 202 receipt, optional UUID `Idempotency-Key` | Batch multipart `files`, max 80; backend enforces limits |
+| `GET /api/batches?limit=1` | Latest persisted receipts (limit 1–20) | Receipt history |
+| `POST /api/retry?document_id=...` | Enabled for failed/source-review ingestion only | Resume eligible local jobs |
+| `GET /api/documents/{id}/pages`, `GET /api/documents/{id}/pages/{number}/image`, `GET /api/documents/{id}/original` | Enabled with path confinement | Source inspection |
 | `POST /api/settings/sme` | Disabled/501 | Established party selection |
 | `GET /api/review/{id}/brief` | Disabled/501 | Lawyer brief |
 | `POST /api/demo` | Disabled/501 | Isolated evaluated sample workspace |
@@ -223,12 +227,12 @@ The Python foundation and scripts now exist. From repository root:
 ```sh
 python3.12 -m venv .venv
 .venv/bin/python -m pip install -r requirements.txt
-# Copy .env.example to .env only on first setup; do not overwrite existing secrets.
+# Defaults work without .env. Create root .env only for overrides; preserve existing secrets.
 .venv/bin/python scripts/doctor.py
 .venv/bin/python scripts/dev.py
 ```
 
-The launcher starts API and UI together on loopback, validates ports, and stops both owned children on Ctrl+C. It does not stop unrelated servers. No Gemini key is required for Phase 1. `VITE_API_BASE_URL` is no longer used.
+The launcher starts API and UI together on loopback, validates ports, and stops both owned children on Ctrl+C. It does not stop unrelated servers. No Gemini key is required for Phase 1 or local ingestion. `VITE_API_BASE_URL` is no longer used.
 
 ```sh
 .venv/bin/python -m pytest -q
@@ -251,7 +255,9 @@ Preserve unrelated edits and coordinate shared-file changes. Do not copy `.env`,
 
 Still unverified: exact default `3000 → 8000` proxy path (3000 was occupied), full 200% browser zoom, Linux and Node 22 runs. Live Gemini access/quota, actual OCR/DOCX conversion, ingestion load, extraction/deadline/conflict accuracy, source highlights and lawyer export are outside Phase 1 verification.
 
-Before Phase 2, read `docs/PHASE_2_HANDOFF.md`. **The draft worker couples reading to extraction; do not merely start it or toggle capabilities.** Refactor local ingestion so it completes with keys unset and without constructing Gemini. Replace disabled route stubs with typed batch/job/source responses, regenerate the contract, verify path confinement/restart/duplicate/failure behavior, and wire UI controls to current health and server limits. Keep all other capabilities false until their own phases pass.
+Phase 2 verification: **37 backend tests and 25 frontend tests passed**, including real clean/degraded scans, mixed/blank pages, DOCX, images, duplicate/idempotent/concurrent uploads, errors/retries, process-lock/restart behavior, path confinement and an 80-file ingestion run. Source coordinates and rotated page geometry are checked. Browser verification exercised native PDF/scan/DOCX upload and visible source highlights. See `PHASE_2_COMPLETION.md` for final checks and limits; Phase 1's old out-of-scope list above is historical.
+
+Before Phase 3, read `docs/PHASE_3_HANDOFF.md`. The active `worker.py` handles ingestion only; `analysis_worker.py` retains the old coupled draft for review, not execution. Add extraction as a separate stage without making local reading depend on a key. Only ingestion jobs may be recovered/claimed now; old document/conflict jobs remain idle. Update generated schemas/types and preserve every page's source/warnings. Current UI polling is three seconds during local processing. Keep every inference capability false until that phase passes.
 
 ## Skills and local tooling
 

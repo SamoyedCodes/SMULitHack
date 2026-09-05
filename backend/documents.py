@@ -3,6 +3,8 @@ import json
 import re
 import subprocess
 import tempfile
+import os
+import zipfile
 from pathlib import Path
 
 import pymupdf
@@ -26,28 +28,43 @@ def normalize_pdf(original: Path, target: Path) -> str:
                 raise ValueError("Password-protected PDF. Provide an unlocked copy.")
             if len(pdf) > MAX_PAGES:
                 raise ValueError(f"Document exceeds the {MAX_PAGES}-page local processing limit; no pages were analyzed.")
-        if not target.exists():
-            target.write_bytes(original.read_bytes())
+        target.write_bytes(original.read_bytes())
         return "original"
     if suffix in {".png", ".jpg", ".jpeg"}:
         with Image.open(original) as image:
+            if getattr(image, "n_frames", 1) != 1:
+                raise ValueError("Animated or multi-frame images are unsupported. Supply every page as a PDF or separate images.")
             image = ImageOps.exif_transpose(image).convert("RGB")
             if image.width * image.height > 40_000_000:
                 raise ValueError("Image exceeds the 40 megapixel processing limit.")
             image.save(target, "PDF", resolution=150)
         return "image"
     if suffix == ".docx":
+        try:
+            with zipfile.ZipFile(original) as archive:
+                if 'word/document.xml' not in archive.namelist() or sum(info.file_size for info in archive.infolist()) > 100 * 1024 * 1024:
+                    raise ValueError("DOCX is invalid or exceeds the 100 MiB expanded-content limit.")
+        except zipfile.BadZipFile:
+            raise ValueError("DOCX is not a readable document archive.") from None
         executable = libreoffice_path()
         if not executable:
             raise ValueError("LibreOffice is missing. Install it, then retry this DOCX.")
         with tempfile.TemporaryDirectory(prefix="aithena-office-") as directory:
             profile = (Path(directory) / "profile").as_uri()
-            subprocess.run([executable, "-env:UserInstallation=" + profile, "--headless",
-                            "--convert-to", "pdf", "--outdir", directory, str(original)],
-                           check=True, capture_output=True, timeout=90)
+            try:
+                subprocess.run([executable, "-env:UserInstallation=" + profile, "--headless",
+                                "--convert-to", "pdf", "--outdir", directory, str(original)],
+                               check=True, capture_output=True, timeout=90)
+            except subprocess.TimeoutExpired:
+                raise ValueError("LibreOffice conversion timed out after 90 seconds. Inspect the DOCX and retry.") from None
+            except subprocess.CalledProcessError:
+                raise ValueError("LibreOffice could not convert this DOCX. Check the document and local conversion permissions, then retry.") from None
             converted = Path(directory) / (original.stem + ".pdf")
             if not converted.exists():
                 raise ValueError("DOCX conversion produced no PDF.")
+            with pymupdf.open(converted) as pdf:
+                if not 1 <= len(pdf) <= MAX_PAGES:
+                    raise ValueError(f"Converted DOCX must contain 1–{MAX_PAGES} pages; no pages were silently omitted.")
             target.write_bytes(converted.read_bytes())
         return "rendered"
     raise ValueError("Unsupported format. Use PDF, DOCX, PNG, or JPEG.")
@@ -94,38 +111,48 @@ def ocr_spans(page, document_id: str, page_number: int, index: int, clip=None) -
     return spans
 
 
-def parse_pdf(path: Path, document_id: str, progress=None) -> list[Page]:
+def parse_pdf(path: Path, document_id: str, progress=None, existing: list[Page] | None = None) -> list[Page]:
     pages = []
+    cached = {p.number: p for p in (existing or [])}
     with pymupdf.open(path) as pdf:
         if pdf.needs_pass:
             raise ValueError("Password-protected PDF.")
         if not len(pdf) or len(pdf) > MAX_PAGES:
             raise ValueError(f"PDF must contain 1–{MAX_PAGES} pages. No pages were silently omitted.")
         for i, page in enumerate(pdf):
+            previous = cached.get(i + 1)
+            if previous and previous.status == 'read' and previous.spans and not previous.warnings and previous.width == page.rect.width and previous.height == page.rect.height:
+                pages.append(previous)
+                if progress:
+                    progress(pages, len(pdf))
+                continue
             result = Page(number=i + 1, width=page.rect.width, height=page.rect.height)
             try:
                 blocks = [b for b in page.get_text("blocks", sort=True) if b[6] == 0 and b[4].strip()]
                 # Sparse text (including an invisible defective OCR layer) must not suppress OCR.
                 native_size = sum(len(b[4].strip()) for b in blocks)
+                result.spans = [
+                    Span(id=f"{document_id}:p{i+1}:s{n}", document_id=document_id,
+                         page=i + 1, text=b[4].strip(), bbox=list(pymupdf.Rect(b[:4]) * page.rotation_matrix), source="native",
+                         clause=clause_label(b[4]))
+                    for n, b in enumerate(blocks)
+                ]
                 if native_size < 40:
-                    result.spans = ocr_spans(page, document_id, i + 1, 0)
+                    # Keep any known native text if OCR is unavailable or finds nothing.
+                    scanned = ocr_spans(page, document_id, i + 1, len(result.spans))
+                    if scanned:
+                        result.spans = scanned
                 else:
-                    result.spans = [
-                        Span(id=f"{document_id}:p{i+1}:s{n}", document_id=document_id,
-                             page=i + 1, text=b[4].strip(), bbox=list(b[:4]), source="native",
-                             clause=clause_label(b[4]))
-                        for n, b in enumerate(blocks)
-                    ]
                     seen = set()
                     for info in page.get_image_info():
-                        box = tuple(round(x, 1) for x in info["bbox"])
+                        box = tuple(round(x, 1) for x in (pymupdf.Rect(info["bbox"]) * page.rotation_matrix))
                         if box in seen or pymupdf.Rect(box).get_area() < 1500:
                             continue
                         seen.add(box)
                         try:
                             result.spans.extend(ocr_spans(page, document_id, i+1, len(result.spans), clip=box))
                         except (ValueError, RuntimeError) as error:
-                            result.warnings.append(str(error))
+                            result.warnings.append(str(error) if isinstance(error, ValueError) else "Local OCR failed or timed out; this page has not been fully read.")
                             result.status = "error"
                 if not result.spans:
                     result.status = "unreadable"
@@ -134,7 +161,7 @@ def parse_pdf(path: Path, document_id: str, progress=None) -> list[Page]:
                     result.warnings.append("Some scanned words have low OCR confidence; source review is needed.")
             except Exception as error:
                 result.status = "error"
-                result.warnings.append(str(error))
+                result.warnings.append(str(error) if isinstance(error, ValueError) else "Local OCR failed or timed out; this page has not been fully read.")
             pages.append(result)
             if progress:
                 progress(pages, len(pdf))
@@ -142,7 +169,10 @@ def parse_pdf(path: Path, document_id: str, progress=None) -> list[Page]:
 
 
 def save_pages(path: Path, pages: list[Page]):
-    path.write_text(json.dumps([p.model_dump() for p in pages]), encoding="utf-8")
+    # Checkpoints must be complete JSON even if the process stops during a write.
+    temporary = path.with_suffix('.json.tmp')
+    temporary.write_text(json.dumps([p.model_dump() for p in pages]), encoding="utf-8")
+    os.replace(temporary, path)
 
 
 def load_pages(path: Path) -> list[Page]:

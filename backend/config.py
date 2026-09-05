@@ -7,7 +7,7 @@ from pathlib import Path
 from dotenv import dotenv_values
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSION = "2026-09-05.1"
+VERSION = "2026-09-05.2"
 
 
 def setting(name: str, default: str = "") -> str:
@@ -69,9 +69,15 @@ class Config:
     def llm_interval(self) -> float:
         return self._interval
 
-    def directory(self, document_id: str) -> Path:
+    def directory(self, document_id: str, create: bool = True) -> Path:
         if not document_id.replace("-", "").isalnum():
             raise ValueError("Invalid document identifier")
-        path = self.data_dir / "documents" / document_id
-        path.mkdir(parents=True, exist_ok=True)
+        root = (self.data_dir / "documents").resolve()
+        if not root.is_relative_to(self.data_dir):
+            raise ValueError("Invalid document storage path")
+        path = (root / document_id).resolve()
+        if not path.is_relative_to(root):
+            raise ValueError("Invalid document storage path")
+        if create:
+            path.mkdir(parents=True, exist_ok=True)
         return path

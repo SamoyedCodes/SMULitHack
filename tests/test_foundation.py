@@ -35,7 +35,7 @@ def test_import_schema_has_no_startup_side_effect(tmp_path):
 def test_health_no_key_tools_optional_and_empty_portfolio(tmp_path):
     cfg = Config(tmp_path / 'data')
     assert not cfg.data_dir.exists()
-    app = create_app(cfg, start_worker=True)
+    app = create_app(cfg, start_worker=False)
     assert not cfg.data_dir.exists()
     with TestClient(app) as client:
         response = client.get('/api/health')
@@ -43,7 +43,8 @@ def test_health_no_key_tools_optional_and_empty_portfolio(tmp_path):
         assert response.status_code == 200
         assert health.status == 'ready' and health.database.status == 'ready'
         assert not health.ocr_available and not health.docx_available and not health.key_configured
-        assert not any(health.capabilities.model_dump().values())
+        assert health.capabilities.ingestion
+        assert not any(v for k, v in health.capabilities.model_dump().items() if k != "ingestion")
         assert not health.worker.enabled and app.state.worker is None
         portfolio = client.get('/api/portfolio?as_of=2026-09-05').json()
         assert portfolio['as_of'] == '2026-09-05' and portfolio['horizon_end'] == '2026-12-04'
@@ -99,7 +100,7 @@ def test_existing_documents_settings_jobs_preserved_across_restart(tmp_path):
     store.job_state(jobs[1]['id'], 'running')
     before = store.jobs('live')
     for _ in range(2):
-        with TestClient(create_app(Config(tmp_path), start_worker=True)) as client:
+        with TestClient(create_app(Config(tmp_path), start_worker=False)) as client:
             assert client.get('/api/health').status_code == 200
             portfolio = client.get('/api/portfolio').json()
             assert portfolio['documents'][0]['id'] == 'saved' and portfolio['sme'] == 'Saved SME'
@@ -108,8 +109,10 @@ def test_existing_documents_settings_jobs_preserved_across_restart(tmp_path):
 
 
 @pytest.mark.parametrize('method,path', [('POST','/api/batches'),('POST','/api/batches/'),('POST','/api/retry'),('POST','/api/demo'),('POST','/api/settings/sme'),('GET','/api/documents/missing/pages'),('GET','/api/documents/missing/pages/1/image'),('GET','/api/documents/missing/original'),('GET','/api/review/missing/brief')])
-def test_disabled_routes_do_not_mutate(tmp_path, method, path):
-    with TestClient(create_app(Config(tmp_path))) as client:
+def test_disabled_routes_do_not_mutate(tmp_path, method, path, monkeypatch):
+    from backend.foundation import CAPABILITIES
+    monkeypatch.setattr(CAPABILITIES, "ingestion", False)
+    with TestClient(create_app(Config(tmp_path), start_worker=False)) as client:
         response = client.request(method, path, content=b'not-even-a-valid-upload')
         assert response.status_code == 501 and response.json()['error']['code'] == 'feature_not_enabled'
         assert client.get('/api/jobs').json() == []
@@ -118,7 +121,7 @@ def test_disabled_routes_do_not_mutate(tmp_path, method, path):
 
 
 def test_missing_validation_origin_and_runtime_database_failure(tmp_path, monkeypatch):
-    app = create_app(Config(tmp_path))
+    app = create_app(Config(tmp_path), start_worker=False)
     with TestClient(app, raise_server_exceptions=False) as client:
         for route in ('/api/documents/missing','/api/batches/missing','/api/unknown'):
             response = client.get(route)

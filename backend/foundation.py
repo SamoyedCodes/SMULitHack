@@ -13,7 +13,7 @@ class Capabilities(Record):
 
 
 # Enable a capability only when its route implementation and phase acceptance tests land.
-CAPABILITIES = Capabilities()
+CAPABILITIES = Capabilities(ingestion=True)
 
 
 class DatabaseStatus(Record):

@@ -1,6 +1,6 @@
 # AITHENA — local contract workspace
 
-Phase 1 connects Builder 2's React interface to a local FastAPI/SQLite foundation. It shows real service readiness, optional tool detection, an honest empty workspace, and disabled later-phase capabilities. No Gemini key is needed; Phase 1 makes no provider requests.
+Phase 2 adds batch ingestion and real source viewing to Builder 2's React interface and the local FastAPI/SQLite foundation. Upload PDFs, DOCX, PNGs or JPEGs (including scans), inspect every physical page, and select text blocks to highlight their source locations. No Gemini key is needed and no provider requests are made.
 
 The navy/blue dashboard styling and navigation are retained. The earlier synthetic dashboard is preserved in `frontend/src/PrototypeDashboard.tsx` for component reuse and fixture tests; it is not loaded by the application. Its legacy sample schema is **not** the backend integration contract. Live types are generated from Python into `shared/api.generated.ts`.
 
@@ -14,7 +14,7 @@ python3.12 -m venv .venv
 pnpm --dir frontend install --frozen-lockfile
 ```
 
-For first setup only, copy `.env.example` to `.env`. **Do not overwrite an existing `.env`.** Defaults also work without that file.
+Defaults work without an environment file. To override them, create a repository-root `.env` using the settings below. Do not overwrite an existing `.env` or store keys in frontend configuration.
 
 ```sh
 .venv/bin/python scripts/doctor.py
@@ -23,7 +23,7 @@ For first setup only, copy `.env.example` to `.env`. **Do not overwrite an exist
 
 Open `http://127.0.0.1:3000`. The API is at `http://127.0.0.1:8000`; API documentation is at `/docs`. Ctrl+C stops both child processes. The launcher checks ports and never stops unrelated processes or silently chooses a new port.
 
-Tesseract and LibreOffice are optional for Phase 1. macOS users can install them with `brew install tesseract` and `brew install --cask libreoffice`. On Debian/Ubuntu, install `tesseract-ocr` and `libreoffice` using the system package manager. Detection means an executable was found, not that OCR/conversion has been tested.
+Tesseract is required for scanned content; LibreOffice is required for DOCX. Missing tools do not prevent app startup: affected documents/pages show visible failures and can be retried after installation. macOS users can install them with `brew install tesseract` and `brew install --cask libreoffice`. On Debian/Ubuntu, install `tesseract-ocr` and `libreoffice` using the system package manager. The readiness panel reports executable detection. Per-document results report whether reading or conversion actually succeeded.
 
 ## Configuration
 
@@ -78,11 +78,29 @@ Neither schema export nor app import initializes storage or starts a worker. Tes
 
 - **Ready** means the local API can query SQLite. It is not evidence of completed extraction.
 - **Configured, not verified** means only that a backend API key exists. Model availability/quota are not tested.
-- **Disconnected / stale** means the current check failed; previous results cannot be treated as current. Checks repeat every ten seconds; Check connection retries immediately when no check is active.
+- **Disconnected / stale** means the current check failed; previous results cannot be treated as current. Checks repeat every three seconds; Check connection retries immediately when no check is active.
 - A fresh workspace has no analyzed contracts. No SME is assumed, and no zero-obligation or all-clear conclusion is shown.
-- Uploads, source viewing, extraction, deadlines, conflict detection, lawyer briefs and sample loading are disabled. Their API routes return structured 501 errors without processing input.
-- Existing saved metadata, settings and queued/running jobs are preserved. Phase 1 does not claim, recover, retry or execute jobs.
+- Ingestion and source viewing are enabled. Extraction, deadlines, conflict detection, lawyer briefs and sample loading remain disabled and return structured 501 errors.
+- Existing saved metadata/settings are preserved. Only ingestion jobs are recovered/claimed/retried. Legacy analysis and conflict jobs remain idle.
 
-Draft later-phase Python modules are included from the original scaffold for the next builders; they are not imported by the Phase 1 API or validated as completed features. Enabling capability flags alone does not implement routes.
+Draft later-phase modules remain disconnected, including the original coupled worker preserved in `backend/analysis_worker.py`. The active worker performs local reading only. Enabling capability flags alone does not implement a later phase.
 
-See [integration contract](docs/INTEGRATION.md), [phased implementation plan](IMPLEMENTATION_PLAN.md), [verification record](PHASE_1_COMPLETION.md) and [Phase 2 handoff](docs/PHASE_2_HANDOFF.md).
+See [integration contract](docs/INTEGRATION.md), [phased implementation plan](IMPLEMENTATION_PLAN.md), [Phase 2 verification](PHASE_2_COMPLETION.md) and [Phase 3 handoff](docs/PHASE_3_HANDOFF.md).
+
+## Ingest and inspect
+
+1. Start the app, open Add contracts, and choose files or a folder. The browser reports unsupported, empty and oversized selections before sending; the backend rejects those entries individually while accepting valid siblings.
+2. Submit one batch (1–80 files, 25 MiB per file). Its persisted receipt lists accepted documents, duplicates and rejections. A retry of an uncertain upload uses the same idempotency key. A duplicate reuses its saved document and does not silently restart a failed read.
+3. Open Contracts. Progress refreshes every three seconds. `text_ready` means local text is available; `needs_source_review` means pages are unreadable or have warnings; `failed` means preparation/reading failed. Neither state establishes legal obligations.
+4. Open View source, choose a physical page, and select a text block to highlight it. OCR reading confidence is separate from future legal confidence. DOCX pages use rendered pagination. Download original returns the preserved bytes.
+5. If a converter/OCR tool was missing, install it and use Retry reading on the affected document. Good page checkpoints are reused; error/uncertain pages are read again. Blank pages are visibly unresolved, not silently omitted.
+
+To generate seven synthetic test files (native PDF, real scanned PDF, degraded scan, mixed/blank pages, PNG, JPEG and DOCX):
+
+```sh
+.venv/bin/python scripts/make_ingestion_fixtures.py --output /tmp/aithena-synthetic
+```
+
+These fixtures are for ingestion verification only. They are not reviewed extraction ground truth. The native integration tests require installed Tesseract/LibreOffice and otherwise report explicit skips; all other tests still run. The 80-file ingestion test is separate from any future extraction evaluation.
+
+Maximum document size is 200 pages; oversized/password-protected/damaged PDFs fail visibly. DOCX conversion has a 90-second timeout and a 100 MiB expanded archive limit; images have a 40-megapixel limit. Multi-frame images are rejected rather than reading only the first frame. New ingestion jobs use a cache version independent of Gemini model/key configuration. A process lock ensures one worker per data directory.

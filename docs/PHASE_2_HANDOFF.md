@@ -1,13 +1,14 @@
-# Next builder: Phase 2 only
+# Phase 2 implemented: ingestion and sources
 
-Start with the README setup and checks. Use `frontend/src/App.tsx` and `api.ts` as the live entry points. Preserve the UI's navy sidebar, readiness panel, honest status and generated API contract.
+Phase 2 was continued in this repository. See `PHASE_2_COMPLETION.md` for results and limits. The next checkpoint is described in `PHASE_3_HANDOFF.md`.
 
-1. Implement `POST /api/batches` with `files` multipart entries (1–80; 25 MiB each), deterministic duplicate handling, per-file visible rejection, originals/hashes and a persisted batch record. Replace its disabled stub and add typed batch/job responses before regenerating OpenAPI/types. Folder selection and ordinary multiple selection should use this same endpoint.
-2. Review the draft `backend/documents.py`, `worker.py`, `store.py` first. **The draft worker currently couples reading to extraction. Refactor it before enabling it:** ingestion must finish PDF extraction/OCR/DOCX conversion without constructing Gemini or requiring an API key. Do not simply start the current worker or toggle flags.
-3. Add source endpoints: all pages including unreadable/error pages, original download and rendered page image. Verify paths stay inside the document directory; never create a document directory on a missing-resource read. Preserve physical one-based pages and page-coordinate boxes. Label DOCX pagination as rendered.
-4. Initialize/start one durable worker in lifespan only when its implementation is ready. Preserve/resume interrupted work with explicit stage and failure states; do not reset existing records. Confirm retry semantics and cache versioning.
-5. Enable `CAPABILITIES.ingestion` only alongside working routes and tests. Keep extraction/deadlines/conflicts/handoff/sample loading false. Wire upload controls only when health is current and ingestion is enabled. Read `health.limits` instead of inheriting the prototype's obsolete 20 MB setting.
-6. Build the contract list/viewer against canonical `Document` and `Page` records. Reuse prototype visual pieces where useful, but do not use its `contracts/actions` payload, simulated page text, hard-coded SME or direct-HTTP stubs. Multiple findings, separate notice fields and all provenance/confidence distinctions must remain possible in Phase 3.
-7. Test a native PDF, actual scan, degraded/mixed PDF, DOCX, image, duplicate, malformed/unsupported/oversized file, 80-file batch and interrupted job. All local ingestion tests must pass with keys unset. Do not claim extraction evaluation based on these tests.
+Current implementation:
 
-Draft inference, deadline and conflict modules are carried over for later phases, not approved implementations. In particular, model access/free-tier quota and semantic extraction/conflict accuracy are unverified. Keep them disconnected until their own phases.
+- Multiple files, folder selection and file drag/drop share `POST /api/batches` (`files`, max 80, 25 MiB per file).
+- Originals/hashes are preserved, byte-identical documents are reused, and each batch has a durable receipt with per-file rejection/duplicate details. A UUID `Idempotency-Key` recovers the same receipt after a lost response. Latest receipts survive browser session loss via `GET /api/batches`.
+- One local worker claims only ingestion jobs; it never imports an LLM adapter. Tesseract handles scans, LibreOffice handles DOCX, and PyMuPDF produces page text/images. A process lock prevents two ingestion workers using the same data directory.
+- Atomic page checkpoints resume interrupted reading. Retry source issues explicitly with `POST /api/retry?document_id=...`. Existing analysis/comparison jobs are not recovered or claimed.
+- The source viewer renders actual physical pages, selectable text blocks and coordinate highlights. Source warnings and OCR reading confidence remain visible; DOCX pagination is labelled rendered.
+- Only `CAPABILITIES.ingestion` is enabled. Source readiness does not mean legal extraction has occurred. `pages_analyzed` remains zero for new ingestion documents.
+
+The original coupled worker is retained as `backend/analysis_worker.py` for review in Phase 3; it is not imported or started. Do not start that draft or use the legacy sample dashboard as a live data adapter.
