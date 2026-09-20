@@ -19,3 +19,4 @@ data/
 .bin/
 
 sample-contracts/CUAD_v1/
+.claude/worktrees/phase-3-extraction/
